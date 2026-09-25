@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workspace Pessoal | Organização de Trabalho</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --panel-soft: #f9fbfd;
+      --border: #e3e8ef;
+      --text: #152033;
+      --muted: #6c788a;
+      --primary: #365cf5;
+      --primary-soft: #eef2ff;
+      --success: #1f9d62;
+      --warning: #d98a00;
+      --danger: #dc3d43;
+      --purple: #7b4ed7;
+      --shadow: 0 10px 30px rgba(23, 38, 61, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 270px 1fr;
+    }
+
+    .sidebar {
+      background: #111827;
+      color: white;
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .brand {
+      padding: 4px 8px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+
+    .brand strong { display:block; font-size: 17px; }
+    .brand span { color:#aab4c3; font-size:12px; }
+
+    .nav-group-title {
+      color:#7f8da1;
+      font-size:10px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-weight:700;
+      margin: 8px 10px 4px;
+    }
+
+    .nav {
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    .nav button {
+      width:100%;
+      border:none;
+      background:transparent;
+      color:#dbe2ea;
+      border-radius:10px;
+      padding:11px 12px;
+      text-align:left;
+      transition:.15s ease;
+    }
+
+    .nav button:hover, .nav button.active {
+      background:#263244;
+      color:#fff;
+    }
+
+    .sidebar-footer {
+      margin-top:auto;
+      display:grid;
+      gap:8px;
+    }
+
+    .sidebar-footer button, .file-label {
+      border:1px solid rgba(255,255,255,.14);
+      background:#1f2937;
+      color:#e8edf3;
+      padding:10px 12px;
+      border-radius:10px;
+      text-align:center;
+      font-size:12px;
+      cursor:pointer;
+    }
+
+    main { min-width:0; }
+
+    .topbar {
+      height:78px;
+      background:rgba(255,255,255,.94);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:0 28px;
+      position:sticky;
+      top:0;
+      z-index:30;
+    }
+
+    .topbar h1 {
+      margin:0;
+      font-size:23px;
+    }
+
+    .topbar p {
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .actions {
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+
+    .search {
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:10px;
+      padding:9px 12px;
+      width:260px;
+      outline:none;
+    }
+
+    .btn {
+      border:none;
+      border-radius:10px;
+      padding:10px 14px;
+      font-weight:700;
+      font-size:13px;
+    }
+
+    .btn-primary { background:var(--primary); color:#fff; }
+    .btn-soft { background:#edf1f6; color:#314058; }
+    .btn-danger { background:#feecee; color:#a52831; }
+    .btn-success { background:#e9f8f1; color:#15764a; }
+
+    .content {
+      padding:26px;
+    }
+
+    .view { display:none; }
+    .view.active { display:block; }
+
+    .grid-4 {
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .grid-3 {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .grid-2 {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:16px;
+    }
+
+    .card {
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:0 2px 6px rgba(0,0,0,.02);
+    }
+
+    .metric {
+      padding:18px;
+    }
+
+    .metric span {
+      color:var(--muted);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+
+    .metric strong {
+      display:block;
+      font-size:30px;
+      margin-top:7px;
+    }
+
+    .metric small { color:var(--muted); }
+
+    .section {
+      margin-top:18px;
+      padding:18px;
+    }
+
+    .section-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .section-head h2, .section-head h3 {
+      margin:0;
+      font-size:16px;
+    }
+
+    .section-head p {
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .task-list, .note-list {
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .task-row {
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:12px;
+      padding:14px;
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:12px;
+      align-items:center;
+    }
+
+    .task-row:hover { border-color:#cdd5df; }
+
+    .task-title {
+      font-weight:800;
+      font-size:14px;
+      margin-bottom:5px;
+    }
+
+    .meta {
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px 10px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .badges {
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      margin-bottom:6px;
+    }
+
+    .badge {
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:10px;
+      font-weight:800;
+    }
+
+    .p-Urgente { background:#fee8ea; color:#b5212d; }
+    .p-Alta { background:#fff0df; color:#a35900; }
+    .p-Média { background:#fff8d8; color:#8c7000; }
+    .p-Baixa { background:#edf1f5; color:#59677b; }
+
+    .s-Pendente { background:#fff6db; color:#9a7000; }
+    .s-Em-Andamento { background:#e8f2ff; color:#1267b8; }
+    .s-Aguardando { background:#f1eaff; color:#6840ae; }
+    .s-Concluída { background:#e6f7ee; color:#16764a; }
+
+    .empty {
+      text-align:center;
+      color:var(--muted);
+      padding:28px 14px;
+      border:1px dashed #cfd7e2;
+      border-radius:12px;
+      background:#fbfcfe;
+      font-size:13px;
+    }
+
+    .today-columns {
+      display:grid;
+      grid-template-columns:1.3fr 1fr;
+      gap:16px;
+      margin-top:18px;
+    }
+
+    .highlight {
+      border-left:4px solid var(--danger);
+    }
+
+    .kanban {
+      display:grid;
+      grid-template-columns:repeat(4,minmax(260px,1fr));
+      gap:14px;
+      overflow-x:auto;
+      padding-bottom:8px;
+    }
+
+    .kanban-col {
+      background:#eef2f7;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+      min-height:520px;
+    }
+
+    .kanban-title {
+      display:flex;
+      justify-content:space-between;
+      font-weight:800;
+      font-size:13px;
+      margin-bottom:12px;
+    }
+
+    .kanban-cards {
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-height:420px;
+    }
+
+    .kanban-card {
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:12px;
+      box-shadow:0 2px 5px rgba(0,0,0,.03);
+    }
+
+    .kanban-card:hover { border-color:#bcc7d4; }
+
+    .filters {
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .filters input, .filters select {
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:10px;
+      background:#fff;
+      outline:none;
+    }
+
+    .table-wrap {
+      overflow:auto;
+      border-radius:14px;
+    }
+
+    table {
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+      min-width:980px;
+    }
+
+    th, td {
+      padding:12px 14px;
+      border-bottom:1px solid var(--border);
+      text-align:left;
+      font-size:12px;
+      vertical-align:top;
+    }
+
+    th {
+      background:#f8fafc;
+      color:#647186;
+      font-weight:800;
+      position:sticky;
+      top:0;
+    }
+
+    .note-grid {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .note-card {
+      padding:16px;
+      min-height:180px;
+      position:relative;
+    }
+
+    .note-card h3 { margin:0 0 8px; font-size:15px; }
+    .note-card p { color:#4c586a; white-space:pre-wrap; font-size:13px; line-height:1.5; }
+    .note-card footer {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      color:var(--muted);
+      font-size:11px;
+      margin-top:14px;
+    }
+
+    .chart-box {
+      height:320px;
+      padding:18px;
+    }
+
+    .modal-backdrop {
+      position:fixed;
+      inset:0;
+      background:rgba(13,22,36,.48);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:100;
+      padding:20px;
+    }
+
+    .modal-backdrop.open { display:flex; }
+
+    .modal {
+      width:min(760px, 96vw);
+      max-height:92vh;
+      overflow:auto;
+      background:#fff;
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      padding:22px;
+    }
+
+    .modal-head {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .modal-head h2 { margin:0; font-size:19px; }
+
+    .x {
+      border:none;
+      background:#eef1f5;
+      width:34px;
+      height:34px;
+      border-radius:9px;
+    }
+
+    .form-grid-2 {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .field { margin-bottom:12px; }
+    .field label {
+      display:block;
+      color:#4b586b;
+      font-size:11px;
+      font-weight:800;
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .field input, .field select, .field textarea {
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:10px 11px;
+      outline:none;
+      background:#fff;
+    }
+
+    .field textarea { resize:vertical; min-height:86px; }
+
+    .modal-actions {
+      display:flex;
+      gap:8px;
+      justify-content:flex-end;
+      border-top:1px solid var(--border);
+      padding-top:14px;
+      margin-top:8px;
+    }
+
+    .checklist-editor {
+      display:flex;
+      gap:8px;
+      margin-bottom:8px;
+    }
+
+    .checklist-items {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .check-item {
+      display:flex;
+      gap:8px;
+      align-items:center;
+      border:1px solid var(--border);
+      border-radius:9px;
+      padding:8px;
+      background:#fbfcfe;
+    }
+
+    .check-item span { flex:1; font-size:12px; }
+    .check-item button {
+      border:none;
+      background:transparent;
+      color:#a6333a;
+    }
+
+    @media (max-width: 1100px) {
+      .app { grid-template-columns: 220px 1fr; }
+      .grid-4 { grid-template-columns:repeat(2,1fr); }
+      .grid-3, .note-grid { grid-template-columns:repeat(2,1fr); }
+      .today-columns, .grid-2 { grid-template-columns:1fr; }
+      .filters { grid-template-columns:repeat(2,1fr); }
+    }
+
+    @media (max-width: 760px) {
+      .app { display:block; }
+      .sidebar { position:relative; height:auto; }
+      .topbar { position:relative; height:auto; padding:16px; align-items:flex-start; gap:12px; flex-direction:column; }
+      .actions { width:100%; flex-wrap:wrap; }
+      .search { width:100%; }
+      .content { padding:16px; }
+      .grid-4, .grid-3, .note-grid, .filters, .form-grid-2 { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <strong>💼 Workspace Pessoal</strong>
+      <span>Organização da rotina de trabalho</span>
+    </div>
+
+    <div class="nav">
+      <div class="nav-group-title">Dia a dia</div>
+      <button class="nav-btn active" data-view="today">🏠 Meu Dia</button>
+      <button class="nav-btn" data-view="tasks">✅ Tarefas</button>
+      <button class="nav-btn" data-view="kanban">📋 Kanban</button>
+
+      <div class="nav-group-title">Organização</div>
+      <button class="nav-btn" data-view="notes">📝 Anotações</button>
+
+      <div class="nav-group-title">Análise</div>
+      <button class="nav-btn" data-view="dashboard">📊 Dashboard</button>
+    </div>
+
+    <div class="sidebar-footer">
+      <button onclick="exportCSV()">📤 Exportar CSV</button>
+      <label class="file-label">📥 Importar CSV
+        <input id="importCSV" type="file" accept=".csv" style="display:none">
+      </label>
+      <button onclick="exportJSON()">💾 Backup JSON</button>
+      <label class="file-label">♻️ Restaurar JSON
+        <input id="importJSON" type="file" accept=".json" style="display:none">
+      </label>
+    </div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">Meu Dia</h1>
+        <p id="pageSubtitle">Veja o que precisa da sua atenção agora.</p>
+      </div>
+      <div class="actions">
+        <input id="globalSearch" class="search" placeholder="Buscar tarefa, projeto, área..." />
+        <button class="btn btn-soft" onclick="openNoteModal()">+ Anotação</button>
+        <button class="btn btn-primary" onclick="openTaskModal()">+ Nova tarefa</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <section id="view-today" class="view active">
+        <div class="grid-4">
+          <div class="card metric"><span>Para hoje</span><strong id="mToday">0</strong><small>Tarefas com vencimento hoje</small></div>
+          <div class="card metric"><span>Atrasadas</span><strong id="mOverdue">0</strong><small>Precisam de atenção</small></div>
+          <div class="card metric"><span>Urgentes</span><strong id="mUrgent">0</strong><small>Não concluídas</small></div>
+          <div class="card metric"><span>Aguardando</span><strong id="mWaiting">0</strong><small>Dependem de terceiros</small></div>
+        </div>
+
+        <div class="today-columns">
+          <div class="card section">
+            <div class="section-head">
+              <div><h2>🔥 Prioridade de hoje</h2><p>Atrasadas, urgentes e vencendo hoje.</p></div>
+            </div>
+            <div id="focusList" class="task-list"></div>
+          </div>
+
+          <div class="card section">
+            <div class="section-head">
+              <div><h2>⏭ Próximos dias</h2><p>O que já está chegando.</p></div>
+            </div>
+            <div id="upcomingList" class="task-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-tasks" class="view">
+        <div class="card section">
+          <div class="filters">
+            <select id="fStatus"><option value="">Todos os status</option></select>
+            <select id="fPriority"><option value="">Todas as prioridades</option></select>
+            <select id="fArea"><option value="">Todas as áreas</option></select>
+            <select id="fProject"><option value="">Todos os projetos</option></select>
+            <input id="fText" placeholder="Filtrar por texto..." />
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tarefa</th><th>Status</th><th>Prioridade</th><th>Área</th>
+                  <th>Projeto</th><th>Vencimento</th><th>Próxima ação</th><th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="taskTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-kanban" class="view">
+        <div class="kanban" id="kanbanBoard"></div>
+      </section>
+
+      <section id="view-notes" class="view">
+        <div class="section-head">
+          <div><h2>Anotações gerais</h2><p>Informações que não precisam virar tarefas.</p></div>
+          <button class="btn btn-primary" onclick="openNoteModal()">+ Nova anotação</button>
+        </div>
+        <div id="notesGrid" class="note-grid"></div>
+      </section>
+
+      <section id="view-dashboard" class="view">
+        <div class="grid-4">
+          <div class="card metric"><span>Total</span><strong id="dTotal">0</strong><small>Tarefas cadastradas</small></div>
+          <div class="card metric"><span>Em andamento</span><strong id="dProgress">0</strong><small>Execução ativa</small></div>
+          <div class="card metric"><span>Concluídas</span><strong id="dDone">0</strong><small id="dRate">0% de conclusão</small></div>
+          <div class="card metric"><span>Horas estimadas</span><strong id="dHours">0h</strong><small>Carga planejada</small></div>
+        </div>
+
+        <div class="grid-2" style="margin-top:18px">
+          <div class="card chart-box"><canvas id="statusChart"></canvas></div>
+          <div class="card chart-box"><canvas id="areaChart"></canvas></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div id="taskModalBackdrop" class="modal-backdrop" onclick="closeBackdrop(event,'taskModalBackdrop')">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="taskModalTitle">Nova tarefa</h2>
+      <button class="x" onclick="closeTaskModal()">✕</button>
+    </div>
+
+    <form id="taskForm">
+      <input type="hidden" id="taskId" />
+
+      <div class="field">
+        <label>Título *</label>
+        <input id="taskTitle" required placeholder="Ex: Conferir contratos pendentes" />
+      </div>
+
+      <div class="form-grid-2">
+        <div class="field">
+          <label>Status</label>
+          <select id="taskStatus">
+            <option>Pendente</option>
+            <option>Em Andamento</option>
+            <option>Aguardando</option>
+            <option>Concluída</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Prioridade</label>
+          <select id="taskPriority">
+            <option>Baixa</option>
+            <option selected>Média</option>
+            <option>Alta</option>
+            <option>Urgente</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="field">
+          <label>Área / setor</label>
+          <input id="taskArea" placeholder="Ex: Financeiro" />
+        </div>
+        <div class="field">
+          <label>Projeto</label>
+          <input id="taskProject" placeholder="Ex: Fechamento Setembro" />
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="field">
+          <label>Relacionado a</label>
+          <input id="taskRelated" placeholder="Cliente, gestor, fornecedor..." />
+        </div>
+        <div class="field">
+          <label>Data de vencimento</label>
+          <input id="taskDue" type="date" />
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="field">
+          <label>Tempo estimado (h)</label>
+          <input id="taskHours" type="number" min="0" step="0.5" value="1" />
+        </div>
+        <div class="field">
+          <label>Tags</label>
+          <input id="taskTags" placeholder="Ex: cliente, mensal, documento" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Próxima ação</label>
+        <input id="taskNextAction" placeholder="Ex: Aguardar retorno do setor financeiro" />
+      </div>
+
+      <div class="field">
+        <label>Descrição</label>
+        <textarea id="taskDescription" placeholder="Detalhes importantes da tarefa..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Checklist</label>
+        <div class="checklist-editor">
+          <input id="newCheckText" placeholder="Adicionar uma etapa..." />
+          <button type="button" class="btn btn-soft" onclick="addChecklistItem()">Adicionar</button>
+        </div>
+        <div id="checklistItems" class="checklist-items"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="deleteTaskBtn" type="button" class="btn btn-danger" onclick="deleteTask()" style="margin-right:auto;display:none">Excluir</button>
+        <button type="button" class="btn btn-soft" onclick="closeTaskModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar tarefa</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="noteModalBackdrop" class="modal-backdrop" onclick="closeBackdrop(event,'noteModalBackdrop')">
+  <div class="modal" style="width:min(620px,96vw)">
+    <div class="modal-head">
+      <h2 id="noteModalTitle">Nova anotação</h2>
+      <button class="x" onclick="closeNoteModal()">✕</button>
+    </div>
+    <form id="noteForm">
+      <input id="noteId" type="hidden" />
+      <div class="field">
+        <label>Título *</label>
+        <input id="noteTitle" required placeholder="Ex: Reunião com a gerência" />
+      </div>
+      <div class="form-grid-2">
+        <div class="field">
+          <label>Categoria</label>
+          <input id="noteCategory" placeholder="Ex: Reunião, Cliente, Lembrete" />
+        </div>
+        <div class="field">
+          <label>Favorita</label>
+          <select id="noteFavorite"><option value="false">Não</option><option value="true">Sim</option></select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Anotação</label>
+        <textarea id="noteText" style="min-height:180px" placeholder="Escreva aqui..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button id="deleteNoteBtn" type="button" class="btn btn-danger" onclick="deleteNote()" style="margin-right:auto;display:none">Excluir</button>
+        <button type="button" class="btn btn-soft" onclick="closeNoteModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar anotação</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const STORAGE_TASKS = 'workspace_tasks_v2';
+const STORAGE_NOTES = 'workspace_notes_v2';
+
+const todayISO = () => new Date().toISOString().slice(0,10);
+
+const seedTasks = [
+  {
+    id: crypto.randomUUID(), title:'Conferir relatório financeiro', status:'Em Andamento',
+    priority:'Alta', area:'Financeiro', project:'Fechamento Mensal',
+    related:'Diretoria', due: todayISO(), hours:2, tags:['mensal','relatório'],
+    nextAction:'Conferir divergências da planilha', description:'Validar os números antes do envio.',
+    checklist:[{id:crypto.randomUUID(),text:'Conferir receitas',done:true},{id:crypto.randomUUID(),text:'Conferir despesas',done:false}]
+  },
+  {
+    id: crypto.randomUUID(), title:'Retornar cliente sobre documentação', status:'Aguardando',
+    priority:'Urgente', area:'Atendimento', project:'Pendências Clientes',
+    related:'Cliente João', due: todayISO(), hours:0.5, tags:['cliente','documentação'],
+    nextAction:'Aguardar comprovante solicitado', description:'Cliente informou que enviará o documento ainda hoje.',
+    checklist:[]
+  },
+  {
+    id: crypto.randomUUID(), title:'Organizar cronograma da próxima semana', status:'Pendente',
+    priority:'Média', area:'Planejamento', project:'Rotina Semanal',
+    related:'Equipe', due:'', hours:1.5, tags:['planejamento'],
+    nextAction:'Listar atividades prioritárias', description:'',
+    checklist:[]
+  }
+];
+
+const seedNotes = [
+  {
+    id: crypto.randomUUID(),
+    title:'Rotina de fechamento',
+    category:'Processo',
+    favorite:true,
+    text:'Antes de concluir o fechamento, conferir se todas as pendências do financeiro foram respondidas.',
+    createdAt:new Date().toISOString()
+  }
+];
+
+let tasks = JSON.parse(localStorage.getItem(STORAGE_TASKS) || 'null') || seedTasks;
+let notes = JSON.parse(localStorage.getItem(STORAGE_NOTES) || 'null') || seedNotes;
+let editingChecklist = [];
+let statusChart = null;
+let areaChart = null;
+
+function persist(){
+  localStorage.setItem(STORAGE_TASKS, JSON.stringify(tasks));
+  localStorage.setItem(STORAGE_NOTES, JSON.stringify(notes));
+  renderAll();
+}
+
+function esc(str=''){
+  return String(str)
+    .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+    .replaceAll('"','&quot;').replaceAll("'","&#039;");
+}
+
+function statusClass(status){ return 's-' + status.replaceAll(' ','-'); }
+
+function parseDateLocal(iso){
+  if(!iso) return null;
+  const [y,m,d] = iso.split('-').map(Number);
+  return new Date(y,m-1,d);
+}
+
+function fmtDate(iso){
+  if(!iso) return 'Sem data';
+  const d = parseDateLocal(iso);
+  return d.toLocaleDateString('pt-BR');
+}
+
+function daysDiff(iso){
+  if(!iso) return null;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const d = parseDateLocal(iso); d.setHours(0,0,0,0);
+  return Math.round((d-now)/86400000);
+}
+
+function getFilteredTasks(){
+  const global = document.getElementById('globalSearch').value.trim().toLowerCase();
+  const localText = document.getElementById('fText')?.value.trim().toLowerCase() || '';
+  const status = document.getElementById('fStatus')?.value || '';
+  const priority = document.getElementById('fPriority')?.value || '';
+  const area = document.getElementById('fArea')?.value || '';
+  const project = document.getElementById('fProject')?.value || '';
+
+  return tasks.filter(t => {
+    const blob = [t.title,t.area,t.project,t.related,t.nextAction,t.description,(t.tags||[]).join(' ')].join(' ').toLowerCase();
+    return (!global || blob.includes(global)) &&
+           (!localText || blob.includes(localText)) &&
+           (!status || t.status===status) &&
+           (!priority || t.priority===priority) &&
+           (!area || t.area===area) &&
+           (!project || t.project===project);
+  });
+}
+
+function taskCardHTML(t, compact=false){
+  const overdue = t.due && daysDiff(t.due) < 0 && t.status !== 'Concluída';
+  const checklistDone = (t.checklist||[]).filter(i=>i.done).length;
+  const checklistTotal = (t.checklist||[]).length;
+
+  return `
+    <div class="task-row ${overdue ? 'highlight':''}">
+      <div>
+        <div class="badges">
+          <span class="badge ${statusClass(t.status)}">${esc(t.status)}</span>
+          <span class="badge p-${esc(t.priority)}">${esc(t.priority)}</span>
+          ${t.area ? `<span class="badge" style="background:#eef2f6;color:#506078">${esc(t.area)}</span>`:''}
+        </div>
+        <div class="task-title">${esc(t.title)}</div>
+        <div class="meta">
+          <span>📅 ${fmtDate(t.due)}</span>
+          ${t.project ? `<span>📁 ${esc(t.project)}</span>`:''}
+          ${t.nextAction ? `<span>➡️ ${esc(t.nextAction)}</span>`:''}
+          ${checklistTotal ? `<span>☑️ ${checklistDone}/${checklistTotal}</span>`:''}
+        </div>
+      </div>
+      <button class="btn btn-soft" onclick="editTask('${t.id}')">Abrir</button>
+    </div>
+  `;
+}
+
+function renderToday(){
+  const active = tasks.filter(t=>t.status!=='Concluída');
+  const today = active.filter(t=>daysDiff(t.due)===0);
+  const overdue = active.filter(t=>t.due && daysDiff(t.due)<0);
+  const urgent = active.filter(t=>t.priority==='Urgente');
+  const waiting = active.filter(t=>t.status==='Aguardando');
+
+  mToday.textContent = today.length;
+  mOverdue.textContent = overdue.length;
+  mUrgent.textContent = urgent.length;
+  mWaiting.textContent = waiting.length;
+
+  const focusMap = new Map();
+  [...overdue, ...urgent, ...today].forEach(t=>focusMap.set(t.id,t));
+  const focus = [...focusMap.values()].sort((a,b)=>{
+    const pa={Urgente:0,Alta:1,Média:2,Baixa:3};
+    return (pa[a.priority]??9)-(pa[b.priority]??9) || (a.due||'9999').localeCompare(b.due||'9999');
+  });
+
+  focusList.innerHTML = focus.length ? focus.map(t=>taskCardHTML(t,true)).join('') : '<div class="empty">Nenhuma tarefa crítica no momento.</div>';
+
+  const upcoming = active.filter(t=>{
+    const d=daysDiff(t.due);
+    return d!==null && d>0 && d<=7;
+  }).sort((a,b)=>a.due.localeCompare(b.due));
+
+  upcomingList.innerHTML = upcoming.length ? upcoming.map(t=>taskCardHTML(t,true)).join('') : '<div class="empty">Nada previsto para os próximos 7 dias.</div>';
+}
+
+function fillFilterOptions(){
+  const statuses=['Pendente','Em Andamento','Aguardando','Concluída'];
+  const priorities=['Baixa','Média','Alta','Urgente'];
+  fStatus.innerHTML='<option value="">Todos os status</option>'+statuses.map(x=>`<option>${x}</option>`).join('');
+  fPriority.innerHTML='<option value="">Todas as prioridades</option>'+priorities.map(x=>`<option>${x}</option>`).join('');
+  const areas=[...new Set(tasks.map(t=>t.area).filter(Boolean))].sort();
+  const projects=[...new Set(tasks.map(t=>t.project).filter(Boolean))].sort();
+  fArea.innerHTML='<option value="">Todas as áreas</option>'+areas.map(x=>`<option>${esc(x)}</option>`).join('');
+  fProject.innerHTML='<option value="">Todos os projetos</option>'+projects.map(x=>`<option>${esc(x)}</option>`).join('');
+}
+
+function renderTaskTable(){
+  const list = getFilteredTasks();
+  taskTableBody.innerHTML = list.length ? list.map(t=>`
+    <tr>
+      <td><strong>${esc(t.title)}</strong><br><span style="color:#7a8799">${esc((t.tags||[]).map(x=>'#'+x).join(' '))}</span></td>
+      <td><span class="badge ${statusClass(t.status)}">${esc(t.status)}</span></td>
+      <td><span class="badge p-${esc(t.priority)}">${esc(t.priority)}</span></td>
+      <td>${esc(t.area||'-')}</td>
+      <td>${esc(t.project||'-')}</td>
+      <td>${fmtDate(t.due)}</td>
+      <td>${esc(t.nextAction||'-')}</td>
+      <td><button class="btn btn-soft" onclick="editTask('${t.id}')">Editar</button></td>
+    </tr>
+  `).join('') : '<tr><td colspan="8"><div class="empty">Nenhuma tarefa encontrada.</div></td></tr>';
+}
+
+function renderKanban(){
+  const statuses=['Pendente','Em Andamento','Aguardando','Concluída'];
+  const list=getFilteredTasks();
+  kanbanBoard.innerHTML = statuses.map(status=>{
+    const items=list.filter(t=>t.status===status);
+    return `<div class="kanban-col" data-status="${status}" ondragover="event.preventDefault()" ondrop="dropTask(event,'${status}')">
+      <div class="kanban-title"><span>${status}</span><span>${items.length}</span></div>
+      <div class="kanban-cards">
+        ${items.map(t=>`
+          <div class="kanban-card" draggable="true" ondragstart="dragTask(event,'${t.id}')" onclick="editTask('${t.id}')">
+            <div class="badges">
+              <span class="badge p-${esc(t.priority)}">${esc(t.priority)}</span>
+              ${t.area ? `<span class="badge" style="background:#eef2f6;color:#506078">${esc(t.area)}</span>`:''}
+            </div>
+            <div class="task-title">${esc(t.title)}</div>
+            <div class="meta">
+              <span>📅 ${fmtDate(t.due)}</span>
+              ${t.project ? `<span>📁 ${esc(t.project)}</span>`:''}
+            </div>
+          </div>
+        `).join('') || '<div class="empty">Sem tarefas</div>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function dragTask(e,id){ e.dataTransfer.setData('text/plain', id); }
+function dropTask(e,status){
+  e.preventDefault();
+  const id=e.dataTransfer.getData('text/plain');
+  const t=tasks.find(x=>x.id===id);
+  if(t){ t.status=status; persist(); }
+}
+
+function renderNotes(){
+  const sorted=[...notes].sort((a,b)=>Number(b.favorite)-Number(a.favorite) || b.createdAt.localeCompare(a.createdAt));
+  notesGrid.innerHTML = sorted.length ? sorted.map(n=>`
+    <article class="card note-card">
+      <div class="badges">
+        ${n.favorite ? '<span class="badge" style="background:#fff4cc;color:#826300">★ Favorita</span>':''}
+        ${n.category ? `<span class="badge" style="background:#edf1f6;color:#516075">${esc(n.category)}</span>`:''}
+      </div>
+      <h3>${esc(n.title)}</h3>
+      <p>${esc(n.text)}</p>
+      <footer>
+        <span>${new Date(n.createdAt).toLocaleDateString('pt-BR')}</span>
+        <button class="btn btn-soft" onclick="editNote('${n.id}')">Editar</button>
+      </footer>
+    </article>
+  `).join('') : '<div class="empty">Nenhuma anotação criada.</div>';
+}
+
+function renderDashboard(){
+  const total=tasks.length;
+  const progress=tasks.filter(t=>t.status==='Em Andamento').length;
+  const done=tasks.filter(t=>t.status==='Concluída').length;
+  const hours=tasks.reduce((a,t)=>a+(Number(t.hours)||0),0);
+  const rate=total?Math.round(done/total*100):0;
+
+  dTotal.textContent=total;
+  dProgress.textContent=progress;
+  dDone.textContent=done;
+  dRate.textContent=`${rate}% de conclusão`;
+  dHours.textContent=`${hours.toFixed(1)}h`;
+
+  const statusLabels=['Pendente','Em Andamento','Aguardando','Concluída'];
+  const statusData=statusLabels.map(s=>tasks.filter(t=>t.status===s).length);
+
+  if(statusChart) statusChart.destroy();
+  statusChart=new Chart(document.getElementById('statusChart'),{
+    type:'doughnut',
+    data:{labels:statusLabels,datasets:[{data:statusData}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{title:{display:true,text:'Distribuição por status'}}}
+  });
+
+  const areas={};
+  tasks.forEach(t=>{ const a=t.area||'Sem área'; areas[a]=(areas[a]||0)+(Number(t.hours)||0); });
+  if(areaChart) areaChart.destroy();
+  areaChart=new Chart(document.getElementById('areaChart'),{
+    type:'bar',
+    data:{labels:Object.keys(areas),datasets:[{label:'Horas estimadas',data:Object.values(areas)}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{title:{display:true,text:'Carga estimada por área'}}}
+  });
+}
+
+function renderAll(){
+  fillFilterOptions();
+  renderToday();
+  renderTaskTable();
+  renderKanban();
+  renderNotes();
+  renderDashboard();
+}
+
+function openTaskModal(){
+  taskForm.reset();
+  taskId.value='';
+  taskModalTitle.textContent='Nova tarefa';
+  deleteTaskBtn.style.display='none';
+  editingChecklist=[];
+  renderChecklistEditor();
+  taskModalBackdrop.classList.add('open');
+}
+
+function closeTaskModal(){ taskModalBackdrop.classList.remove('open'); }
+
+function editTask(id){
+  const t=tasks.find(x=>x.id===id);
+  if(!t) return;
+  taskId.value=t.id;
+  taskTitle.value=t.title||'';
+  taskStatus.value=t.status||'Pendente';
+  taskPriority.value=t.priority||'Média';
+  taskArea.value=t.area||'';
+  taskProject.value=t.project||'';
+  taskRelated.value=t.related||'';
+  taskDue.value=t.due||'';
+  taskHours.value=t.hours||0;
+  taskTags.value=(t.tags||[]).join(', ');
+  taskNextAction.value=t.nextAction||'';
+  taskDescription.value=t.description||'';
+  editingChecklist=JSON.parse(JSON.stringify(t.checklist||[]));
+  renderChecklistEditor();
+  taskModalTitle.textContent='Editar tarefa';
+  deleteTaskBtn.style.display='inline-block';
+  taskModalBackdrop.classList.add('open');
+}
+
+function addChecklistItem(){
+  const text=newCheckText.value.trim();
+  if(!text) return;
+  editingChecklist.push({id:crypto.randomUUID(),text,done:false});
+  newCheckText.value='';
+  renderChecklistEditor();
+}
+
+function toggleChecklist(id){
+  const item=editingChecklist.find(x=>x.id===id);
+  if(item) item.done=!item.done;
+  renderChecklistEditor();
+}
+
+function removeChecklist(id){
+  editingChecklist=editingChecklist.filter(x=>x.id!==id);
+  renderChecklistEditor();
+}
+
+function renderChecklistEditor(){
+  checklistItems.innerHTML=editingChecklist.map(i=>`
+    <div class="check-item">
+      <input type="checkbox" ${i.done?'checked':''} onchange="toggleChecklist('${i.id}')">
+      <span style="${i.done?'text-decoration:line-through;color:#8a95a4':''}">${esc(i.text)}</span>
+      <button type="button" onclick="removeChecklist('${i.id}')">✕</button>
+    </div>
+  `).join('');
+}
+
+taskForm.addEventListener('submit',e=>{
+  e.preventDefault();
+  const payload={
+    id:taskId.value||crypto.randomUUID(),
+    title:taskTitle.value.trim(),
+    status:taskStatus.value,
+    priority:taskPriority.value,
+    area:taskArea.value.trim(),
+    project:taskProject.value.trim(),
+    related:taskRelated.value.trim(),
+    due:taskDue.value,
+    hours:Number(taskHours.value)||0,
+    tags:taskTags.value.split(',').map(x=>x.trim()).filter(Boolean),
+    nextAction:taskNextAction.value.trim(),
+    description:taskDescription.value.trim(),
+    checklist:editingChecklist
+  };
+
+  const idx=tasks.findIndex(x=>x.id===payload.id);
+  if(idx>=0) tasks[idx]=payload; else tasks.push(payload);
+  closeTaskModal();
+  persist();
+});
+
+function deleteTask(){
+  const id=taskId.value;
+  if(!id || !confirm('Excluir esta tarefa?')) return;
+  tasks=tasks.filter(x=>x.id!==id);
+  closeTaskModal();
+  persist();
+}
+
+function openNoteModal(){
+  noteForm.reset();
+  noteId.value='';
+  noteModalTitle.textContent='Nova anotação';
+  deleteNoteBtn.style.display='none';
+  noteModalBackdrop.classList.add('open');
+}
+
+function closeNoteModal(){ noteModalBackdrop.classList.remove('open'); }
+
+function editNote(id){
+  const n=notes.find(x=>x.id===id);
+  if(!n) return;
+  noteId.value=n.id;
+  noteTitle.value=n.title||'';
+  noteCategory.value=n.category||'';
+  noteFavorite.value=String(!!n.favorite);
+  noteText.value=n.text||'';
+  noteModalTitle.textContent='Editar anotação';
+  deleteNoteBtn.style.display='inline-block';
+  noteModalBackdrop.classList.add('open');
+}
+
+noteForm.addEventListener('submit',e=>{
+  e.preventDefault();
+  const existing=notes.find(x=>x.id===noteId.value);
+  const payload={
+    id:noteId.value||crypto.randomUUID(),
+    title:noteTitle.value.trim(),
+    category:noteCategory.value.trim(),
+    favorite:noteFavorite.value==='true',
+    text:noteText.value.trim(),
+    createdAt:existing?.createdAt||new Date().toISOString()
+  };
+  const idx=notes.findIndex(x=>x.id===payload.id);
+  if(idx>=0) notes[idx]=payload; else notes.push(payload);
+  closeNoteModal();
+  persist();
+});
+
+function deleteNote(){
+  const id=noteId.value;
+  if(!id || !confirm('Excluir esta anotação?')) return;
+  notes=notes.filter(x=>x.id!==id);
+  closeNoteModal();
+  persist();
+}
+
+function closeBackdrop(e,id){
+  if(e.target.id===id){
+    if(id==='taskModalBackdrop') closeTaskModal();
+    if(id==='noteModalBackdrop') closeNoteModal();
+  }
+}
+
+const viewMeta={
+  today:['Meu Dia','Veja o que precisa da sua atenção agora.'],
+  tasks:['Tarefas','Pesquise, filtre e acompanhe todas as demandas.'],
+  kanban:['Kanban','Mova tarefas entre os status conforme o trabalho avança.'],
+  notes:['Anotações','Guarde informações sem transformar tudo em tarefa.'],
+  dashboard:['Dashboard','Acompanhe volume, status e carga de trabalho.']
+};
+
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active');
+    const view=btn.dataset.view;
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+    document.getElementById('view-'+view).classList.add('active');
+    pageTitle.textContent=viewMeta[view][0];
+    pageSubtitle.textContent=viewMeta[view][1];
+    renderAll();
+  });
+});
+
+['globalSearch','fText','fStatus','fPriority','fArea','fProject'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('input',renderAll);
+  document.getElementById(id)?.addEventListener('change',renderAll);
+});
+
+function csvEscape(value){
+  const s=String(value??'').replaceAll('"','""');
+  return `"${s}"`;
+}
+
+function exportCSV(){
+  const header=['ID','Título','Status','Prioridade','Área','Projeto','Relacionado a','Vencimento','Horas','Tags','Próxima ação','Descrição'];
+  const rows=tasks.map(t=>[
+    t.id,t.title,t.status,t.priority,t.area,t.project,t.related,t.due,t.hours,(t.tags||[]).join(','),t.nextAction,t.description
+  ]);
+  const csv=[header,...rows].map(r=>r.map(csvEscape).join(';')).join('\n');
+  downloadFile('\uFEFF'+csv,'tarefas_workspace.csv','text/csv;charset=utf-8');
+}
+
+function parseCSVLine(line){
+  const out=[]; let cur=''; let quoted=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch==='"'){
+      if(quoted && line[i+1]==='"'){ cur+='"'; i++; }
+      else quoted=!quoted;
+    } else if(ch===';' && !quoted){ out.push(cur); cur=''; }
+    else cur+=ch;
+  }
+  out.push(cur);
+  return out;
+}
+
+document.getElementById('importCSV').addEventListener('change',e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const lines=String(reader.result).replace(/^\uFEFF/,'').split(/\r?\n/).filter(Boolean);
+    if(lines.length<2) return alert('CSV vazio ou inválido.');
+    const header=parseCSVLine(lines[0]);
+    const idx=name=>header.indexOf(name);
+    const imported=lines.slice(1).map(line=>{
+      const c=parseCSVLine(line);
+      return {
+        id:c[idx('ID')]||crypto.randomUUID(),
+        title:c[idx('Título')]||'Sem título',
+        status:c[idx('Status')]||'Pendente',
+        priority:c[idx('Prioridade')]||'Média',
+        area:c[idx('Área')]||'',
+        project:c[idx('Projeto')]||'',
+        related:c[idx('Relacionado a')]||'',
+        due:c[idx('Vencimento')]||'',
+        hours:Number(c[idx('Horas')])||0,
+        tags:(c[idx('Tags')]||'').split(',').map(x=>x.trim()).filter(Boolean),
+        nextAction:c[idx('Próxima ação')]||'',
+        description:c[idx('Descrição')]||'',
+        checklist:[]
+      };
+    });
+    if(imported.length){
+      tasks=imported;
+      persist();
+      alert('CSV importado com sucesso.');
+    }
+    e.target.value='';
+  };
+  reader.readAsText(file,'utf-8');
+});
+
+function exportJSON(){
+  const data={version:2,exportedAt:new Date().toISOString(),tasks,notes};
+  downloadFile(JSON.stringify(data,null,2),'backup_workspace.json','application/json');
+}
+
+document.getElementById('importJSON').addEventListener('change',e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result);
+      if(!Array.isArray(data.tasks) || !Array.isArray(data.notes)) throw new Error();
+      tasks=data.tasks; notes=data.notes; persist();
+      alert('Backup restaurado com sucesso.');
+    }catch{
+      alert('Arquivo JSON inválido.');
+    }
+    e.target.value='';
+  };
+  reader.readAsText(file);
+});
+
+function downloadFile(content,name,type){
+  const blob=new Blob([content],{type});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=name; a.click();
+  URL.revokeObjectURL(url);
+}
+
+renderAll();
+</script>
+</body>
+</html>
