@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Workspace Pessoal | Organização de Trabalho</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root {
       --bg: #f6f8fb;
@@ -854,10 +855,281 @@
       .mobile-nav { left:5px; right:5px; }
       .mobile-nav button { font-size:8px; }
     }
+    /* --- LOGIN GOOGLE / EXPERIÊNCIA DE APP --- */
+    .login-screen {
+      min-height:100dvh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:
+        radial-gradient(circle at top left, rgba(54,92,245,.28), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(123,78,215,.22), transparent 36%),
+        linear-gradient(145deg,#101827,#18243a 58%,#101827);
+    }
+
+    .login-card {
+      width:min(430px,100%);
+      background:rgba(255,255,255,.98);
+      border:1px solid rgba(255,255,255,.55);
+      border-radius:24px;
+      padding:28px;
+      box-shadow:0 28px 70px rgba(0,0,0,.28);
+    }
+
+    .login-logo {
+      width:56px;
+      height:56px;
+      display:grid;
+      place-items:center;
+      border-radius:16px;
+      background:var(--primary-soft);
+      font-size:28px;
+      margin-bottom:18px;
+    }
+
+    .login-card h1 { margin:0; font-size:25px; }
+    .login-card > p { color:var(--muted); line-height:1.55; font-size:13px; margin:9px 0 20px; }
+    .google-button-wrap { min-height:44px; display:flex; justify-content:center; }
+    .login-hint {
+      background:#f6f8fc;
+      border:1px solid var(--border);
+      color:#657286;
+      border-radius:12px;
+      padding:11px 12px;
+      font-size:11px;
+      line-height:1.45;
+      margin-top:14px;
+    }
+    .demo-access { width:100%; margin-top:10px; }
+    .login-security { margin-top:16px; color:#8a95a4; font-size:10px; text-align:center; }
+
+    .topbar-title-row {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+
+    .user-chip {
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:999px;
+      min-height:38px;
+      padding:5px 10px 5px 6px;
+      display:flex;
+      align-items:center;
+      gap:7px;
+      color:#405068;
+      font-size:11px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .user-chip img {
+      width:27px;
+      height:27px;
+      border-radius:50%;
+      object-fit:cover;
+      background:#edf1f6;
+    }
+
+    .today-hero {
+      position:relative;
+      overflow:hidden;
+      padding:22px;
+      margin-bottom:14px;
+      background:linear-gradient(135deg,#243b78 0%,#365cf5 58%,#7256d8 100%);
+      color:#fff;
+      border:none;
+      box-shadow:0 16px 40px rgba(54,92,245,.20);
+    }
+
+    .today-hero::after {
+      content:"";
+      position:absolute;
+      width:220px;
+      height:220px;
+      border-radius:50%;
+      right:-80px;
+      top:-100px;
+      background:rgba(255,255,255,.10);
+    }
+
+    .today-hero-content { position:relative; z-index:1; }
+    .today-hero h2 { margin:0; font-size:23px; }
+    .today-hero p { margin:5px 0 0; color:rgba(255,255,255,.78); font-size:12px; }
+    .today-date { font-size:11px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; opacity:.8; margin-bottom:7px; }
+
+    .daily-progress {
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:1fr auto;
+      align-items:end;
+      gap:10px;
+    }
+
+    .daily-progress strong { font-size:13px; }
+    .daily-progress span { font-size:11px; color:rgba(255,255,255,.82); }
+    .progress-track {
+      grid-column:1 / -1;
+      height:8px;
+      background:rgba(255,255,255,.20);
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .progress-fill {
+      width:0%;
+      height:100%;
+      background:#fff;
+      border-radius:999px;
+      transition:width .3s ease;
+    }
+
+    .quick-actions {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:9px;
+      margin-top:14px;
+    }
+
+    .quick-action {
+      border:1px solid var(--border);
+      background:#fff;
+      color:#35445b;
+      border-radius:12px;
+      padding:11px 9px;
+      font-size:11px;
+      font-weight:800;
+    }
+    .quick-action:hover { border-color:#bfc9d7; background:#fbfcfe; }
+
+    .completed-tools {
+      display:none;
+      margin-bottom:14px;
+      padding:14px;
+      border:1px solid #cfe3d9;
+      background:#f2fbf6;
+      border-radius:14px;
+    }
+
+    .completed-tools.active { display:block; }
+
+    .completed-tools-head {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .completed-tools-head strong { font-size:13px; }
+    .completed-tools-head span { color:#587264; font-size:11px; }
+
+    .completed-filter-grid {
+      display:grid;
+      grid-template-columns:1.2fr 1fr 1fr 1fr;
+      gap:8px;
+    }
+
+    .completed-filter-grid input,
+    .completed-filter-grid select {
+      width:100%;
+      min-height:40px;
+      border:1px solid #cadfd4;
+      border-radius:10px;
+      padding:8px 10px;
+      background:#fff;
+      outline:none;
+      font-size:12px;
+    }
+
+    .completed-date-field.hidden { display:none; }
+
+    .mobile-fab { display:none; }
+
+    .task-row.compact {
+      padding:11px 12px;
+    }
+
+    .task-row.compact .task-title { margin-bottom:4px; }
+
+    @media (max-width:760px) {
+      .login-screen { padding:16px; align-items:flex-end; }
+      .login-card {
+        width:100%;
+        border-radius:24px 24px 14px 14px;
+        padding:24px 18px calc(22px + env(safe-area-inset-bottom));
+      }
+
+      .topbar-title-row {
+        width:100%;
+        justify-content:space-between;
+      }
+
+      .user-chip span { display:none; }
+      .user-chip { padding-right:6px; }
+
+      .today-hero {
+        padding:18px 16px;
+        border-radius:18px;
+        margin-bottom:10px;
+      }
+
+      .today-hero h2 { font-size:21px; }
+      .quick-actions {
+        grid-template-columns:repeat(3,1fr);
+        gap:7px;
+        margin-top:10px;
+      }
+      .quick-action { padding:10px 5px; font-size:10px; }
+
+      .completed-filter-grid {
+        grid-template-columns:1fr 1fr;
+      }
+
+      .completed-filter-grid > :first-child { grid-column:1 / -1; }
+
+      .mobile-fab {
+        display:grid;
+        place-items:center;
+        position:fixed;
+        right:18px;
+        bottom:calc(84px + env(safe-area-inset-bottom));
+        z-index:89;
+        width:56px;
+        height:56px;
+        border:none;
+        border-radius:50%;
+        background:var(--primary);
+        color:#fff;
+        font-size:28px;
+        box-shadow:0 12px 28px rgba(54,92,245,.38);
+      }
+    }
+
+    @media (max-width:390px) {
+      .completed-filter-grid { grid-template-columns:1fr; }
+      .completed-filter-grid > :first-child { grid-column:auto; }
+    }
   </style>
 </head>
 <body>
-<div class="app">
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">💼</div>
+    <h1>Workspace da Lala</h1>
+    <p>Entre com sua conta Google para acessar tarefas, anotações e o painel de trabalho.</p>
+    <div id="googleButton" class="google-button-wrap"></div>
+    <div id="googleSetupHint" class="login-hint">
+      O login Google está preparado, mas ainda precisa do Client ID do Google para ser ativado.
+    </div>
+    <button id="demoAccessBtn" class="btn btn-soft demo-access" type="button" onclick="enterDemoMode()">Continuar em modo de teste</button>
+    <div class="login-security">O aplicativo não lê seus e-mails. O Google é usado apenas para identificar a conta.</div>
+  </div>
+</div>
+
+<div class="app" id="appShell" style="display:none">
   <aside class="sidebar">
     <div class="brand">
       <strong>💼 Workspace Pessoal</strong>
@@ -886,14 +1158,21 @@
       <label class="file-label">♻️ Restaurar JSON
         <input id="importJSON" type="file" accept=".json" style="display:none">
       </label>
+      <button onclick="logoutGoogle()">🚪 Sair da conta</button>
     </div>
   </aside>
 
   <main>
     <header class="topbar">
-      <div>
-        <h1 id="pageTitle">Meu Dia</h1>
-        <p id="pageSubtitle">Veja o que precisa da sua atenção agora.</p>
+      <div class="topbar-title-row">
+        <div>
+          <h1 id="pageTitle">Meu Dia</h1>
+          <p id="pageSubtitle">Veja o que precisa da sua atenção agora.</p>
+        </div>
+        <button id="userChip" class="user-chip" type="button" onclick="logoutGoogle()" title="Sair da conta">
+          <img id="userAvatar" alt="" style="display:none">
+          <span id="userName">Conta</span>
+        </button>
       </div>
       <div class="actions">
         <input id="globalSearch" class="search" placeholder="Buscar tarefa, projeto, área..." />
@@ -904,7 +1183,26 @@
 
     <div class="content">
       <section id="view-today" class="view active">
-        <div class="grid-4">
+        <div class="card today-hero">
+          <div class="today-hero-content">
+            <div id="todayDateLabel" class="today-date"></div>
+            <h2 id="todayGreeting">Olá 👋</h2>
+            <p id="todayMessage">Organize o que importa e avance uma tarefa de cada vez.</p>
+            <div class="daily-progress">
+              <strong>Progresso das tarefas de hoje</strong>
+              <span id="dailyProgressText">0%</span>
+              <div class="progress-track"><div id="dailyProgressBar" class="progress-fill"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <button class="quick-action" onclick="openTaskModal()">＋ Nova tarefa</button>
+          <button class="quick-action" onclick="openNoteModal()">📝 Anotação</button>
+          <button class="quick-action" onclick="showCompletedHistory()">✓ Concluídas</button>
+        </div>
+
+        <div class="grid-4" style="margin-top:14px">
           <div class="card metric"><span>Para hoje</span><strong id="mToday">0</strong><small>Tarefas com vencimento hoje</small></div>
           <div class="card metric"><span>Atrasadas</span><strong id="mOverdue">0</strong><small>Precisam de atenção</small></div>
           <div class="card metric"><span>Urgentes</span><strong id="mUrgent">0</strong><small>Não concluídas</small></div>
@@ -937,12 +1235,43 @@
             <select id="fProject"><option value="">Todos os projetos</option></select>
             <input id="fText" placeholder="Filtrar por texto..." />
           </div>
+
+          <div id="completedTools" class="completed-tools">
+            <div class="completed-tools-head">
+              <div>
+                <strong>✓ Histórico de atividades concluídas</strong><br>
+                <span>Filtre pela data em que a tarefa foi concluída.</span>
+              </div>
+              <span id="completedFilterSummary">0 atividades</span>
+            </div>
+            <div class="completed-filter-grid">
+              <select id="completedPeriod">
+                <option value="all">Todas as concluídas</option>
+                <option value="today">Concluídas hoje</option>
+                <option value="week">Esta semana</option>
+                <option value="month" selected>Este mês</option>
+                <option value="previousMonth">Mês anterior</option>
+                <option value="year">Este ano</option>
+                <option value="specificMonth">Escolher mês</option>
+                <option value="range">Período personalizado</option>
+              </select>
+              <div id="completedMonthWrap" class="completed-date-field hidden">
+                <input id="completedMonth" type="month" aria-label="Mês da conclusão">
+              </div>
+              <div id="completedFromWrap" class="completed-date-field hidden">
+                <input id="completedFrom" type="date" aria-label="Data inicial">
+              </div>
+              <div id="completedToWrap" class="completed-date-field hidden">
+                <input id="completedTo" type="date" aria-label="Data final">
+              </div>
+            </div>
+          </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
                   <th>Tarefa</th><th>Status</th><th>Prioridade</th><th>Área</th>
-                  <th>Projeto</th><th>Vencimento</th><th>Próxima ação</th><th>Ações</th>
+                  <th>Projeto</th><th>Vencimento</th><th>Concluída em</th><th>Próxima ação</th><th>Ações</th>
                 </tr>
               </thead>
               <tbody id="taskTableBody"></tbody>
@@ -987,6 +1316,8 @@
   <button class="nav-btn" data-view="notes"><span class="ico">📝</span><span>Notas</span></button>
   <button class="nav-btn" data-view="dashboard"><span class="ico">📊</span><span>Painel</span></button>
 </nav>
+
+<button class="mobile-fab" type="button" onclick="openTaskModal()" aria-label="Nova tarefa">＋</button>
 
 <div id="taskModalBackdrop" class="modal-backdrop" onclick="closeBackdrop(event,'taskModalBackdrop')">
   <div class="modal">
@@ -1044,6 +1375,11 @@
           <label>Data de vencimento</label>
           <input id="taskDue" type="date" />
         </div>
+      </div>
+
+      <div id="taskCompletedWrap" class="field" style="display:none">
+        <label>Data da conclusão</label>
+        <input id="taskCompletedAt" type="date" />
       </div>
 
       <div class="form-grid-2">
@@ -1123,6 +1459,144 @@
 <script>
 const STORAGE_TASKS = 'workspace_tasks_v2';
 const STORAGE_NOTES = 'workspace_notes_v2';
+const STORAGE_USER = 'workspace_google_user';
+
+/*
+  Para ativar o login real:
+  1) Crie um OAuth Client ID do tipo Web no Google Cloud.
+  2) Adicione a origem do GitHub Pages nas "Authorized JavaScript origins".
+  3) Cole o Client ID abaixo.
+*/
+const GOOGLE_CLIENT_ID = 'COLE_SEU_CLIENT_ID_AQUI.apps.googleusercontent.com';
+const ALLOWED_EMAILS = []; // Opcional: ex. ['email@gmail.com'] para restringir a conta.
+
+function googleConfigured(){
+  return GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith('COLE_SEU_CLIENT_ID');
+}
+
+function decodeGoogleCredential(token){
+  try{
+    const payload = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    const json = decodeURIComponent(atob(payload).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return JSON.parse(json);
+  }catch{
+    return null;
+  }
+}
+
+function getStoredUser(){
+  try{
+    const user = JSON.parse(localStorage.getItem(STORAGE_USER) || 'null');
+    if(!user) return null;
+    if(user.exp && Date.now()/1000 > user.exp){
+      localStorage.removeItem(STORAGE_USER);
+      return null;
+    }
+    return user;
+  }catch{
+    return null;
+  }
+}
+
+function applyUserUI(user){
+  const firstName = (user?.name || user?.given_name || 'Lala').split(' ')[0];
+  userName.textContent = user?.demo ? 'Modo teste' : firstName;
+  if(user?.picture){
+    userAvatar.src = user.picture;
+    userAvatar.style.display = 'block';
+  }else{
+    userAvatar.style.display = 'none';
+  }
+}
+
+function enterWorkspace(user){
+  if(user) localStorage.setItem(STORAGE_USER, JSON.stringify(user));
+  loginScreen.style.display = 'none';
+  appShell.style.display = '';
+  applyUserUI(user || getStoredUser());
+  renderAll();
+}
+
+function enterDemoMode(){
+  enterWorkspace({name:'Lala', demo:true});
+}
+
+function handleGoogleCredential(response){
+  const payload = decodeGoogleCredential(response.credential);
+  if(!payload?.email){
+    alert('Não foi possível identificar a conta Google.');
+    return;
+  }
+  if(ALLOWED_EMAILS.length && !ALLOWED_EMAILS.map(x=>x.toLowerCase()).includes(payload.email.toLowerCase())){
+    alert('Esta conta Google não está autorizada a acessar o aplicativo.');
+    return;
+  }
+  enterWorkspace({
+    name: payload.name,
+    given_name: payload.given_name,
+    email: payload.email,
+    picture: payload.picture,
+    exp: payload.exp
+  });
+}
+
+function renderGoogleLogin(){
+  if(!googleConfigured()){
+    googleSetupHint.style.display = 'block';
+    demoAccessBtn.style.display = 'block';
+    return;
+  }
+  googleSetupHint.style.display = 'none';
+  demoAccessBtn.style.display = 'none';
+
+  let attempts = 0;
+  const timer = setInterval(()=>{
+    attempts++;
+    if(window.google?.accounts?.id){
+      clearInterval(timer);
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleCredential,
+        auto_select: false,
+        cancel_on_tap_outside: true
+      });
+      googleButton.innerHTML = '';
+      google.accounts.id.renderButton(googleButton,{
+        theme:'outline',
+        size:'large',
+        type:'standard',
+        shape:'rectangular',
+        text:'signin_with',
+        width:340,
+        locale:'pt-BR'
+      });
+    }else if(attempts > 25){
+      clearInterval(timer);
+      googleSetupHint.textContent = 'Não foi possível carregar o botão do Google. Verifique a conexão e recarregue a página.';
+      googleSetupHint.style.display = 'block';
+    }
+  },200);
+}
+
+function initAuth(){
+  const user = getStoredUser();
+  if(user){
+    enterWorkspace(user);
+  }else{
+    loginScreen.style.display = 'flex';
+    appShell.style.display = 'none';
+    renderGoogleLogin();
+  }
+}
+
+function logoutGoogle(){
+  localStorage.removeItem(STORAGE_USER);
+  if(window.google?.accounts?.id) google.accounts.id.disableAutoSelect();
+  appShell.style.display = 'none';
+  loginScreen.style.display = 'flex';
+  googleButton.innerHTML = '';
+  renderGoogleLogin();
+}
 
 const todayISO = () => new Date().toISOString().slice(0,10);
 
@@ -1162,6 +1636,7 @@ const seedNotes = [
 ];
 
 let tasks = JSON.parse(localStorage.getItem(STORAGE_TASKS) || 'null') || seedTasks;
+tasks = tasks.map(t=>({...t, completedAt: t.completedAt || ''}));
 let notes = JSON.parse(localStorage.getItem(STORAGE_NOTES) || 'null') || seedNotes;
 let editingChecklist = [];
 let statusChart = null;
@@ -1200,6 +1675,54 @@ function daysDiff(iso){
   return Math.round((d-now)/86400000);
 }
 
+function startOfWeek(date){
+  const d = new Date(date); d.setHours(0,0,0,0);
+  const day = d.getDay();
+  const diff = day===0 ? -6 : 1-day;
+  d.setDate(d.getDate()+diff);
+  return d;
+}
+
+function taskMatchesCompletedPeriod(t){
+  if(t.status!=='Concluída') return true;
+  const period = document.getElementById('completedPeriod')?.value || 'all';
+  if(period==='all') return true;
+  if(!t.completedAt) return false;
+
+  const d = parseDateLocal(t.completedAt);
+  const now = new Date(); now.setHours(0,0,0,0);
+
+  if(period==='today') return d.getTime()===now.getTime();
+
+  if(period==='week'){
+    const start=startOfWeek(now);
+    const end=new Date(start); end.setDate(end.getDate()+6); end.setHours(23,59,59,999);
+    return d>=start && d<=end;
+  }
+
+  if(period==='month') return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
+
+  if(period==='previousMonth'){
+    const prev=new Date(now.getFullYear(),now.getMonth()-1,1);
+    return d.getFullYear()===prev.getFullYear() && d.getMonth()===prev.getMonth();
+  }
+
+  if(period==='year') return d.getFullYear()===now.getFullYear();
+
+  if(period==='specificMonth'){
+    const value=document.getElementById('completedMonth')?.value;
+    return !value || t.completedAt.startsWith(value);
+  }
+
+  if(period==='range'){
+    const from=document.getElementById('completedFrom')?.value;
+    const to=document.getElementById('completedTo')?.value;
+    return (!from || t.completedAt>=from) && (!to || t.completedAt<=to);
+  }
+
+  return true;
+}
+
 function getFilteredTasks(){
   const global = document.getElementById('globalSearch').value.trim().toLowerCase();
   const localText = document.getElementById('fText')?.value.trim().toLowerCase() || '';
@@ -1215,7 +1738,8 @@ function getFilteredTasks(){
            (!status || t.status===status) &&
            (!priority || t.priority===priority) &&
            (!area || t.area===area) &&
-           (!project || t.project===project);
+           (!project || t.project===project) &&
+           (status!=='Concluída' || taskMatchesCompletedPeriod(t));
   });
 }
 
@@ -1225,7 +1749,7 @@ function taskCardHTML(t, compact=false){
   const checklistTotal = (t.checklist||[]).length;
 
   return `
-    <div class="task-row ${overdue ? 'highlight':''}">
+    <div class="task-row ${compact ? 'compact':''} ${overdue ? 'highlight':''}">
       <div>
         <div class="badges">
           <span class="badge ${statusClass(t.status)}">${esc(t.status)}</span>
@@ -1235,6 +1759,7 @@ function taskCardHTML(t, compact=false){
         <div class="task-title">${esc(t.title)}</div>
         <div class="meta">
           <span>📅 ${fmtDate(t.due)}</span>
+          ${t.status==='Concluída' && t.completedAt ? `<span>✅ ${fmtDate(t.completedAt)}</span>`:''}
           ${t.project ? `<span>📁 ${esc(t.project)}</span>`:''}
           ${t.nextAction ? `<span>➡️ ${esc(t.nextAction)}</span>`:''}
           ${checklistTotal ? `<span>☑️ ${checklistDone}/${checklistTotal}</span>`:''}
@@ -1252,6 +1777,20 @@ function renderToday(){
   const urgent = active.filter(t=>t.priority==='Urgente');
   const waiting = active.filter(t=>t.status==='Aguardando');
 
+  const user=getStoredUser();
+  const firstName=(user?.name || user?.given_name || 'Lala').split(' ')[0];
+  todayGreeting.textContent = `Olá, ${firstName} 👋`;
+  todayDateLabel.textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+  todayMessage.textContent = overdue.length
+    ? `Você tem ${overdue.length} tarefa${overdue.length===1?'':'s'} atrasada${overdue.length===1?'':'s'} pedindo atenção.`
+    : 'Seu dia está organizado. Foque no que precisa avançar agora.';
+
+  const dueTodayAll = tasks.filter(t=>daysDiff(t.due)===0);
+  const dueTodayDone = dueTodayAll.filter(t=>t.status==='Concluída').length;
+  const progress = dueTodayAll.length ? Math.round(dueTodayDone/dueTodayAll.length*100) : 0;
+  dailyProgressText.textContent = dueTodayAll.length ? `${progress}% · ${dueTodayDone}/${dueTodayAll.length}` : 'Sem vencimentos hoje';
+  dailyProgressBar.style.width = `${progress}%`;
+
   mToday.textContent = today.length;
   mOverdue.textContent = overdue.length;
   mUrgent.textContent = urgent.length;
@@ -1264,7 +1803,7 @@ function renderToday(){
     return (pa[a.priority]??9)-(pa[b.priority]??9) || (a.due||'9999').localeCompare(b.due||'9999');
   });
 
-  focusList.innerHTML = focus.length ? focus.map(t=>taskCardHTML(t,true)).join('') : '<div class="empty">Nenhuma tarefa crítica no momento.</div>';
+  focusList.innerHTML = focus.length ? focus.map(t=>taskCardHTML(t,true)).join('') : '<div class="empty">Nenhuma tarefa crítica no momento. 🎉</div>';
 
   const upcoming = active.filter(t=>{
     const d=daysDiff(t.due);
@@ -1275,6 +1814,9 @@ function renderToday(){
 }
 
 function fillFilterOptions(){
+  const values={
+    status:fStatus.value, priority:fPriority.value, area:fArea.value, project:fProject.value
+  };
   const statuses=['Pendente','Em Andamento','Aguardando','Concluída'];
   const priorities=['Baixa','Média','Alta','Urgente'];
   fStatus.innerHTML='<option value="">Todos os status</option>'+statuses.map(x=>`<option>${x}</option>`).join('');
@@ -1283,10 +1825,35 @@ function fillFilterOptions(){
   const projects=[...new Set(tasks.map(t=>t.project).filter(Boolean))].sort();
   fArea.innerHTML='<option value="">Todas as áreas</option>'+areas.map(x=>`<option>${esc(x)}</option>`).join('');
   fProject.innerHTML='<option value="">Todos os projetos</option>'+projects.map(x=>`<option>${esc(x)}</option>`).join('');
+
+  if(statuses.includes(values.status)) fStatus.value=values.status;
+  if(priorities.includes(values.priority)) fPriority.value=values.priority;
+  if(areas.includes(values.area)) fArea.value=values.area;
+  if(projects.includes(values.project)) fProject.value=values.project;
+}
+
+function toggleCompletedTools(){
+  const active = fStatus.value==='Concluída';
+  completedTools.classList.toggle('active', active);
+
+  const period=completedPeriod.value;
+  completedMonthWrap.classList.toggle('hidden', period!=='specificMonth');
+  completedFromWrap.classList.toggle('hidden', period!=='range');
+  completedToWrap.classList.toggle('hidden', period!=='range');
+}
+
+function updateCompletedSummary(list){
+  if(fStatus.value!=='Concluída') return;
+  const withoutDate=list.filter(t=>!t.completedAt).length;
+  completedFilterSummary.textContent = `${list.length} atividade${list.length===1?'':'s'}${withoutDate ? ` · ${withoutDate} sem data` : ''}`;
 }
 
 function renderTaskTable(){
-  const list = getFilteredTasks();
+  let list = getFilteredTasks();
+  if(fStatus.value==='Concluída'){
+    list=[...list].sort((a,b)=>(b.completedAt||'').localeCompare(a.completedAt||''));
+  }
+  updateCompletedSummary(list);
   taskTableBody.innerHTML = list.length ? list.map(t=>`
     <tr>
       <td data-label="Tarefa"><strong>${esc(t.title)}</strong><br><span style="color:#7a8799">${esc((t.tags||[]).map(x=>'#'+x).join(' '))}</span></td>
@@ -1295,10 +1862,11 @@ function renderTaskTable(){
       <td data-label="Área">${esc(t.area||'-')}</td>
       <td data-label="Projeto">${esc(t.project||'-')}</td>
       <td data-label="Vencimento">${fmtDate(t.due)}</td>
+      <td data-label="Concluída em">${t.completedAt ? fmtDate(t.completedAt) : '<span style="color:#98a2b1">Sem data</span>'}</td>
       <td data-label="Próxima ação">${esc(t.nextAction||'-')}</td>
       <td data-label="Ações"><button class="btn btn-soft" onclick="editTask('${t.id}')">Editar tarefa</button></td>
     </tr>
-  `).join('') : '<tr><td colspan="8"><div class="empty">Nenhuma tarefa encontrada.</div></td></tr>';
+  `).join('') : '<tr><td colspan="9"><div class="empty">Nenhuma tarefa encontrada para este filtro.</div></td></tr>';
 }
 
 function renderKanban(){
@@ -1332,7 +1900,13 @@ function dropTask(e,status){
   e.preventDefault();
   const id=e.dataTransfer.getData('text/plain');
   const t=tasks.find(x=>x.id===id);
-  if(t){ t.status=status; persist(); }
+  if(t){
+    const wasCompleted=t.status==='Concluída';
+    t.status=status;
+    if(status==='Concluída' && !wasCompleted) t.completedAt=todayISO();
+    if(status!=='Concluída') t.completedAt='';
+    persist();
+  }
 }
 
 function renderNotes(){
@@ -1388,11 +1962,18 @@ function renderDashboard(){
 
 function renderAll(){
   fillFilterOptions();
+  toggleCompletedTools();
   renderToday();
   renderTaskTable();
   renderKanban();
   renderNotes();
   renderDashboard();
+}
+
+function updateCompletedField(){
+  const concluded = taskStatus.value==='Concluída';
+  taskCompletedWrap.style.display = concluded ? 'block' : 'none';
+  if(concluded && !taskCompletedAt.value) taskCompletedAt.value=todayISO();
 }
 
 function openTaskModal(){
@@ -1401,6 +1982,8 @@ function openTaskModal(){
   taskModalTitle.textContent='Nova tarefa';
   deleteTaskBtn.style.display='none';
   editingChecklist=[];
+  taskCompletedAt.value='';
+  updateCompletedField();
   renderChecklistEditor();
   taskModalBackdrop.classList.add('open');
 }
@@ -1418,11 +2001,13 @@ function editTask(id){
   taskProject.value=t.project||'';
   taskRelated.value=t.related||'';
   taskDue.value=t.due||'';
+  taskCompletedAt.value=t.completedAt||'';
   taskHours.value=t.hours||0;
   taskTags.value=(t.tags||[]).join(', ');
   taskNextAction.value=t.nextAction||'';
   taskDescription.value=t.description||'';
   editingChecklist=JSON.parse(JSON.stringify(t.checklist||[]));
+  updateCompletedField();
   renderChecklistEditor();
   taskModalTitle.textContent='Editar tarefa';
   deleteTaskBtn.style.display='inline-block';
@@ -1469,6 +2054,7 @@ taskForm.addEventListener('submit',e=>{
     project:taskProject.value.trim(),
     related:taskRelated.value.trim(),
     due:taskDue.value,
+    completedAt: taskStatus.value==='Concluída' ? (taskCompletedAt.value || todayISO()) : '',
     hours:Number(taskHours.value)||0,
     tags:taskTags.value.split(',').map(x=>x.trim()).filter(Boolean),
     nextAction:taskNextAction.value.trim(),
@@ -1553,25 +2139,49 @@ const viewMeta={
   dashboard:['Dashboard','Acompanhe volume, status e carga de trabalho.']
 };
 
+function activateView(view){
+  document.querySelectorAll('.nav-btn').forEach(x=>{
+    x.classList.toggle('active', x.dataset.view===view);
+  });
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  pageTitle.textContent=viewMeta[view][0];
+  pageSubtitle.textContent=viewMeta[view][1];
+  window.scrollTo({top:0, behavior:'smooth'});
+  renderAll();
+}
+
+function showCompletedHistory(){
+  activateView('tasks');
+  fStatus.value='Concluída';
+  completedPeriod.value='month';
+  toggleCompletedTools();
+  renderAll();
+}
+
 document.querySelectorAll('.nav-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    const view=btn.dataset.view;
-    document.querySelectorAll('.nav-btn').forEach(x=>{
-      x.classList.toggle('active', x.dataset.view===view);
-    });
-    document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
-    document.getElementById('view-'+view).classList.add('active');
-    pageTitle.textContent=viewMeta[view][0];
-    pageSubtitle.textContent=viewMeta[view][1];
-    window.scrollTo({top:0, behavior:'smooth'});
+  btn.addEventListener('click',()=>activateView(btn.dataset.view));
+});
+
+['globalSearch','fText','fPriority','fArea','fProject'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('input',renderAll);
+  document.getElementById(id)?.addEventListener('change',renderAll);
+});
+
+fStatus.addEventListener('change',()=>{
+  if(fStatus.value==='Concluída' && completedPeriod.value==='all') completedPeriod.value='month';
+  toggleCompletedTools();
+  renderAll();
+});
+
+['completedPeriod','completedMonth','completedFrom','completedTo'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('change',()=>{
+    toggleCompletedTools();
     renderAll();
   });
 });
 
-['globalSearch','fText','fStatus','fPriority','fArea','fProject'].forEach(id=>{
-  document.getElementById(id)?.addEventListener('input',renderAll);
-  document.getElementById(id)?.addEventListener('change',renderAll);
-});
+taskStatus.addEventListener('change',updateCompletedField);
 
 function csvEscape(value){
   const s=String(value??'').replaceAll('"','""');
@@ -1579,9 +2189,9 @@ function csvEscape(value){
 }
 
 function exportCSV(){
-  const header=['ID','Título','Status','Prioridade','Área','Projeto','Relacionado a','Vencimento','Horas','Tags','Próxima ação','Descrição'];
+  const header=['ID','Título','Status','Prioridade','Área','Projeto','Relacionado a','Vencimento','Data da conclusão','Horas','Tags','Próxima ação','Descrição'];
   const rows=tasks.map(t=>[
-    t.id,t.title,t.status,t.priority,t.area,t.project,t.related,t.due,t.hours,(t.tags||[]).join(','),t.nextAction,t.description
+    t.id,t.title,t.status,t.priority,t.area,t.project,t.related,t.due,t.completedAt||'',t.hours,(t.tags||[]).join(','),t.nextAction,t.description
   ]);
   const csv=[header,...rows].map(r=>r.map(csvEscape).join(';')).join('\n');
   downloadFile('\uFEFF'+csv,'tarefas_workspace.csv','text/csv;charset=utf-8');
@@ -1620,6 +2230,7 @@ document.getElementById('importCSV').addEventListener('change',e=>{
         project:c[idx('Projeto')]||'',
         related:c[idx('Relacionado a')]||'',
         due:c[idx('Vencimento')]||'',
+        completedAt:c[idx('Data da conclusão')]||'',
         hours:Number(c[idx('Horas')])||0,
         tags:(c[idx('Tags')]||'').split(',').map(x=>x.trim()).filter(Boolean),
         nextAction:c[idx('Próxima ação')]||'',
@@ -1668,6 +2279,7 @@ function downloadFile(content,name,type){
 }
 
 renderAll();
+initAuth();
 </script>
 </body>
 </html>
