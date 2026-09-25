@@ -539,6 +539,8 @@
       color:#a6333a;
     }
 
+    .mobile-nav { display:none; }
+
     @media (max-width: 1100px) {
       .app { grid-template-columns: 220px 1fr; }
       .grid-4 { grid-template-columns:repeat(2,1fr); }
@@ -547,14 +549,310 @@
       .filters { grid-template-columns:repeat(2,1fr); }
     }
 
+    @media (hover: none) and (pointer: coarse) {
+      .btn, .nav button, .sidebar-footer button, .file-label { min-height:44px; }
+      .kanban-card, .task-row, .note-card { -webkit-tap-highlight-color: transparent; }
+    }
+
     @media (max-width: 760px) {
-      .app { display:block; }
-      .sidebar { position:relative; height:auto; }
-      .topbar { position:relative; height:auto; padding:16px; align-items:flex-start; gap:12px; flex-direction:column; }
-      .actions { width:100%; flex-wrap:wrap; }
-      .search { width:100%; }
-      .content { padding:16px; }
-      .grid-4, .grid-3, .note-grid, .filters, .form-grid-2 { grid-template-columns:1fr; }
+      body {
+        min-height:100dvh;
+        overflow-x:hidden;
+        background:#f4f7fb;
+      }
+
+      .app {
+        display:block;
+        min-height:100dvh;
+      }
+
+      .sidebar { display:none; }
+      main { width:100%; min-width:0; }
+
+      .topbar {
+        position:sticky;
+        top:0;
+        height:auto;
+        padding:13px 12px 12px;
+        align-items:flex-start;
+        gap:10px;
+        flex-direction:column;
+        z-index:60;
+        box-shadow:0 4px 18px rgba(21,32,51,.06);
+      }
+
+      .topbar h1 { font-size:20px; }
+      .topbar p { font-size:11px; margin-top:2px; }
+
+      .actions {
+        width:100%;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+      }
+
+      .actions .search {
+        grid-column:1 / -1;
+        width:100%;
+        min-height:44px;
+        font-size:16px;
+      }
+
+      .actions .btn {
+        width:100%;
+        min-height:44px;
+        padding:10px 8px;
+      }
+
+      .content {
+        padding:12px 12px calc(92px + env(safe-area-inset-bottom));
+      }
+
+      .grid-4 {
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:9px;
+      }
+
+      .grid-3, .note-grid, .filters, .form-grid-2 { grid-template-columns:1fr; }
+
+      .metric { padding:13px; border-radius:14px; }
+      .metric span { font-size:9px; }
+      .metric strong { font-size:25px; margin-top:5px; }
+      .metric small { font-size:10px; line-height:1.25; display:block; }
+
+      .today-columns, .grid-2 {
+        grid-template-columns:1fr;
+        gap:12px;
+        margin-top:12px;
+      }
+
+      .section {
+        margin-top:12px;
+        padding:13px;
+        border-radius:14px;
+      }
+
+      .section-head {
+        align-items:flex-start;
+        margin-bottom:11px;
+      }
+
+      .section-head h2, .section-head h3 { font-size:15px; }
+
+      .task-row {
+        grid-template-columns:1fr;
+        gap:9px;
+        padding:12px;
+      }
+
+      .task-row > .btn {
+        width:100%;
+        min-height:40px;
+      }
+
+      .task-title { font-size:14px; }
+      .meta { gap:5px 9px; font-size:11px; }
+
+      .filters {
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+      }
+
+      .filters input, .filters select {
+        min-height:44px;
+        font-size:14px;
+      }
+
+      #fText { grid-column:1 / -1; }
+
+      .table-wrap {
+        overflow:visible;
+        border-radius:0;
+      }
+
+      table {
+        min-width:0;
+        display:block;
+        background:transparent;
+      }
+
+      thead { display:none; }
+      tbody { display:block; }
+
+      tbody tr {
+        display:block;
+        background:#fff;
+        border:1px solid var(--border);
+        border-radius:14px;
+        margin-bottom:10px;
+        padding:12px 13px;
+        box-shadow:0 2px 6px rgba(0,0,0,.02);
+      }
+
+      tbody td {
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:12px;
+        padding:9px 0;
+        border-bottom:1px solid #edf1f5;
+        text-align:right;
+        font-size:12px;
+      }
+
+      tbody td::before {
+        content:attr(data-label);
+        color:var(--muted);
+        font-weight:800;
+        text-align:left;
+        flex:0 0 36%;
+      }
+
+      tbody td:first-child {
+        display:block;
+        text-align:left;
+        font-size:14px;
+        padding-top:1px;
+      }
+
+      tbody td:first-child::before { display:none; }
+      tbody td:last-child { border-bottom:none; padding-bottom:0; }
+      tbody td:last-child .btn { width:100%; min-height:40px; }
+
+      .kanban {
+        display:flex;
+        gap:10px;
+        overflow-x:auto;
+        scroll-snap-type:x mandatory;
+        overscroll-behavior-x:contain;
+        padding:0 2px 10px;
+        margin-right:-12px;
+        scrollbar-width:none;
+      }
+
+      .kanban::-webkit-scrollbar { display:none; }
+
+      .kanban-col {
+        flex:0 0 86vw;
+        min-width:86vw;
+        max-width:86vw;
+        min-height:440px;
+        scroll-snap-align:start;
+        border-radius:14px;
+      }
+
+      .kanban-cards { min-height:340px; }
+      .kanban-card { padding:13px; }
+
+      .note-grid { gap:10px; }
+      .note-card { min-height:auto; padding:14px; }
+
+      .chart-box {
+        height:275px;
+        padding:12px;
+      }
+
+      .modal-backdrop {
+        align-items:flex-end;
+        padding:0;
+      }
+
+      .modal {
+        width:100%;
+        max-height:94dvh;
+        border-radius:20px 20px 0 0;
+        padding:18px 14px calc(16px + env(safe-area-inset-bottom));
+      }
+
+      .modal-head {
+        position:sticky;
+        top:-18px;
+        z-index:2;
+        background:#fff;
+        padding:16px 0 10px;
+        margin-bottom:10px;
+      }
+
+      .modal-head h2 { font-size:18px; }
+
+      .field input, .field select, .field textarea {
+        min-height:44px;
+        font-size:16px;
+      }
+
+      .form-grid-2 { grid-template-columns:1fr; gap:0; }
+
+      .checklist-editor {
+        display:grid;
+        grid-template-columns:1fr auto;
+      }
+
+      .modal-actions {
+        position:sticky;
+        bottom:calc(-16px - env(safe-area-inset-bottom));
+        background:#fff;
+        padding:12px 0 calc(12px + env(safe-area-inset-bottom));
+        margin-top:12px;
+        z-index:3;
+        box-shadow:0 -8px 18px rgba(255,255,255,.96);
+      }
+
+      .modal-actions .btn {
+        min-height:44px;
+        flex:1;
+      }
+
+      .mobile-nav {
+        position:fixed;
+        left:8px;
+        right:8px;
+        bottom:calc(8px + env(safe-area-inset-bottom));
+        z-index:90;
+        display:grid;
+        grid-template-columns:repeat(5,1fr);
+        gap:3px;
+        padding:7px 6px;
+        background:rgba(17,24,39,.96);
+        backdrop-filter:blur(14px);
+        border:1px solid rgba(255,255,255,.10);
+        border-radius:18px;
+        box-shadow:0 10px 30px rgba(15,23,42,.28);
+      }
+
+      .mobile-nav button {
+        border:none;
+        background:transparent;
+        color:#aeb8c7;
+        border-radius:12px;
+        min-width:0;
+        min-height:52px;
+        padding:5px 2px;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        gap:3px;
+        font-size:9px;
+        font-weight:700;
+      }
+
+      .mobile-nav button .ico { font-size:18px; line-height:1; }
+
+      .mobile-nav button.active {
+        color:#fff;
+        background:#2a3850;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .content { padding-left:9px; padding-right:9px; }
+      .topbar { padding-left:10px; padding-right:10px; }
+      .metric { padding:11px; }
+      .metric strong { font-size:23px; }
+      .metric small { font-size:9px; }
+      .mobile-nav { left:5px; right:5px; }
+      .mobile-nav button { font-size:8px; }
     }
   </style>
 </head>
@@ -681,6 +979,14 @@
     </div>
   </main>
 </div>
+
+<nav class="mobile-nav" aria-label="Navegação principal">
+  <button class="nav-btn active" data-view="today"><span class="ico">🏠</span><span>Meu Dia</span></button>
+  <button class="nav-btn" data-view="tasks"><span class="ico">✅</span><span>Tarefas</span></button>
+  <button class="nav-btn" data-view="kanban"><span class="ico">📋</span><span>Kanban</span></button>
+  <button class="nav-btn" data-view="notes"><span class="ico">📝</span><span>Notas</span></button>
+  <button class="nav-btn" data-view="dashboard"><span class="ico">📊</span><span>Painel</span></button>
+</nav>
 
 <div id="taskModalBackdrop" class="modal-backdrop" onclick="closeBackdrop(event,'taskModalBackdrop')">
   <div class="modal">
@@ -983,14 +1289,14 @@ function renderTaskTable(){
   const list = getFilteredTasks();
   taskTableBody.innerHTML = list.length ? list.map(t=>`
     <tr>
-      <td><strong>${esc(t.title)}</strong><br><span style="color:#7a8799">${esc((t.tags||[]).map(x=>'#'+x).join(' '))}</span></td>
-      <td><span class="badge ${statusClass(t.status)}">${esc(t.status)}</span></td>
-      <td><span class="badge p-${esc(t.priority)}">${esc(t.priority)}</span></td>
-      <td>${esc(t.area||'-')}</td>
-      <td>${esc(t.project||'-')}</td>
-      <td>${fmtDate(t.due)}</td>
-      <td>${esc(t.nextAction||'-')}</td>
-      <td><button class="btn btn-soft" onclick="editTask('${t.id}')">Editar</button></td>
+      <td data-label="Tarefa"><strong>${esc(t.title)}</strong><br><span style="color:#7a8799">${esc((t.tags||[]).map(x=>'#'+x).join(' '))}</span></td>
+      <td data-label="Status"><span class="badge ${statusClass(t.status)}">${esc(t.status)}</span></td>
+      <td data-label="Prioridade"><span class="badge p-${esc(t.priority)}">${esc(t.priority)}</span></td>
+      <td data-label="Área">${esc(t.area||'-')}</td>
+      <td data-label="Projeto">${esc(t.project||'-')}</td>
+      <td data-label="Vencimento">${fmtDate(t.due)}</td>
+      <td data-label="Próxima ação">${esc(t.nextAction||'-')}</td>
+      <td data-label="Ações"><button class="btn btn-soft" onclick="editTask('${t.id}')">Editar tarefa</button></td>
     </tr>
   `).join('') : '<tr><td colspan="8"><div class="empty">Nenhuma tarefa encontrada.</div></td></tr>';
 }
@@ -1249,13 +1555,15 @@ const viewMeta={
 
 document.querySelectorAll('.nav-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
-    btn.classList.add('active');
     const view=btn.dataset.view;
+    document.querySelectorAll('.nav-btn').forEach(x=>{
+      x.classList.toggle('active', x.dataset.view===view);
+    });
     document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
     document.getElementById('view-'+view).classList.add('active');
     pageTitle.textContent=viewMeta[view][0];
     pageSubtitle.textContent=viewMeta[view][1];
+    window.scrollTo({top:0, behavior:'smooth'});
     renderAll();
   });
 });
