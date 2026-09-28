@@ -37,6 +37,7 @@ interface WorkspaceValue {
   toggleTaskDone: (id: string) => void;
   upsertNote: (note: Partial<Note> & { title: string; body: string }) => void;
   removeNote: (id: string) => void;
+  replaceWorkspace: (tasks: Task[], notes: Note[]) => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceValue | null>(null);
@@ -65,6 +66,7 @@ export function WorkspaceProvider({ user, children }: PropsWithChildren<{ user: 
   const [syncState, setSyncState] = useState<SyncState>('connecting');
   const readyRef = useRef(false);
   const saveTimer = useRef<number | null>(null);
+  const lastCloudSignatureRef = useRef('');
 
   useEffect(() => {
     localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
@@ -89,6 +91,7 @@ export function WorkspaceProvider({ user, children }: PropsWithChildren<{ user: 
           const data = first.data();
           const remoteTasks = Array.isArray(data.tasks) ? data.tasks.map(normalizeTask) : [];
           const remoteNotes = Array.isArray(data.notes) ? data.notes : [];
+          lastCloudSignatureRef.current = JSON.stringify({ tasks: remoteTasks, notes: remoteNotes });
           setTasks(remoteTasks);
           setNotes(remoteNotes);
         } else {
@@ -98,6 +101,7 @@ export function WorkspaceProvider({ user, children }: PropsWithChildren<{ user: 
             version: 4,
             updatedAt: serverTimestamp()
           });
+          lastCloudSignatureRef.current = JSON.stringify({ tasks, notes });
         }
 
         readyRef.current = true;
@@ -108,8 +112,18 @@ export function WorkspaceProvider({ user, children }: PropsWithChildren<{ user: 
           snapshot => {
             if (!snapshot.exists()) return;
             const data = snapshot.data();
-            setTasks(Array.isArray(data.tasks) ? data.tasks.map(normalizeTask) : []);
-            setNotes(Array.isArray(data.notes) ? data.notes : []);
+            const remoteTasks = Array.isArray(data.tasks) ? data.tasks.map(normalizeTask) : [];
+            const remoteNotes = Array.isArray(data.notes) ? data.notes : [];
+            const remoteSignature = JSON.stringify({ tasks: remoteTasks, notes: remoteNotes });
+
+            lastCloudSignatureRef.current = remoteSignature;
+
+            const localSignature = JSON.stringify({ tasks, notes });
+            if (remoteSignature !== localSignature) {
+              setTasks(remoteTasks);
+              setNotes(remoteNotes);
+            }
+
             setSyncState('synced');
           },
           () => {
@@ -135,6 +149,13 @@ export function WorkspaceProvider({ user, children }: PropsWithChildren<{ user: 
 
   useEffect(() => {
     if (!readyRef.current) return;
+
+    const signature = JSON.stringify({ tasks, notes });
+    if (signature === lastCloudSignatureRef.current) {
+      setSyncState('synced');
+      return;
+    }
+
     if (saveTimer.current) window.clearTimeout(saveTimer.current);
 
     setSyncState('saving');
@@ -150,6 +171,7 @@ export function WorkspaceProvider({ user, children }: PropsWithChildren<{ user: 
           },
           { merge: true }
         );
+        lastCloudSignatureRef.current = signature;
         setSyncState('synced');
       } catch {
         setSyncState('local');
@@ -237,6 +259,11 @@ export function WorkspaceProvider({ user, children }: PropsWithChildren<{ user: 
     setNotes(current => current.filter(note => note.id !== id));
   }
 
+  function replaceWorkspace(nextTasks: Task[], nextNotes: Note[]) {
+    setTasks(nextTasks.map(normalizeTask));
+    setNotes(Array.isArray(nextNotes) ? nextNotes : []);
+  }
+
   const value = useMemo<WorkspaceValue>(
     () => ({
       tasks,
@@ -247,7 +274,8 @@ export function WorkspaceProvider({ user, children }: PropsWithChildren<{ user: 
       setTaskStatus,
       toggleTaskDone,
       upsertNote,
-      removeNote
+      removeNote,
+      replaceWorkspace
     }),
     [tasks, notes, syncState]
   );
