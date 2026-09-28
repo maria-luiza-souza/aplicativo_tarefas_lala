@@ -3762,7 +3762,7 @@ async function logoutGoogle(){
   }
 }
 
-const todayISOfunction toISODateLocal(date=new Date()){
+function toISODateLocal(date=new Date()){
   const y=date.getFullYear();
   const m=String(date.getMonth()+1).padStart(2,'0');
   const d=String(date.getDate()).padStart(2,'0');
@@ -4021,7 +4021,7 @@ function taskCardHTML(t, compact=false){
   `;
 }
 
-function renderTodayfunction renderToday(){
+function renderToday(){
   const active = tasks.filter(t=>t.status!=='Concluída');
   const today = active.filter(t=>daysDiff(t.due)===0);
   const overdue = active.filter(t=>t.due && daysDiff(t.due)<0);
@@ -4101,7 +4101,6 @@ function updateCompletedSummary(list){
   completedFilterSummary.textContent = `${list.length} atividade${list.length===1?'':'s'}${withoutDate ? ` · ${withoutDate} sem data` : ''}`;
 }
 
-function renderTaskTable
 function renderTaskTable(){
   const list = sortTaskList(getFilteredTasks(true));
   updateCompletedSummary(list);
@@ -4125,7 +4124,7 @@ function renderTaskTable(){
   `).join('') : '<tr><td colspan="9"><div class="empty">Nenhuma tarefa encontrada para este filtro.</div></td></tr>';
 }
 
-function renderKanbanfunction renderKanban(){
+function renderKanban(){
   const statuses=['Pendente','Em Andamento','Aguardando','Concluída'];
   const statusMeta={
     'Pendente':{icon:'○',label:'Pendente'},
@@ -4634,7 +4633,7 @@ function editTask(id){
   taskModalBackdrop.classList.add('open');
 }
 
-function addChecklistItemfunction addChecklistItem(){
+function addChecklistItem(){
   const text=newCheckText.value.trim();
   if(!text) return;
   editingChecklist.push({id:crypto.randomUUID(),text,done:false});
@@ -4708,7 +4707,7 @@ taskForm.addEventListener('submit',e=>{
   persist();
 });
 
-function deleteTaskfunction deleteTask(){
+function deleteTask(){
   const id=taskId.value;
   if(!id || !confirm('Excluir esta tarefa?')) return;
   tasks=tasks.filter(x=>x.id!==id);
@@ -4835,7 +4834,7 @@ window.addEventListener('resize',()=>{
 });
 setInterval(checkTaskReminders,30*60*1000);
 
-function csvEscapefunction csvEscape(value){
+function csvEscape(value){
   const s=String(value??'').replaceAll('"','""');
   return `"${s}"`;
 }
