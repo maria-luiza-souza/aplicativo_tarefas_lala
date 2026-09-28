@@ -3089,6 +3089,13 @@
     }
   </style>
 
+
+  <style id="ulala-auth-visibility-fix">
+    body:not(.authenticated) .auth-only {
+      display:none !important;
+    }
+  </style>
+
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
@@ -3358,7 +3365,7 @@
   </main>
 </div>
 
-<nav class="mobile-nav" aria-label="Navegação principal">
+<nav class="mobile-nav auth-only" aria-label="Navegação principal">
   <button class="nav-btn active" data-view="today"><span class="ico">🏠</span><span>Meu Dia</span></button>
   <button class="nav-btn" data-view="tasks"><span class="ico">✅</span><span>Tarefas</span></button>
   <button class="nav-btn" data-view="kanban"><span class="ico">▦</span><span>Kanban</span></button>
@@ -3366,13 +3373,13 @@
   <button type="button" class="mobile-more-btn" onclick="openMoreSheet()"><span class="ico">•••</span><span>Mais</span></button>
 </nav>
 
-<div id="mobileFabMenu" class="mobile-fab-menu">
+<div id="mobileFabMenu" class="mobile-fab-menu auth-only">
   <button type="button" onclick="openTaskFromFab()">✅ Nova tarefa</button>
   <button type="button" onclick="openNoteFromFab()">📝 Nova anotação</button>
 </div>
-<button id="mobileFab" class="mobile-fab" type="button" onclick="toggleQuickCreate()" aria-label="Criar">＋</button>
+<button id="mobileFab" class="mobile-fab auth-only" type="button" onclick="toggleQuickCreate()" aria-label="Criar">＋</button>
 
-<div id="moreSheetBackdrop" class="more-sheet-backdrop" onclick="closeMoreBackdrop(event)">
+<div id="moreSheetBackdrop" class="more-sheet-backdrop auth-only" onclick="closeMoreBackdrop(event)">
   <div class="more-sheet">
     <div class="more-sheet-handle"></div>
     <div class="more-sheet-head">
@@ -3714,6 +3721,7 @@ function clearLoginError(){
 
 function enterWorkspace(user){
   currentWorkspaceUser = user;
+  document.body.classList.add('authenticated');
   loginScreen.style.display = 'none';
   appShell.style.display = '';
   applyUserUI(user);
@@ -3761,6 +3769,9 @@ function initAuth(){
     }else{
       stopWorkspaceSync();
       currentWorkspaceUser = null;
+      document.body.classList.remove('authenticated');
+      closeQuickCreate();
+      closeMoreSheet();
       appShell.style.display = 'none';
       loginScreen.style.display = 'flex';
       clearLoginError();
