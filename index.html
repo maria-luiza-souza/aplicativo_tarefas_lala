@@ -4468,6 +4468,573 @@
     }
   </style>
 
+
+  <style id="ulala-today-focus-v7">
+    .today-focus-shell {
+      display:grid;
+      gap:14px;
+    }
+
+    .today-focus-hero {
+      position:relative;
+      overflow:hidden;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) minmax(300px,.72fr);
+      grid-template-areas:
+        "copy progress"
+        "status status";
+      gap:20px 26px;
+      padding:24px;
+      border-radius:23px;
+      color:#fff;
+      background:
+        radial-gradient(circle at 94% 4%, rgba(216,107,125,.34), transparent 28%),
+        radial-gradient(circle at 10% 118%, rgba(255,255,255,.08), transparent 32%),
+        linear-gradient(125deg,#29465d 0%,#3b627b 62%,#66869f 100%);
+      box-shadow:0 16px 36px rgba(42,68,88,.17);
+    }
+
+    .today-focus-hero::after {
+      content:"";
+      position:absolute;
+      width:210px;
+      height:210px;
+      border-radius:50%;
+      border:1px solid rgba(255,255,255,.08);
+      top:-125px;
+      right:21%;
+      pointer-events:none;
+    }
+
+    .today-focus-copy {
+      grid-area:copy;
+      position:relative;
+      z-index:1;
+      align-self:center;
+    }
+
+    .today-focus-copy .today-date {
+      margin-bottom:7px;
+      color:rgba(255,255,255,.68);
+    }
+
+    .today-focus-copy h2 {
+      margin:0;
+      font-family:"Plus Jakarta Sans",sans-serif;
+      font-size:27px;
+      line-height:1.1;
+      letter-spacing:-.035em;
+    }
+
+    .today-focus-copy > p {
+      max-width:540px;
+      margin:7px 0 0;
+      color:rgba(255,255,255,.75) !important;
+      font-size:12px;
+      line-height:1.5;
+    }
+
+    .today-inline-actions {
+      display:flex;
+      gap:7px;
+      margin-top:16px;
+    }
+
+    .today-inline-actions button {
+      min-height:35px;
+      border:1px solid rgba(255,255,255,.17);
+      border-radius:9px;
+      background:rgba(255,255,255,.09);
+      color:#fff;
+      padding:7px 10px;
+      font:700 10px "Manrope",sans-serif;
+      cursor:pointer;
+      backdrop-filter:blur(5px);
+      transition:background .15s ease,transform .15s ease;
+    }
+
+    .today-inline-actions button:hover {
+      background:rgba(255,255,255,.16);
+      transform:translateY(-1px);
+    }
+
+    .today-progress-card {
+      grid-area:progress;
+      position:relative;
+      z-index:1;
+      align-self:center;
+      padding:16px;
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:17px;
+      background:rgba(25,50,69,.28);
+      backdrop-filter:blur(10px);
+    }
+
+    .today-progress-head {
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .today-progress-label {
+      display:block;
+      margin-bottom:3px;
+      color:rgba(255,255,255,.56);
+      font-size:8px;
+      font-weight:800;
+      letter-spacing:.14em;
+    }
+
+    .today-progress-head strong {
+      display:block;
+      font-family:"Plus Jakarta Sans",sans-serif;
+      font-size:28px;
+      line-height:1;
+    }
+
+    .today-progress-mood {
+      max-width:130px;
+      padding:6px 8px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      color:rgba(255,255,255,.82);
+      font-size:8px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .today-progress-track {
+      position:relative;
+      height:13px;
+      margin-top:15px;
+      overflow:hidden;
+      border-radius:999px;
+      background:rgba(255,255,255,.14);
+      box-shadow:inset 0 1px 3px rgba(15,35,50,.18);
+    }
+
+    .today-progress-fill {
+      position:absolute;
+      inset:0 auto 0 0;
+      width:0;
+      overflow:hidden;
+      border-radius:inherit;
+      background:linear-gradient(90deg,#f5d5db 0%,#e98b9b 45%,#d86b7d 100%);
+      box-shadow:0 0 16px rgba(235,139,155,.22);
+      transition:width .75s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .today-progress-fill::after {
+      content:"";
+      position:absolute;
+      inset:0;
+      width:45%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);
+      animation:todayProgressShimmer 2.2s ease-in-out infinite;
+    }
+
+    .today-progress-fill.complete {
+      background:linear-gradient(90deg,#9dc9b1,#7eb99a);
+      box-shadow:0 0 18px rgba(126,185,154,.26);
+    }
+
+    .today-progress-marker {
+      position:absolute;
+      top:50%;
+      z-index:2;
+      width:3px;
+      height:3px;
+      border-radius:50%;
+      background:rgba(255,255,255,.70);
+      transform:translate(-50%,-50%);
+    }
+
+    .today-progress-marker.m25 { left:25%; }
+    .today-progress-marker.m50 { left:50%; }
+    .today-progress-marker.m75 { left:75%; }
+
+    .today-progress-footer {
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin-top:7px;
+      color:rgba(255,255,255,.63);
+      font-size:8px;
+    }
+
+    .today-progress-footer span:last-child {
+      text-align:right;
+    }
+
+    @keyframes todayProgressShimmer {
+      0% { transform:translateX(-160%); }
+      55%,100% { transform:translateX(260%); }
+    }
+
+    .today-status-strip {
+      grid-area:status;
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;
+      padding-top:3px;
+    }
+
+    .today-status-pill {
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:9px;
+      border:1px solid rgba(255,255,255,.13);
+      border-radius:13px;
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      padding:9px 11px;
+      text-align:left;
+      cursor:pointer;
+      transition:background .15s ease,transform .15s ease;
+    }
+
+    .today-status-pill:hover {
+      background:rgba(255,255,255,.14);
+      transform:translateY(-1px);
+    }
+
+    .today-status-icon {
+      width:27px;
+      height:27px;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      border-radius:9px;
+      background:rgba(118,146,170,.35);
+      color:#fff;
+      font-size:10px;
+      font-weight:900;
+    }
+
+    .today-status-pill.danger .today-status-icon {
+      background:rgba(216,107,125,.30);
+      color:#ffd9df;
+    }
+
+    .today-status-pill.waiting .today-status-icon {
+      background:rgba(170,150,181,.30);
+      color:#efe7f3;
+    }
+
+    .today-status-pill strong {
+      display:block;
+      font-family:"Plus Jakarta Sans",sans-serif;
+      font-size:16px;
+      line-height:1;
+    }
+
+    .today-status-pill small {
+      display:block;
+      margin-top:2px;
+      color:rgba(255,255,255,.60);
+      font-size:8px;
+      font-weight:700;
+    }
+
+    .today-summary-grid {
+      display:grid;
+      grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);
+      gap:14px;
+    }
+
+    .today-focus-card,
+    .today-upcoming-card {
+      padding:16px;
+      border-radius:18px !important;
+    }
+
+    .today-compact-head {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:11px;
+    }
+
+    .today-section-kicker {
+      display:block;
+      margin-bottom:5px;
+      color:#b75d6f;
+      font-size:8px;
+      font-weight:800;
+      letter-spacing:.14em;
+    }
+
+    .today-compact-head h3 {
+      margin:0;
+      color:#31404c;
+      font-family:"Plus Jakarta Sans",sans-serif;
+      font-size:14px;
+      letter-spacing:-.02em;
+    }
+
+    .today-head-actions {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      flex:0 0 auto;
+    }
+
+    .today-count-badge {
+      min-width:26px;
+      height:26px;
+      display:grid;
+      place-items:center;
+      border-radius:9px;
+      background:#edf2f5;
+      color:#55738a;
+      font-size:9px;
+      font-weight:900;
+    }
+
+    .today-head-actions button {
+      border:0;
+      background:transparent;
+      color:#b95669;
+      padding:5px;
+      font-size:9px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .today-task-list {
+      display:grid;
+      gap:7px;
+    }
+
+    .today-task-list .task-row {
+      padding:10px 11px !important;
+      border-radius:12px !important;
+    }
+
+    .today-task-list .task-title {
+      font-size:12px;
+    }
+
+    .today-task-list .meta {
+      font-size:9px;
+    }
+
+    .today-upcoming-list {
+      display:grid;
+    }
+
+    .today-upcoming-item {
+      width:100%;
+      min-width:0;
+      display:grid;
+      grid-template-columns:65px minmax(0,1fr) auto;
+      align-items:center;
+      gap:9px;
+      border:0;
+      border-bottom:1px solid #eee9e5;
+      background:transparent;
+      color:var(--text);
+      padding:9px 2px;
+      text-align:left;
+      cursor:pointer;
+    }
+
+    .today-upcoming-item:last-child {
+      border-bottom:0;
+    }
+
+    .today-upcoming-date {
+      padding:5px 6px;
+      border-radius:8px;
+      background:#edf2f5;
+      color:#55738a;
+      font-size:8px;
+      font-weight:800;
+      text-align:center;
+    }
+
+    .today-upcoming-copy {
+      min-width:0;
+    }
+
+    .today-upcoming-copy strong {
+      display:block;
+      overflow:hidden;
+      color:#3c4952;
+      font-size:10px;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .today-upcoming-copy small {
+      display:block;
+      margin-top:2px;
+      color:var(--muted);
+      font-size:8px;
+    }
+
+    .today-upcoming-arrow {
+      color:#aaa4a3;
+      font-size:16px;
+    }
+
+    .today-empty-good {
+      display:grid;
+      justify-items:center;
+      gap:4px;
+      padding:22px 12px;
+      border:1px dashed #d9dfdf;
+      border-radius:12px;
+      background:#fbfaf8;
+      text-align:center;
+    }
+
+    .today-empty-good > span {
+      width:30px;
+      height:30px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:#e8f3ed;
+      color:#4d8068;
+      font-weight:900;
+    }
+
+    .today-empty-good strong {
+      color:#43515a;
+      font-size:11px;
+    }
+
+    .today-empty-good small {
+      color:var(--muted);
+      font-size:8px;
+    }
+
+    .today-empty-good.compact {
+      padding:18px 10px;
+    }
+
+    @media (max-width:980px) {
+      .today-focus-hero {
+        grid-template-columns:1fr;
+        grid-template-areas:
+          "copy"
+          "progress"
+          "status";
+      }
+
+      .today-summary-grid {
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:760px) {
+      .today-focus-shell {
+        gap:10px;
+      }
+
+      .today-focus-hero {
+        gap:14px;
+        padding:17px 14px;
+        border-radius:18px;
+      }
+
+      .today-focus-copy h2 {
+        font-size:21px;
+      }
+
+      .today-focus-copy > p {
+        font-size:10px;
+      }
+
+      .today-inline-actions {
+        display:none;
+      }
+
+      .today-progress-card {
+        padding:12px;
+        border-radius:14px;
+      }
+
+      .today-progress-head strong {
+        font-size:24px;
+      }
+
+      .today-progress-mood {
+        font-size:7px;
+        padding:5px 7px;
+      }
+
+      .today-progress-track {
+        height:11px;
+        margin-top:12px;
+      }
+
+      .today-progress-footer {
+        font-size:7px;
+      }
+
+      .today-status-strip {
+        gap:6px;
+      }
+
+      .today-status-pill {
+        gap:6px;
+        padding:8px 7px;
+        border-radius:11px;
+      }
+
+      .today-status-icon {
+        width:24px;
+        height:24px;
+        border-radius:8px;
+      }
+
+      .today-status-pill strong {
+        font-size:14px;
+      }
+
+      .today-status-pill small {
+        font-size:7px;
+      }
+
+      .today-focus-card,
+      .today-upcoming-card {
+        padding:12px;
+        border-radius:15px !important;
+      }
+
+      .today-task-list .task-row:nth-child(n+4) {
+        display:none;
+      }
+
+      .today-upcoming-item {
+        grid-template-columns:58px minmax(0,1fr) auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .today-progress-fill {
+        transition:none !important;
+      }
+
+      .today-progress-fill::after {
+        animation:none !important;
+      }
+
+      .today-status-pill,
+      .today-inline-actions button {
+        transition:none !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
@@ -4547,49 +5114,90 @@
 
     <div class="content">
       <section id="view-today" class="view active">
-        <div class="card today-hero">
-          <div class="today-hero-content">
-            <div id="todayDateLabel" class="today-date"></div>
-            <h2 id="todayGreeting">Olá 👋</h2>
-            <p id="todayMessage">Organize o que importa e avance uma tarefa de cada vez.</p>
-            <div class="daily-progress">
-              <strong>Progresso das tarefas de hoje</strong>
-              <span id="dailyProgressText">0%</span>
-              <div class="progress-track"><div id="dailyProgressBar" class="progress-fill"></div></div>
+        <div class="today-focus-shell">
+          <div class="today-focus-hero">
+            <div class="today-focus-copy">
+              <div id="todayDateLabel" class="today-date"></div>
+              <h2 id="todayGreeting">Olá 👋</h2>
+              <p id="todayMessage">Organize o que importa e avance uma tarefa de cada vez.</p>
+
+              <div class="today-inline-actions">
+                <button type="button" onclick="openTaskModal()">＋ Nova tarefa</button>
+                <button type="button" onclick="openNoteModal()">📝 Anotação</button>
+              </div>
+            </div>
+
+            <div class="today-progress-card">
+              <div class="today-progress-head">
+                <div>
+                  <span class="today-progress-label">PROGRESSO DE HOJE</span>
+                  <strong id="dailyProgressText">0%</strong>
+                </div>
+                <span id="dailyProgressMood" class="today-progress-mood">Começando</span>
+              </div>
+
+              <div class="today-progress-track" aria-label="Progresso das tarefas de hoje">
+                <div id="dailyProgressBar" class="today-progress-fill"></div>
+                <span class="today-progress-marker m25"></span>
+                <span class="today-progress-marker m50"></span>
+                <span class="today-progress-marker m75"></span>
+              </div>
+
+              <div class="today-progress-footer">
+                <span id="dailyProgressCount">0 de 0 concluídas</span>
+                <span id="dailyProgressHint">Sem tarefas com vencimento hoje</span>
+              </div>
+            </div>
+
+            <div class="today-status-strip">
+              <button type="button" class="today-status-pill" onclick="openTodayQuickFilter('today')">
+                <span class="today-status-icon">●</span>
+                <span><strong id="mToday">0</strong><small>Para hoje</small></span>
+              </button>
+              <button type="button" class="today-status-pill danger" onclick="openTodayQuickFilter('overdue')">
+                <span class="today-status-icon">!</span>
+                <span><strong id="mOverdue">0</strong><small>Atrasadas</small></span>
+              </button>
+              <button type="button" class="today-status-pill waiting" onclick="openTodayQuickFilter('waiting')">
+                <span class="today-status-icon">◷</span>
+                <span><strong id="mWaiting">0</strong><small>Aguardando</small></span>
+              </button>
             </div>
           </div>
-        </div>
 
-        <div class="quick-actions">
-          <button class="quick-action" onclick="openTaskModal()">＋ Nova tarefa</button>
-          <button class="quick-action" onclick="openNoteModal()">📝 Anotação</button>
-          <button class="quick-action" onclick="showCompletedHistory()">✓ Concluídas</button>
-        </div>
-
-        <div class="today-metrics" style="margin-top:14px">
-          <div class="card metric"><span>Para hoje</span><strong id="mToday">0</strong><small>Vencem hoje</small></div>
-          <div class="card metric"><span>Atrasadas</span><strong id="mOverdue">0</strong><small>Pedem atenção</small></div>
-          <div class="card metric"><span>Aguardando</span><strong id="mWaiting">0</strong><small>Dependem de retorno</small></div>
-        </div>
-
-        <div class="today-columns">
-          <div class="card section">
-            <div class="section-head">
-              <div><h2>🔥 Prioridade de hoje</h2><p>Atrasadas, urgentes e vencendo hoje.</p></div>
+          <div class="today-summary-grid">
+            <div class="card today-focus-card">
+              <div class="today-compact-head">
+                <div>
+                  <span class="today-section-kicker">FOCO AGORA</span>
+                  <h3>Prioridades do dia</h3>
+                </div>
+                <div class="today-head-actions">
+                  <span id="focusCountBadge" class="today-count-badge">0</span>
+                  <button type="button" onclick="openTodayQuickFilter('focus')">Ver todas</button>
+                </div>
+              </div>
+              <div id="focusList" class="task-list today-task-list"></div>
             </div>
-            <div id="focusList" class="task-list"></div>
-          </div>
 
-          <div class="card section">
-            <div class="section-head">
-              <div><h2>⏭ Próximos dias</h2><p>O que já está chegando.</p></div>
+            <div class="card today-upcoming-card">
+              <div class="today-compact-head">
+                <div>
+                  <span class="today-section-kicker">PRÓXIMOS 7 DIAS</span>
+                  <h3>O que vem depois</h3>
+                </div>
+                <div class="today-head-actions">
+                  <span id="upcomingCountBadge" class="today-count-badge">0</span>
+                  <button type="button" onclick="openTodayQuickFilter('week')">Ver agenda</button>
+                </div>
+              </div>
+              <div id="upcomingList" class="today-upcoming-list"></div>
             </div>
-            <div id="upcomingList" class="task-list"></div>
           </div>
         </div>
       </section>
 
-      <section id="view-tasks" class="view">
+      <section id="view-tasks"<section id="view-tasks" class="view">
         <div class="card section">
           <div class="task-toolbar">
             <div class="quick-filter-scroll" aria-label="Filtros rápidos">
@@ -5564,6 +6172,48 @@ function taskCardHTML(t, compact=false){
   `;
 }
 
+function openTodayQuickFilter(kind){
+  activateView('tasks');
+  fStatus.value='';
+  fPriority.value='';
+  fArea.value='';
+  fProject.value='';
+  fText.value='';
+  advancedFilters.classList.remove('open');
+  advancedFiltersBtn.textContent='⚙ Filtros';
+
+  if(kind==='today') setQuickTaskFilter('today');
+  else if(kind==='overdue') setQuickTaskFilter('overdue');
+  else if(kind==='week') setQuickTaskFilter('week');
+  else if(kind==='waiting'){
+    quickTaskFilter='all';
+    document.querySelectorAll('.quick-filter').forEach(btn=>btn.classList.toggle('active',btn.dataset.quickFilter==='all'));
+    fStatus.value='Aguardando';
+    advancedFilters.classList.add('open');
+    advancedFiltersBtn.textContent='✕ Fechar filtros';
+    renderTaskTable();
+  }else if(kind==='focus'){
+    quickTaskFilter='all';
+    document.querySelectorAll('.quick-filter').forEach(btn=>btn.classList.toggle('active',btn.dataset.quickFilter==='all'));
+    renderTaskTable();
+  }
+}
+
+function todayUpcomingItemHTML(t){
+  const diff=daysDiff(t.due);
+  const when=diff===1?'Amanhã':diff>1?`Em ${diff} dias`:fmtDate(t.due);
+  return `
+    <button type="button" class="today-upcoming-item" onclick="editTask('${t.id}')">
+      <span class="today-upcoming-date">${when}</span>
+      <span class="today-upcoming-copy">
+        <strong>${esc(t.title)}</strong>
+        <small>${t.project ? esc(t.project)+' · ' : ''}${esc(t.priority)}</small>
+      </span>
+      <span class="today-upcoming-arrow">›</span>
+    </button>
+  `;
+}
+
 function renderToday(){
   const active = tasks.filter(t=>t.status!=='Concluída');
   const today = active.filter(t=>daysDiff(t.due)===0);
@@ -5575,15 +6225,49 @@ function renderToday(){
   const firstName=(user?.name || user?.given_name || 'Lala').split(' ')[0];
   todayGreeting.textContent = `Olá, ${firstName} 👋`;
   todayDateLabel.textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
-  todayMessage.textContent = overdue.length
-    ? `Você tem ${overdue.length} tarefa${overdue.length===1?'':'s'} atrasada${overdue.length===1?'':'s'} pedindo atenção.`
-    : 'Seu dia está organizado. Foque no que precisa avançar agora.';
 
   const dueTodayAll = tasks.filter(t=>daysDiff(t.due)===0);
   const dueTodayDone = dueTodayAll.filter(t=>t.status==='Concluída').length;
   const progress = dueTodayAll.length ? Math.round(dueTodayDone/dueTodayAll.length*100) : 0;
-  dailyProgressText.textContent = dueTodayAll.length ? `${progress}% · ${dueTodayDone}/${dueTodayAll.length}` : 'Sem vencimentos hoje';
-  dailyProgressBar.style.width = `${progress}%`;
+
+  let mood='Começando';
+  let hint='Dê o primeiro passo';
+  if(!dueTodayAll.length){
+    mood='Dia livre';
+    hint='Sem tarefas com vencimento hoje';
+  }else if(progress===100){
+    mood='Tudo concluído ✨';
+    hint='Você fechou as tarefas previstas para hoje';
+  }else if(progress>=75){
+    mood='Quase lá';
+    hint='Falta pouco para concluir o dia';
+  }else if(progress>=40){
+    mood='Bom ritmo';
+    hint='Continue assim';
+  }else if(progress>0){
+    mood='Em movimento';
+    hint='O progresso já começou';
+  }
+
+  if(overdue.length){
+    todayMessage.textContent = `${overdue.length} tarefa${overdue.length===1?' atrasada precisa':'s atrasadas precisam'} da sua atenção.`;
+  }else if(today.length){
+    todayMessage.textContent = `Você tem ${today.length} tarefa${today.length===1?'':'s'} para avançar hoje.`;
+  }else{
+    todayMessage.textContent = 'Seu dia está organizado. Use este espaço para manter o foco.';
+  }
+
+  dailyProgressText.textContent = `${progress}%`;
+  dailyProgressCount.textContent = dueTodayAll.length
+    ? `${dueTodayDone} de ${dueTodayAll.length} concluída${dueTodayDone===1?'':'s'}`
+    : '0 de 0 concluídas';
+  dailyProgressMood.textContent=mood;
+  dailyProgressHint.textContent=hint;
+
+  requestAnimationFrame(()=>{
+    dailyProgressBar.style.width=`${progress}%`;
+    dailyProgressBar.classList.toggle('complete',progress===100);
+  });
 
   mToday.textContent = today.length;
   mOverdue.textContent = overdue.length;
@@ -5593,20 +6277,29 @@ function renderToday(){
   [...overdue, ...urgent, ...today].forEach(t=>focusMap.set(t.id,t));
   const focus = [...focusMap.values()].sort((a,b)=>{
     const pa={Urgente:0,Alta:1,Média:2,Baixa:3};
-    return (pa[a.priority]??9)-(pa[b.priority]??9) || (a.due||'9999').localeCompare(b.due||'9999');
+    const da=daysDiff(a.due);
+    const db=daysDiff(b.due);
+    return (da??999)-(db??999) || (pa[a.priority]??9)-(pa[b.priority]??9);
   });
 
-  focusList.innerHTML = focus.length ? focus.map(t=>taskCardHTML(t,true)).join('') : '<div class="empty">Nenhuma tarefa crítica no momento. 🎉</div>';
+  focusCountBadge.textContent=focus.length;
+  const visibleFocus=focus.slice(0,4);
+  focusList.innerHTML = visibleFocus.length
+    ? visibleFocus.map(t=>taskCardHTML(t,true)).join('')
+    : '<div class="today-empty-good"><span>✓</span><strong>Nada crítico agora</strong><small>Você está em dia com as prioridades.</small></div>';
 
   const upcoming = active.filter(t=>{
     const d=daysDiff(t.due);
     return d!==null && d>0 && d<=7;
   }).sort((a,b)=>a.due.localeCompare(b.due));
 
-  upcomingList.innerHTML = upcoming.length ? upcoming.map(t=>taskCardHTML(t,true)).join('') : '<div class="empty">Nada previsto para os próximos 7 dias.</div>';
+  upcomingCountBadge.textContent=upcoming.length;
+  upcomingList.innerHTML = upcoming.length
+    ? upcoming.slice(0,4).map(todayUpcomingItemHTML).join('')
+    : '<div class="today-empty-good compact"><span>○</span><strong>Agenda tranquila</strong><small>Nada previsto para os próximos 7 dias.</small></div>';
 }
 
-function fillFilterOptions(){
+function fillFilterOptionsfunction fillFilterOptions(){
   const values={
     status:fStatus.value, priority:fPriority.value, area:fArea.value, project:fProject.value
   };
