@@ -44,14 +44,19 @@
     .sidebar {
       background: #111827;
       color: white;
-      padding: 22px 16px;
+      padding: 22px 16px 16px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 14px;
       position: sticky;
       top: 0;
-      height: 100vh;
+      height: 100dvh;
+      align-self: start;
+      overflow-y: auto;
+      scrollbar-width: none;
     }
+
+    .sidebar::-webkit-scrollbar { display:none; }
 
     .brand {
       padding: 4px 8px 18px;
@@ -74,6 +79,7 @@
       display:flex;
       flex-direction:column;
       gap:4px;
+      flex:0 0 auto;
     }
 
     .nav button {
@@ -93,20 +99,83 @@
     }
 
     .sidebar-footer {
-      margin-top:auto;
+      margin-top:10px;
+      padding-top:14px;
+      border-top:1px solid rgba(255,255,255,.10);
       display:grid;
+      gap:9px;
+    }
+
+    .sidebar-tools {
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:12px;
+      overflow:hidden;
+      background:#182231;
+    }
+
+    .sidebar-tools summary {
+      list-style:none;
+      cursor:pointer;
+      padding:10px 12px;
+      color:#dce4ef;
+      font-size:12px;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
       gap:8px;
+      user-select:none;
+    }
+
+    .sidebar-tools summary::-webkit-details-marker { display:none; }
+
+    .sidebar-tools summary::after {
+      content:"⌄";
+      color:#8d9aae;
+      font-size:14px;
+      transition:transform .15s ease;
+    }
+
+    .sidebar-tools[open] summary::after { transform:rotate(180deg); }
+
+    .sidebar-tools-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:6px;
+      padding:0 8px 8px;
     }
 
     .sidebar-footer button, .file-label {
-      border:1px solid rgba(255,255,255,.14);
-      background:#1f2937;
+      border:1px solid rgba(255,255,255,.10);
+      background:#202b3b;
       color:#e8edf3;
-      padding:10px 12px;
-      border-radius:10px;
+      padding:9px 8px;
+      border-radius:9px;
       text-align:center;
-      font-size:12px;
+      font-size:10px;
+      line-height:1.25;
       cursor:pointer;
+    }
+
+    .sidebar-footer button:hover,
+    .file-label:hover {
+      background:#2a3749;
+      border-color:rgba(255,255,255,.17);
+    }
+
+    .sidebar-logout {
+      width:100%;
+      background:transparent !important;
+      color:#aeb9c9 !important;
+      border-color:transparent !important;
+      text-align:left !important;
+      padding:8px 10px !important;
+      font-size:11px !important;
+    }
+
+    .sidebar-logout:hover {
+      color:#fff !important;
+      background:rgba(255,255,255,.06) !important;
     }
 
     main { min-width:0; }
@@ -1182,15 +1251,20 @@
     </div>
 
     <div class="sidebar-footer">
-      <button onclick="exportCSV()">📤 Exportar CSV</button>
-      <label class="file-label">📥 Importar CSV
-        <input id="importCSV" type="file" accept=".csv" style="display:none">
-      </label>
-      <button onclick="exportJSON()">💾 Backup JSON</button>
-      <label class="file-label">♻️ Restaurar JSON
-        <input id="importJSON" type="file" accept=".json" style="display:none">
-      </label>
-      <button onclick="logoutGoogle()">🚪 Sair da conta</button>
+      <details class="sidebar-tools">
+        <summary>⚙️ Ferramentas</summary>
+        <div class="sidebar-tools-grid">
+          <button onclick="exportCSV()">📤 Exportar<br>CSV</button>
+          <label class="file-label">📥 Importar<br>CSV
+            <input id="importCSV" type="file" accept=".csv" style="display:none">
+          </label>
+          <button onclick="exportJSON()">💾 Fazer<br>backup</button>
+          <label class="file-label">♻️ Restaurar<br>backup
+            <input id="importJSON" type="file" accept=".json" style="display:none">
+          </label>
+        </div>
+      </details>
+      <button class="sidebar-logout" onclick="logoutGoogle()">🚪 Sair da conta</button>
     </div>
   </aside>
 
