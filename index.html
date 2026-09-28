@@ -5035,6 +5035,146 @@
     }
   </style>
 
+
+  <style id="ulala-today-smart-summary-v8">
+    .today-smart-summary {
+      display:grid;
+      grid-template-columns:minmax(0,1.45fr) repeat(2,minmax(135px,.72fr));
+      gap:7px;
+      margin-top:15px;
+    }
+
+    .today-smart-item {
+      min-width:0;
+      min-height:56px;
+      display:flex;
+      align-items:center;
+      gap:9px;
+      padding:9px 10px;
+      border:1px solid rgba(255,255,255,.13);
+      border-radius:12px;
+      background:rgba(255,255,255,.075);
+      color:#fff;
+      text-align:left;
+      backdrop-filter:blur(6px);
+    }
+
+    button.today-smart-item {
+      cursor:pointer;
+      transition:background .15s ease,transform .15s ease,border-color .15s ease;
+    }
+
+    button.today-smart-item:not(:disabled):hover {
+      background:rgba(255,255,255,.14);
+      border-color:rgba(255,255,255,.20);
+      transform:translateY(-1px);
+    }
+
+    button.today-smart-item:disabled {
+      cursor:default;
+      opacity:.76;
+    }
+
+    .today-smart-icon {
+      width:29px;
+      height:29px;
+      flex:0 0 29px;
+      display:grid;
+      place-items:center;
+      border-radius:9px;
+      background:rgba(255,255,255,.11);
+      color:#f4c4cd;
+      font-size:13px;
+      font-weight:900;
+    }
+
+    .today-smart-copy {
+      min-width:0;
+      display:block;
+    }
+
+    .today-smart-copy small {
+      display:block;
+      margin-bottom:3px;
+      color:rgba(255,255,255,.53);
+      font-size:7px;
+      line-height:1;
+      font-weight:800;
+      letter-spacing:.10em;
+    }
+
+    .today-smart-copy strong {
+      display:block;
+      overflow:hidden;
+      color:#fff;
+      font-size:10px;
+      line-height:1.25;
+      font-weight:800;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .today-next-task .today-smart-icon {
+      background:rgba(216,107,125,.22);
+      color:#ffdbe1;
+    }
+
+    .today-next-task.empty .today-smart-icon {
+      background:rgba(255,255,255,.09);
+      color:rgba(255,255,255,.55);
+    }
+
+    @media (max-width:980px) {
+      .today-smart-summary {
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+
+      .today-next-task {
+        grid-column:1 / -1;
+      }
+    }
+
+    @media (max-width:760px) {
+      .today-smart-summary {
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:6px;
+        margin-top:12px;
+      }
+
+      .today-next-task {
+        grid-column:1 / -1;
+      }
+
+      .today-smart-item {
+        min-height:52px;
+        padding:8px;
+      }
+
+      .today-smart-icon {
+        width:26px;
+        height:26px;
+        flex-basis:26px;
+        border-radius:8px;
+        font-size:11px;
+      }
+
+      .today-smart-copy strong {
+        font-size:9px;
+      }
+
+      .today-smart-copy small {
+        font-size:6.5px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      button.today-smart-item {
+        transition:none !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
@@ -5121,9 +5261,30 @@
               <h2 id="todayGreeting">Olá 👋</h2>
               <p id="todayMessage">Organize o que importa e avance uma tarefa de cada vez.</p>
 
-              <div class="today-inline-actions">
-                <button type="button" onclick="openTaskModal()">＋ Nova tarefa</button>
-                <button type="button" onclick="openNoteModal()">📝 Anotação</button>
+              <div class="today-smart-summary">
+                <button id="todayNextTaskCard" class="today-smart-item today-next-task" type="button" onclick="openTodayNextTask()">
+                  <span class="today-smart-icon">→</span>
+                  <span class="today-smart-copy">
+                    <small>PRÓXIMA AÇÃO</small>
+                    <strong id="todayNextTaskTitle">Nenhuma tarefa imediata</strong>
+                  </span>
+                </button>
+
+                <div class="today-smart-item">
+                  <span class="today-smart-icon">◴</span>
+                  <span class="today-smart-copy">
+                    <small>CARGA DE HOJE</small>
+                    <strong id="todayHoursPlanned">0h planejadas</strong>
+                  </span>
+                </div>
+
+                <div class="today-smart-item">
+                  <span class="today-smart-icon">✓</span>
+                  <span class="today-smart-copy">
+                    <small>CONCLUÍDAS HOJE</small>
+                    <strong id="todayCompletedCount">0 tarefas</strong>
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -6214,6 +6375,12 @@ function todayUpcomingItemHTML(t){
   `;
 }
 
+let todayNextTaskId = '';
+
+function openTodayNextTask(){
+  if(todayNextTaskId) editTask(todayNextTaskId);
+}
+
 function renderToday(){
   const active = tasks.filter(t=>t.status!=='Concluída');
   const today = active.filter(t=>daysDiff(t.due)===0);
@@ -6273,6 +6440,15 @@ function renderToday(){
   mOverdue.textContent = overdue.length;
   mWaiting.textContent = waiting.length;
 
+  const completedToday = tasks.filter(t=>t.completedAt===todayISO()).length;
+  const hoursToday = dueTodayAll.reduce((sum,t)=>sum+(Number(t.hours)||0),0);
+
+  todayHoursPlanned.textContent = hoursToday
+    ? `${hoursToday.toFixed(hoursToday % 1 ? 1 : 0)}h planejada${hoursToday===1?'':'s'}`
+    : 'Sem horas estimadas';
+
+  todayCompletedCount.textContent = `${completedToday} tarefa${completedToday===1?'':'s'}`;
+
   const focusMap = new Map();
   [...overdue, ...urgent, ...today].forEach(t=>focusMap.set(t.id,t));
   const focus = [...focusMap.values()].sort((a,b)=>{
@@ -6281,6 +6457,15 @@ function renderToday(){
     const db=daysDiff(b.due);
     return (da??999)-(db??999) || (pa[a.priority]??9)-(pa[b.priority]??9);
   });
+
+  const nextTask = focus[0] || today[0] || active
+    .filter(t=>t.due)
+    .sort((a,b)=>a.due.localeCompare(b.due))[0] || null;
+
+  todayNextTaskId = nextTask?.id || '';
+  todayNextTaskTitle.textContent = nextTask?.title || 'Nenhuma tarefa imediata';
+  todayNextTaskCard.disabled = !nextTask;
+  todayNextTaskCard.classList.toggle('empty',!nextTask);
 
   focusCountBadge.textContent=focus.length;
   const visibleFocus=focus.slice(0,4);
