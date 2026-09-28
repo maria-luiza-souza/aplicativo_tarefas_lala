@@ -67,6 +67,7 @@ export function WorkspaceProvider({ user, children }: PropsWithChildren<{ user: 
   const readyRef = useRef(false);
   const saveTimer = useRef<number | null>(null);
   const lastCloudSignatureRef = useRef('');
+  const localSignatureRef = useRef('');
 
   useEffect(() => {
     localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
@@ -75,6 +76,10 @@ export function WorkspaceProvider({ user, children }: PropsWithChildren<{ user: 
   useEffect(() => {
     localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
   }, [notes]);
+
+  useEffect(() => {
+    localSignatureRef.current = JSON.stringify({ tasks, notes });
+  }, [tasks, notes]);
 
   useEffect(() => {
     const workspaceRef = doc(db, 'users', user.uid, 'workspace', 'main');
@@ -118,8 +123,7 @@ export function WorkspaceProvider({ user, children }: PropsWithChildren<{ user: 
 
             lastCloudSignatureRef.current = remoteSignature;
 
-            const localSignature = JSON.stringify({ tasks, notes });
-            if (remoteSignature !== localSignature) {
+            if (remoteSignature !== localSignatureRef.current) {
               setTasks(remoteTasks);
               setNotes(remoteNotes);
             }
