@@ -13,7 +13,15 @@ import { CalendarPage } from './pages/Calendar';
 import { NotesPage } from './pages/Notes';
 import { DashboardPage } from './pages/Dashboard';
 
-function LoginScreen() {
+type Theme = 'light' | 'dark';
+
+function LoginScreen({
+  theme,
+  onToggleTheme
+}: {
+  theme: Theme;
+  onToggleTheme: () => void;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const logo = import.meta.env.BASE_URL + 'logo-ulala.webp';
@@ -32,30 +40,36 @@ function LoginScreen() {
 
   return (
     <main className="login-screen">
+      <button
+        type="button"
+        className="login-theme-toggle"
+        onClick={onToggleTheme}
+        title={theme === 'dark' ? 'Usar modo claro' : 'Usar modo escuro'}
+      >
+        {theme === 'dark' ? '☀' : '☾'}
+      </button>
+
       <section className="login-card">
         <div className="login-brand">
-          <div className="brand-mark brand-mark-login" aria-hidden="true">
-            <span className="brand-orbit orbit-one" />
-            <span className="brand-orbit orbit-two" />
-            <div className="brand-art">
-              <img src={logo} alt="" />
-            </div>
-            <span className="brand-music-note note-one">♪</span>
-            <span className="brand-music-note note-two">♫</span>
+          <div className="login-brand-emblem" aria-hidden="true">
+            <img src={logo} alt="" />
+            <i />
           </div>
 
           <div className="login-brand-copy">
-            <span className="login-brand-kicker">SEU ESPAÇO DE ORGANIZAÇÃO</span>
-            <h1>ULALÁ</h1>
+            <span className="login-brand-kicker">ORGANIZE · PRIORIZE · AVANCE</span>
+            <h1>ulalá</h1>
             <small>workspace</small>
           </div>
         </div>
 
         <p>Organize tarefas, projetos, prazos e anotações em um espaço só seu.</p>
+
         <button type="button" className="google-button" onClick={() => void login()} disabled={loading}>
           <span>G</span>
           {loading ? 'Entrando...' : 'Continuar com Google'}
         </button>
+
         {error && <small className="login-error">{error}</small>}
         <em>O Google é usado apenas para autenticação.</em>
       </section>
@@ -63,7 +77,15 @@ function LoginScreen() {
   );
 }
 
-function WorkspaceApp({ user }: { user: User }) {
+function WorkspaceApp({
+  user,
+  theme,
+  onToggleTheme
+}: {
+  user: User;
+  theme: Theme;
+  onToggleTheme: () => void;
+}) {
   const { syncState } = useWorkspace();
   const [activeView, setActiveView] = useState<ViewKey>('today');
   const [search, setSearch] = useState('');
@@ -101,6 +123,8 @@ function WorkspaceApp({ user }: { user: User }) {
         search={search}
         setSearch={changeSearch}
         onCreateTask={createTask}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
       >
         {activeView === 'today' && <TodayPage onEdit={editTask} onOpenTasks={openTasks} />}
         {activeView === 'tasks' && (
@@ -115,7 +139,7 @@ function WorkspaceApp({ user }: { user: User }) {
         {activeView === 'kanban' && <KanbanPage onEdit={editTask} />}
         {activeView === 'calendar' && <CalendarPage onEdit={editTask} />}
         {activeView === 'notes' && <NotesPage />}
-        {activeView === 'dashboard' && <DashboardPage onOpenTasks={openTasks} />}
+        {activeView === 'dashboard' && <DashboardPage onOpenTasks={openTasks} theme={theme} />}
       </Layout>
 
       <TaskModal
@@ -129,18 +153,34 @@ function WorkspaceApp({ user }: { user: User }) {
 
 export default function App() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [theme, setTheme] = useState<Theme>(() => {
+    const stored = localStorage.getItem('ulala_theme');
+    if (stored === 'dark' || stored === 'light') return stored;
+    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
 
   useEffect(() => onAuthStateChanged(auth, current => setUser(current)), []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('ulala_theme', theme);
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme(current => current === 'dark' ? 'light' : 'dark');
+  }
 
   if (user === undefined) {
     return <div className="boot-screen"><span className="boot-dot" /><strong>ULALÁ</strong></div>;
   }
 
-  if (!user) return <LoginScreen />;
+  if (!user) {
+    return <LoginScreen theme={theme} onToggleTheme={toggleTheme} />;
+  }
 
   return (
     <WorkspaceProvider user={user}>
-      <WorkspaceApp user={user} />
+      <WorkspaceApp user={user} theme={theme} onToggleTheme={toggleTheme} />
     </WorkspaceProvider>
   );
 }
