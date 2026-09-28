@@ -3791,6 +3791,683 @@
     }
   </style>
 
+
+  <style id="ulala-dashboard-v6">
+    .dashboard-shell {
+      display:grid;
+      gap:16px;
+    }
+
+    .dashboard-hero {
+      position:relative;
+      overflow:hidden;
+      min-height:220px;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      align-items:center;
+      gap:26px;
+      padding:28px 30px;
+      border-radius:24px;
+      color:#fff;
+      background:
+        radial-gradient(circle at 88% 16%, rgba(216,107,125,.40), transparent 28%),
+        radial-gradient(circle at 68% 120%, rgba(255,255,255,.10), transparent 35%),
+        linear-gradient(125deg,#243f55 0%,#355e78 57%,#6d8da5 100%);
+      box-shadow:0 18px 42px rgba(37,62,80,.19);
+    }
+
+    .dashboard-hero::before {
+      content:"";
+      position:absolute;
+      width:220px;
+      height:220px;
+      border:1px solid rgba(255,255,255,.11);
+      border-radius:50%;
+      right:140px;
+      top:-110px;
+    }
+
+    .dashboard-hero-copy,
+    .dashboard-score {
+      position:relative;
+      z-index:1;
+    }
+
+    .dashboard-eyebrow,
+    .dashboard-card-kicker {
+      display:block;
+      font-size:9px;
+      line-height:1;
+      font-weight:800;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .dashboard-eyebrow {
+      color:#f0bcc6;
+      margin-bottom:10px;
+    }
+
+    .dashboard-hero h2 {
+      margin:0;
+      font-family:"Plus Jakarta Sans",sans-serif;
+      font-size:30px;
+      line-height:1.1;
+      letter-spacing:-.035em;
+    }
+
+    .dashboard-hero p {
+      max-width:620px;
+      margin:9px 0 0;
+      color:rgba(255,255,255,.78);
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .dashboard-hero-actions {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-top:20px;
+    }
+
+    .dashboard-period,
+    .dashboard-refresh {
+      min-height:38px;
+      border:1px solid rgba(255,255,255,.20);
+      border-radius:10px;
+      color:#fff;
+      background:rgba(255,255,255,.10);
+      backdrop-filter:blur(8px);
+      padding:8px 11px;
+      font:700 11px "Manrope",sans-serif;
+      outline:none;
+    }
+
+    .dashboard-period option {
+      color:#28343d;
+      background:#fff;
+    }
+
+    .dashboard-refresh {
+      cursor:pointer;
+      transition:background .15s ease,transform .15s ease;
+    }
+
+    .dashboard-refresh:hover {
+      background:rgba(255,255,255,.17);
+      transform:translateY(-1px);
+    }
+
+    .dashboard-score {
+      width:170px;
+      display:grid;
+      justify-items:center;
+      gap:8px;
+    }
+
+    .dashboard-ring {
+      --progress:0;
+      width:142px;
+      height:142px;
+      padding:9px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:conic-gradient(#f4a2b0 calc(var(--progress) * 1%), rgba(255,255,255,.16) 0);
+      box-shadow:0 13px 34px rgba(17,43,61,.18);
+      transition:background .5s ease;
+    }
+
+    .dashboard-ring-inner {
+      width:100%;
+      height:100%;
+      display:grid;
+      place-content:center;
+      text-align:center;
+      border-radius:50%;
+      background:rgba(34,62,82,.88);
+      border:1px solid rgba(255,255,255,.13);
+      backdrop-filter:blur(8px);
+    }
+
+    .dashboard-ring-inner strong {
+      font-family:"Plus Jakarta Sans",sans-serif;
+      font-size:30px;
+      line-height:1;
+    }
+
+    .dashboard-ring-inner span {
+      margin-top:5px;
+      color:rgba(255,255,255,.67);
+      font-size:9px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.10em;
+    }
+
+    .dashboard-score > small {
+      color:rgba(255,255,255,.72);
+      font-size:9px;
+      text-align:center;
+    }
+
+    .dashboard-kpis {
+      display:grid;
+      grid-template-columns:repeat(6,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .dashboard-kpi {
+      position:relative;
+      min-width:0;
+      min-height:126px;
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr) auto;
+      align-items:center;
+      gap:10px;
+      padding:15px;
+      border:1px solid var(--border);
+      border-radius:17px;
+      background:#fff;
+      color:var(--text);
+      text-align:left;
+      cursor:pointer;
+      box-shadow:0 8px 22px rgba(47,57,66,.055);
+      overflow:hidden;
+      transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+    }
+
+    .dashboard-kpi::after {
+      content:"";
+      position:absolute;
+      width:62px;
+      height:62px;
+      border-radius:50%;
+      right:-30px;
+      top:-30px;
+      background:var(--kpi-tint,#eef2f4);
+    }
+
+    .dashboard-kpi:hover {
+      transform:translateY(-3px);
+      border-color:#cbd7de;
+      box-shadow:0 13px 28px rgba(47,57,66,.09);
+    }
+
+    .dashboard-kpi-icon {
+      width:34px;
+      height:34px;
+      display:grid;
+      place-items:center;
+      border-radius:11px;
+      background:var(--kpi-bg,#eef2f4);
+      color:var(--kpi-fg,#526b7c);
+      font-size:16px;
+      font-weight:900;
+    }
+
+    .dashboard-kpi div {
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .dashboard-kpi small {
+      color:var(--muted);
+      font-size:9px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .dashboard-kpi strong {
+      margin-top:3px;
+      font-family:"Plus Jakarta Sans",sans-serif;
+      font-size:25px;
+      line-height:1;
+      color:#31404c;
+    }
+
+    .dashboard-kpi em {
+      margin-top:6px;
+      overflow:hidden;
+      color:#8a8584;
+      font-size:9px;
+      font-style:normal;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .dashboard-kpi-arrow {
+      position:relative;
+      z-index:1;
+      color:#b0aaac;
+      font-size:20px;
+    }
+
+    .kpi-total { --kpi-bg:#edf2f5; --kpi-fg:#55738a; --kpi-tint:#f1f5f7; }
+    .kpi-progress { --kpi-bg:#e6eff5; --kpi-fg:#47708c; --kpi-tint:#edf4f8; }
+    .kpi-overdue { --kpi-bg:#fae9ed; --kpi-fg:#bd5368; --kpi-tint:#fcf0f2; }
+    .kpi-done { --kpi-bg:#e8f3ed; --kpi-fg:#4a8067; --kpi-tint:#eff7f3; }
+    .kpi-waiting { --kpi-bg:#efeaf2; --kpi-fg:#756182; --kpi-tint:#f5f1f6; }
+    .kpi-hours { --kpi-bg:#f8efe4; --kpi-fg:#9b6d3f; --kpi-tint:#fbf5ee; }
+
+    .dashboard-main-grid,
+    .dashboard-secondary-grid,
+    .dashboard-bottom-grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:16px;
+    }
+
+    .dashboard-chart-card,
+    .dashboard-insights-card,
+    .dashboard-activity-card,
+    .dashboard-projects-card {
+      padding:18px;
+      border-radius:19px !important;
+    }
+
+    .dashboard-card-head {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .dashboard-card-kicker {
+      color:#b86676;
+      margin-bottom:7px;
+    }
+
+    .dashboard-card-head h3 {
+      margin:0;
+      color:#31404c;
+      font-family:"Plus Jakarta Sans",sans-serif;
+      font-size:15px;
+      letter-spacing:-.02em;
+    }
+
+    .dashboard-card-head p {
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:10px;
+      line-height:1.4;
+    }
+
+    .dashboard-card-badge {
+      flex:0 0 auto;
+      padding:6px 8px;
+      border-radius:999px;
+      background:#edf2f5;
+      color:#5a7284;
+      font-size:9px;
+      font-weight:800;
+    }
+
+    .dashboard-chart-wrap {
+      position:relative;
+      height:285px;
+    }
+
+    .dashboard-donut-wrap {
+      max-width:440px;
+      margin:0 auto;
+    }
+
+    .dashboard-donut-center {
+      position:absolute;
+      pointer-events:none;
+      inset:50% auto auto 50%;
+      transform:translate(-50%,-68%);
+      display:grid;
+      text-align:center;
+    }
+
+    .dashboard-donut-center strong {
+      color:#31404c;
+      font-family:"Plus Jakarta Sans",sans-serif;
+      font-size:29px;
+      line-height:1;
+    }
+
+    .dashboard-donut-center span {
+      margin-top:4px;
+      color:var(--muted);
+      font-size:9px;
+      font-weight:700;
+    }
+
+    .dashboard-insights {
+      display:grid;
+      gap:8px;
+    }
+
+    .dashboard-insight {
+      width:100%;
+      display:grid;
+      grid-template-columns:36px minmax(0,1fr) auto;
+      align-items:center;
+      gap:10px;
+      border:1px solid #e6e1de;
+      border-radius:13px;
+      background:#fff;
+      padding:10px;
+      color:var(--text);
+      text-align:left;
+      cursor:pointer;
+      transition:transform .14s ease,background .14s ease;
+    }
+
+    .dashboard-insight:hover {
+      transform:translateX(2px);
+      background:#fafafa;
+    }
+
+    .dashboard-insight-icon {
+      width:34px;
+      height:34px;
+      display:grid;
+      place-items:center;
+      border-radius:11px;
+      background:#f0f3f4;
+      font-weight:900;
+    }
+
+    .dashboard-insight.danger .dashboard-insight-icon { background:#fae9ed; color:#b94d62; }
+    .dashboard-insight.success .dashboard-insight-icon { background:#e8f3ed; color:#4c8068; }
+    .dashboard-insight.coral .dashboard-insight-icon { background:#fae9ed; color:#c05a6e; }
+    .dashboard-insight.blue .dashboard-insight-icon { background:#e8f0f5; color:#4d7189; }
+    .dashboard-insight.neutral .dashboard-insight-icon { background:#f0f0ee; color:#777270; }
+
+    .dashboard-insight strong,
+    .dashboard-recent-copy strong {
+      display:block;
+      color:#38454f;
+      font-size:11px;
+    }
+
+    .dashboard-insight small,
+    .dashboard-recent-copy small {
+      display:block;
+      margin-top:2px;
+      color:var(--muted);
+      font-size:9px;
+      line-height:1.35;
+    }
+
+    .dashboard-insight-arrow {
+      color:#aaa4a4;
+      font-size:18px;
+    }
+
+    .dashboard-recent {
+      display:grid;
+      gap:4px;
+    }
+
+    .dashboard-recent-item {
+      width:100%;
+      display:grid;
+      grid-template-columns:31px minmax(0,1fr) auto;
+      align-items:center;
+      gap:9px;
+      border:0;
+      border-bottom:1px solid #eee9e6;
+      background:transparent;
+      padding:9px 3px;
+      color:var(--text);
+      text-align:left;
+      cursor:pointer;
+    }
+
+    .dashboard-recent-item:last-child {
+      border-bottom:0;
+    }
+
+    .dashboard-recent-check {
+      width:29px;
+      height:29px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:#e8f3ed;
+      color:#4f8169;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .dashboard-link-btn {
+      flex:0 0 auto;
+      border:0;
+      background:transparent;
+      color:#b95669;
+      font-size:9px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .dashboard-project-list {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:9px;
+    }
+
+    .dashboard-project {
+      min-width:0;
+      display:grid;
+      gap:12px;
+      border:1px solid #e7e2df;
+      border-radius:14px;
+      background:#fbfaf8;
+      padding:13px;
+      color:var(--text);
+      text-align:left;
+      cursor:pointer;
+      transition:border-color .14s ease,transform .14s ease;
+    }
+
+    .dashboard-project:hover {
+      transform:translateY(-2px);
+      border-color:#c4d1d9;
+    }
+
+    .dashboard-project-name {
+      display:block;
+      overflow:hidden;
+      color:#364651;
+      font-size:11px;
+      font-weight:800;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .dashboard-project-meta {
+      display:block;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:9px;
+    }
+
+    .dashboard-project-progress {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      align-items:center;
+      gap:8px;
+    }
+
+    .dashboard-project-progress > span {
+      height:6px;
+      overflow:hidden;
+      border-radius:999px;
+      background:#e8e5e2;
+    }
+
+    .dashboard-project-progress i {
+      display:block;
+      height:100%;
+      border-radius:inherit;
+      background:linear-gradient(90deg,#7692aa,#d86b7d);
+    }
+
+    .dashboard-project-progress strong {
+      min-width:30px;
+      color:#5a6872;
+      font-size:9px;
+      text-align:right;
+    }
+
+    .dashboard-empty-state {
+      padding:24px 10px;
+      color:var(--muted);
+      font-size:10px;
+      text-align:center;
+    }
+
+    @media (max-width:1180px) {
+      .dashboard-kpis {
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+
+      .dashboard-project-list {
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+    }
+
+    @media (max-width:760px) {
+      .dashboard-shell {
+        gap:11px;
+      }
+
+      .dashboard-hero {
+        min-height:auto;
+        grid-template-columns:1fr;
+        gap:20px;
+        padding:20px 16px;
+        border-radius:19px;
+      }
+
+      .dashboard-hero h2 {
+        font-size:24px;
+      }
+
+      .dashboard-hero p {
+        font-size:11px;
+      }
+
+      .dashboard-hero-actions {
+        display:grid;
+        grid-template-columns:1fr auto;
+        margin-top:15px;
+      }
+
+      .dashboard-period,
+      .dashboard-refresh {
+        min-height:42px;
+        font-size:11px;
+      }
+
+      .dashboard-score {
+        width:100%;
+        grid-template-columns:auto 1fr;
+        justify-items:start;
+        align-items:center;
+      }
+
+      .dashboard-ring {
+        width:100px;
+        height:100px;
+        padding:7px;
+      }
+
+      .dashboard-ring-inner strong {
+        font-size:22px;
+      }
+
+      .dashboard-score > small {
+        max-width:150px;
+        text-align:left;
+        font-size:9px;
+      }
+
+      .dashboard-kpis {
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:8px;
+      }
+
+      .dashboard-kpi {
+        min-height:105px;
+        grid-template-columns:30px minmax(0,1fr);
+        padding:12px 10px;
+      }
+
+      .dashboard-kpi-icon {
+        width:30px;
+        height:30px;
+        border-radius:9px;
+        font-size:14px;
+      }
+
+      .dashboard-kpi strong {
+        font-size:22px;
+      }
+
+      .dashboard-kpi em {
+        font-size:8px;
+      }
+
+      .dashboard-kpi-arrow {
+        display:none;
+      }
+
+      .dashboard-main-grid,
+      .dashboard-secondary-grid,
+      .dashboard-bottom-grid {
+        grid-template-columns:1fr;
+        gap:11px;
+      }
+
+      .dashboard-chart-card,
+      .dashboard-insights-card,
+      .dashboard-activity-card,
+      .dashboard-projects-card {
+        padding:13px;
+        border-radius:15px !important;
+      }
+
+      .dashboard-chart-wrap {
+        height:250px;
+      }
+
+      .dashboard-project-list {
+        grid-template-columns:1fr;
+      }
+
+      .dashboard-card-head {
+        align-items:flex-start;
+      }
+
+      .dashboard-card-head h3 {
+        font-size:14px;
+      }
+
+      .dashboard-card-head p {
+        font-size:9px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .dashboard-kpi,
+      .dashboard-insight,
+      .dashboard-project,
+      .dashboard-refresh {
+        transition:none !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
@@ -4039,17 +4716,165 @@
       </section>
 
       <section id="view-dashboard" class="view">
-        <div class="grid-4">
-          <div class="card metric"><span>Total</span><strong id="dTotal">0</strong><small>Tarefas cadastradas</small></div>
-          <div class="card metric"><span>Em andamento</span><strong id="dProgress">0</strong><small>Execução ativa</small></div>
-          <div class="card metric"><span>Concluídas</span><strong id="dDone">0</strong><small id="dRate">0% de conclusão</small></div>
-          <div class="card metric"><span>Horas estimadas</span><strong id="dHours">0h</strong><small>Carga planejada</small></div>
-        </div>
+        <div class="dashboard-shell">
+          <div class="dashboard-hero">
+            <div class="dashboard-hero-copy">
+              <span class="dashboard-eyebrow">VISÃO EXECUTIVA</span>
+              <h2>Panorama do trabalho</h2>
+              <p id="dashboardHeroMessage">Acompanhe produtividade, prioridades e gargalos em um só lugar.</p>
+              <div class="dashboard-hero-actions">
+                <select id="dashboardPeriod" class="dashboard-period" aria-label="Período do dashboard">
+                  <option value="all">Visão geral</option>
+                  <option value="month">Este mês</option>
+                  <option value="30days">Últimos 30 dias</option>
+                  <option value="year">Este ano</option>
+                </select>
+                <button class="dashboard-refresh" type="button" onclick="renderDashboard()">↻ Atualizar</button>
+              </div>
+            </div>
 
-        <div class="grid-2" style="margin-top:18px">
-          <div class="card chart-box"><canvas id="statusChart"></canvas></div>
-          <div class="card chart-box"><canvas id="areaChart"></canvas></div>
+            <div class="dashboard-score">
+              <div class="dashboard-ring" id="dashboardRing" style="--progress:0">
+                <div class="dashboard-ring-inner">
+                  <strong id="dashboardScoreValue">0%</strong>
+                  <span>conclusão</span>
+                </div>
+              </div>
+              <small id="dashboardScoreCaption">0 de 0 tarefas concluídas</small>
+            </div>
+          </div>
+
+          <div class="dashboard-kpis">
+            <button class="dashboard-kpi kpi-total" type="button" onclick="openDashboardTasks('all')">
+              <span class="dashboard-kpi-icon">◎</span>
+              <div><small>Total de tarefas</small><strong id="dTotal">0</strong><em id="dTotalMeta">Visão completa</em></div>
+              <span class="dashboard-kpi-arrow">›</span>
+            </button>
+            <button class="dashboard-kpi kpi-progress" type="button" onclick="openDashboardTasks('progress')">
+              <span class="dashboard-kpi-icon">◐</span>
+              <div><small>Em andamento</small><strong id="dProgress">0</strong><em id="dProgressMeta">Em execução</em></div>
+              <span class="dashboard-kpi-arrow">›</span>
+            </button>
+            <button class="dashboard-kpi kpi-overdue" type="button" onclick="openDashboardTasks('overdue')">
+              <span class="dashboard-kpi-icon">!</span>
+              <div><small>Atrasadas</small><strong id="dOverdue">0</strong><em id="dOverdueMeta">Precisam de atenção</em></div>
+              <span class="dashboard-kpi-arrow">›</span>
+            </button>
+            <button class="dashboard-kpi kpi-done" type="button" onclick="openDashboardTasks('done')">
+              <span class="dashboard-kpi-icon">✓</span>
+              <div><small>Concluídas</small><strong id="dDone">0</strong><em id="dRate">0% de conclusão</em></div>
+              <span class="dashboard-kpi-arrow">›</span>
+            </button>
+            <button class="dashboard-kpi kpi-waiting" type="button" onclick="openDashboardTasks('waiting')">
+              <span class="dashboard-kpi-icon">◷</span>
+              <div><small>Aguardando</small><strong id="dWaiting">0</strong><em id="dWaitingMeta">Dependem de retorno</em></div>
+              <span class="dashboard-kpi-arrow">›</span>
+            </button>
+            <button class="dashboard-kpi kpi-hours" type="button" onclick="openDashboardTasks('hours')">
+              <span class="dashboard-kpi-icon">◴</span>
+              <div><small>Horas estimadas</small><strong id="dHours">0h</strong><em id="dHoursMeta">Carga planejada</em></div>
+              <span class="dashboard-kpi-arrow">›</span>
+            </button>
+          </div>
+
+          <div class="dashboard-main-grid">
+            <div class="card dashboard-chart-card dashboard-status-card">
+              <div class="dashboard-card-head">
+                <div>
+                  <span class="dashboard-card-kicker">FLUXO</span>
+                  <h3>Status das tarefas</h3>
+                  <p>Clique em uma fatia para abrir as tarefas daquele status.</p>
+                </div>
+                <span class="dashboard-card-badge" id="dashboardActiveCount">0 ativas</span>
+              </div>
+              <div class="dashboard-chart-wrap dashboard-donut-wrap">
+                <canvas id="statusChart"></canvas>
+                <div class="dashboard-donut-center">
+                  <strong id="dashboardDonutValue">0</strong>
+                  <span>tarefas</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card dashboard-chart-card">
+              <div class="dashboard-card-head">
+                <div>
+                  <span class="dashboard-card-kicker">EVOLUÇÃO</span>
+                  <h3>Produtividade</h3>
+                  <p>Conclusões registradas nos últimos 6 meses.</p>
+                </div>
+              </div>
+              <div class="dashboard-chart-wrap">
+                <canvas id="completionChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-secondary-grid">
+            <div class="card dashboard-chart-card">
+              <div class="dashboard-card-head">
+                <div>
+                  <span class="dashboard-card-kicker">CAPACIDADE</span>
+                  <h3>Carga por área</h3>
+                  <p>Horas estimadas distribuídas entre os setores.</p>
+                </div>
+              </div>
+              <div class="dashboard-chart-wrap">
+                <canvas id="areaChart"></canvas>
+              </div>
+            </div>
+
+            <div class="card dashboard-chart-card">
+              <div class="dashboard-card-head">
+                <div>
+                  <span class="dashboard-card-kicker">PRIORIDADE</span>
+                  <h3>Nível de atenção</h3>
+                  <p>Onde a energia do trabalho está concentrada.</p>
+                </div>
+              </div>
+              <div class="dashboard-chart-wrap">
+                <canvas id="priorityChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-bottom-grid">
+            <div class="card dashboard-insights-card">
+              <div class="dashboard-card-head">
+                <div>
+                  <span class="dashboard-card-kicker">INSIGHTS</span>
+                  <h3>O que merece atenção</h3>
+                  <p>Leitura automática dos dados atuais.</p>
+                </div>
+              </div>
+              <div id="dashboardInsights" class="dashboard-insights"></div>
+            </div>
+
+            <div class="card dashboard-activity-card">
+              <div class="dashboard-card-head">
+                <div>
+                  <span class="dashboard-card-kicker">ATIVIDADE RECENTE</span>
+                  <h3>Últimas conclusões</h3>
+                  <p>As tarefas concluídas mais recentemente.</p>
+                </div>
+                <button class="dashboard-link-btn" type="button" onclick="showCompletedHistory()">Ver histórico</button>
+              </div>
+              <div id="dashboardRecent" class="dashboard-recent"></div>
+            </div>
+          </div>
+
+          <div class="card dashboard-projects-card">
+            <div class="dashboard-card-head">
+              <div>
+                <span class="dashboard-card-kicker">PROJETOS</span>
+                <h3>Projetos em destaque</h3>
+                <p>Volume de tarefas e andamento por projeto.</p>
+              </div>
+            </div>
+            <div id="dashboardProjects" class="dashboard-project-list"></div>
+          </div>
         </div>
+      </section>
       </section>
     </div>
   </main>
@@ -4540,6 +5365,8 @@ let notes = JSON.parse(localStorage.getItem(STORAGE_NOTES) || 'null') || seedNot
 let editingChecklist = [];
 let statusChart = null;
 let areaChart = null;
+let completionChart = null;
+let priorityChart = null;
 let quickTaskFilter = 'all';
 let calendarCursor = new Date(new Date().getFullYear(),new Date().getMonth(),1);
 let calendarSelectedDate = todayISO();
@@ -5056,72 +5883,396 @@ function renderNotes(){
   `).join('') : '<div class="empty">Nenhuma anotação criada.</div>';
 }
 
+function getDashboardTasks(){
+  const period=document.getElementById('dashboardPeriod')?.value || 'all';
+  if(period==='all') return [...tasks];
+
+  const now=new Date();
+  now.setHours(0,0,0,0);
+  let start=null;
+
+  if(period==='month') start=new Date(now.getFullYear(),now.getMonth(),1);
+  if(period==='30days'){
+    start=new Date(now);
+    start.setDate(start.getDate()-29);
+  }
+  if(period==='year') start=new Date(now.getFullYear(),0,1);
+
+  return tasks.filter(t=>{
+    const candidates=[t.completedAt,t.due,t.createdAt?.slice?.(0,10)].filter(Boolean);
+    return candidates.some(value=>{
+      const d=parseDateLocal(value);
+      return d && d>=start && d<=now;
+    });
+  });
+}
+
+function openDashboardTasks(kind, value=''){
+  activateView('tasks');
+  quickTaskFilter='all';
+  document.querySelectorAll('.quick-filter').forEach(btn=>btn.classList.toggle('active',btn.dataset.quickFilter==='all'));
+  fStatus.value='';
+  fPriority.value='';
+  fArea.value='';
+  fProject.value='';
+  fText.value='';
+
+  if(kind==='progress') fStatus.value='Em Andamento';
+  if(kind==='waiting') fStatus.value='Aguardando';
+  if(kind==='done'){
+    fStatus.value='Concluída';
+    completedPeriod.value='all';
+  }
+  if(kind==='overdue') setQuickTaskFilter('overdue');
+  if(kind==='status') fStatus.value=value;
+  if(kind==='priority') fPriority.value=value;
+  if(kind==='area') fArea.value=value;
+  if(kind==='project') fProject.value=value;
+
+  if(['status','priority','area','project','done','progress','waiting'].includes(kind)){
+    advancedFilters.classList.add('open');
+    advancedFiltersBtn.textContent='✕ Fechar filtros';
+  }
+
+  toggleCompletedTools();
+  renderTaskTable();
+}
+
 function renderDashboard(){
-  const total=tasks.length;
-  const progress=tasks.filter(t=>t.status==='Em Andamento').length;
-  const done=tasks.filter(t=>t.status==='Concluída').length;
-  const hours=tasks.reduce((a,t)=>a+(Number(t.hours)||0),0);
+  if(!window.dTotal) return;
+
+  const list=getDashboardTasks();
+  const total=list.length;
+  const progress=list.filter(t=>t.status==='Em Andamento').length;
+  const done=list.filter(t=>t.status==='Concluída').length;
+  const waiting=list.filter(t=>t.status==='Aguardando').length;
+  const overdue=list.filter(t=>t.status!=='Concluída' && t.due && daysDiff(t.due)<0).length;
+  const hours=list.reduce((a,t)=>a+(Number(t.hours)||0),0);
+  const active=total-done;
   const rate=total?Math.round(done/total*100):0;
 
   dTotal.textContent=total;
   dProgress.textContent=progress;
   dDone.textContent=done;
+  dWaiting.textContent=waiting;
+  dOverdue.textContent=overdue;
   dRate.textContent=`${rate}% de conclusão`;
   dHours.textContent=`${hours.toFixed(1)}h`;
+  dTotalMeta.textContent=total===1?'1 tarefa no período':`${total} tarefas no período`;
+  dProgressMeta.textContent=progress ? `${progress} em execução` : 'Nenhuma em execução';
+  dOverdueMeta.textContent=overdue ? `${overdue} pedindo atenção` : 'Tudo dentro do prazo';
+  dWaitingMeta.textContent=waiting ? `${waiting} dependem de retorno` : 'Nenhuma dependência';
+  dHoursMeta.textContent=hours ? 'Carga planejada no período' : 'Sem horas estimadas';
+
+  dashboardScoreValue.textContent=`${rate}%`;
+  dashboardScoreCaption.textContent=`${done} de ${total} tarefa${total===1?'':'s'} concluída${done===1?'':'s'}`;
+  dashboardRing.style.setProperty('--progress',rate);
+  dashboardDonutValue.textContent=total;
+  dashboardActiveCount.textContent=`${active} ativa${active===1?'':'s'}`;
+
+  let heroMessage='Seu painel está pronto para acompanhar o ritmo do trabalho.';
+  if(overdue>0) heroMessage=`${overdue} tarefa${overdue===1?' está':'s estão'} atrasada${overdue===1?'':'s'} e merece${overdue===1?'':'m'} atenção agora.`;
+  else if(rate>=80 && total) heroMessage='Excelente ritmo: a maior parte das tarefas deste recorte já foi concluída.';
+  else if(progress>0) heroMessage=`${progress} tarefa${progress===1?' está':'s estão'} em andamento neste momento.`;
+  dashboardHeroMessage.textContent=heroMessage;
+
+  const chartFont={family:'Manrope'};
+  const textColor='#667078';
+  const gridColor='rgba(214,217,216,.55)';
 
   const statusLabels=['Pendente','Em Andamento','Aguardando','Concluída'];
-  const statusData=statusLabels.map(s=>tasks.filter(t=>t.status===s).length);
+  const statusData=statusLabels.map(s=>list.filter(t=>t.status===s).length);
 
   if(statusChart) statusChart.destroy();
   statusChart=new Chart(document.getElementById('statusChart'),{
     type:'doughnut',
-    data:{labels:statusLabels,datasets:[{
-      data:statusData,
-      backgroundColor:['#e7c68d','#7692aa','#aa96b5','#82b399'],
-      borderColor:'#ffffff',
-      borderWidth:3,
-      hoverOffset:5
-    }]},
+    data:{
+      labels:statusLabels,
+      datasets:[{
+        data:statusData,
+        backgroundColor:['#e7c68d','#7692aa','#aa96b5','#82b399'],
+        borderColor:'#ffffff',
+        borderWidth:4,
+        hoverOffset:10,
+        spacing:2
+      }]
+    },
     options:{
       responsive:true,
       maintainAspectRatio:false,
+      cutout:'72%',
+      animation:{duration:800,easing:'easeOutQuart'},
+      onClick:(evt,elements)=>{
+        if(!elements.length) return;
+        openDashboardTasks('status',statusLabels[elements[0].index]);
+      },
       plugins:{
-        legend:{labels:{color:'#667078',font:{family:'Manrope'}}},
-        title:{display:true,text:'Distribuição por status',color:'#31404c',font:{family:'Manrope',size:14,weight:'700'}}
+        legend:{
+          position:'bottom',
+          labels:{color:textColor,font:chartFont,usePointStyle:true,padding:18,boxWidth:8}
+        },
+        tooltip:{
+          callbacks:{
+            label:(ctx)=>` ${ctx.label}: ${ctx.raw} tarefa${ctx.raw===1?'':'s'}`
+          }
+        }
       }
     }
   });
 
-  const areas={};
-  tasks.forEach(t=>{ const a=t.area||'Sem área'; areas[a]=(areas[a]||0)+(Number(t.hours)||0); });
+  const areaHours={};
+  list.forEach(t=>{
+    const a=t.area||'Sem área';
+    areaHours[a]=(areaHours[a]||0)+(Number(t.hours)||0);
+  });
+  const areaEntries=Object.entries(areaHours).sort((a,b)=>b[1]-a[1]).slice(0,7);
+
   if(areaChart) areaChart.destroy();
   areaChart=new Chart(document.getElementById('areaChart'),{
     type:'bar',
-    data:{labels:Object.keys(areas),datasets:[{
-      label:'Horas estimadas',
-      data:Object.values(areas),
-      backgroundColor:'rgba(118,146,170,.62)',
-      borderColor:'#5f8199',
-      borderWidth:1,
-      borderRadius:8
-    }]},
+    data:{
+      labels:areaEntries.map(x=>x[0]),
+      datasets:[{
+        label:'Horas estimadas',
+        data:areaEntries.map(x=>Number(x[1].toFixed(1))),
+        backgroundColor:'rgba(118,146,170,.72)',
+        borderColor:'#5f8199',
+        borderWidth:1,
+        borderRadius:9,
+        borderSkipped:false
+      }]
+    },
     options:{
+      indexAxis:'y',
       responsive:true,
       maintainAspectRatio:false,
+      animation:{duration:750,easing:'easeOutQuart'},
+      onClick:(evt,elements)=>{
+        if(!elements.length) return;
+        openDashboardTasks('area',areaEntries[elements[0].index][0]==='Sem área'?'':areaEntries[elements[0].index][0]);
+      },
       scales:{
-        x:{ticks:{color:'#73777b',font:{family:'Manrope'}},grid:{display:false}},
-        y:{ticks:{color:'#73777b',font:{family:'Manrope'}},grid:{color:'rgba(214,217,216,.62)'}}
+        x:{beginAtZero:true,ticks:{color:textColor,font:chartFont},grid:{color:gridColor}},
+        y:{ticks:{color:textColor,font:chartFont},grid:{display:false}}
       },
       plugins:{
-        legend:{labels:{color:'#667078',font:{family:'Manrope'}}},
-        title:{display:true,text:'Carga estimada por área',color:'#31404c',font:{family:'Manrope',size:14,weight:'700'}}
+        legend:{display:false},
+        tooltip:{callbacks:{label:(ctx)=>` ${ctx.raw}h estimadas`}}
       }
     }
   });
+
+  const priorityLabels=['Urgente','Alta','Média','Baixa'];
+  const priorityData=priorityLabels.map(p=>list.filter(t=>t.status!=='Concluída' && t.priority===p).length);
+
+  if(priorityChart) priorityChart.destroy();
+  priorityChart=new Chart(document.getElementById('priorityChart'),{
+    type:'bar',
+    data:{
+      labels:priorityLabels,
+      datasets:[{
+        data:priorityData,
+        backgroundColor:['#d86b7d','#d8a16e','#7692aa','#aab0b3'],
+        borderRadius:10,
+        borderSkipped:false
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      animation:{duration:750,easing:'easeOutQuart'},
+      onClick:(evt,elements)=>{
+        if(!elements.length) return;
+        openDashboardTasks('priority',priorityLabels[elements[0].index]);
+      },
+      scales:{
+        x:{ticks:{color:textColor,font:chartFont},grid:{display:false}},
+        y:{beginAtZero:true,ticks:{precision:0,color:textColor,font:chartFont},grid:{color:gridColor}}
+      },
+      plugins:{legend:{display:false}}
+    }
+  });
+
+  const monthLabels=[];
+  const completionValues=[];
+  const now=new Date();
+  for(let i=5;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const y=d.getFullYear();
+    const m=d.getMonth();
+    monthLabels.push(d.toLocaleDateString('pt-BR',{month:'short'}).replace('.',''));
+    completionValues.push(tasks.filter(t=>{
+      if(!t.completedAt) return false;
+      const cd=parseDateLocal(t.completedAt);
+      return cd.getFullYear()===y && cd.getMonth()===m;
+    }).length);
+  }
+
+  if(completionChart) completionChart.destroy();
+  completionChart=new Chart(document.getElementById('completionChart'),{
+    type:'line',
+    data:{
+      labels:monthLabels,
+      datasets:[{
+        label:'Concluídas',
+        data:completionValues,
+        borderColor:'#d86b7d',
+        backgroundColor:'rgba(216,107,125,.12)',
+        pointBackgroundColor:'#ffffff',
+        pointBorderColor:'#d86b7d',
+        pointBorderWidth:3,
+        pointRadius:4,
+        pointHoverRadius:6,
+        borderWidth:3,
+        tension:.38,
+        fill:true
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      animation:{duration:850,easing:'easeOutQuart'},
+      interaction:{intersect:false,mode:'index'},
+      scales:{
+        x:{ticks:{color:textColor,font:chartFont},grid:{display:false}},
+        y:{beginAtZero:true,ticks:{precision:0,color:textColor,font:chartFont},grid:{color:gridColor}}
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:(ctx)=>` ${ctx.raw} concluída${ctx.raw===1?'':'s'}`}}
+      }
+    }
+  });
+
+  const urgent=list.filter(t=>t.status!=='Concluída' && t.priority==='Urgente').length;
+  const dueToday=list.filter(t=>t.status!=='Concluída' && daysDiff(t.due)===0).length;
+  const noDate=list.filter(t=>t.status!=='Concluída' && !t.due).length;
+  const insights=[];
+
+  if(overdue>0){
+    insights.push({
+      icon:'⚠',
+      tone:'danger',
+      title:`${overdue} tarefa${overdue===1?' atrasada':'s atrasadas'}`,
+      text:'Priorize essas atividades para reduzir o acúmulo.',
+      action:`openDashboardTasks('overdue')`
+    });
+  }else{
+    insights.push({
+      icon:'✓',
+      tone:'success',
+      title:'Nenhum atraso no período',
+      text:'Os prazos estão sob controle.',
+      action:`openDashboardTasks('all')`
+    });
+  }
+
+  if(urgent>0){
+    insights.push({
+      icon:'◆',
+      tone:'coral',
+      title:`${urgent} prioridade${urgent===1?' urgente':'s urgentes'}`,
+      text:'Vale revisar se todas ainda precisam desse nível de prioridade.',
+      action:`openDashboardTasks('priority','Urgente')`
+    });
+  }
+
+  if(waiting>0){
+    insights.push({
+      icon:'◷',
+      tone:'blue',
+      title:`${waiting} aguardando retorno`,
+      text:'Essas tarefas dependem de terceiros para avançar.',
+      action:`openDashboardTasks('waiting')`
+    });
+  }
+
+  if(dueToday>0){
+    insights.push({
+      icon:'●',
+      tone:'blue',
+      title:`${dueToday} para hoje`,
+      text:'Concentre o foco no que vence até o fim do dia.',
+      action:`setQuickTaskFilter('today');activateView('tasks')`
+    });
+  }
+
+  if(noDate>0){
+    insights.push({
+      icon:'○',
+      tone:'neutral',
+      title:`${noDate} sem vencimento`,
+      text:'Adicionar datas pode facilitar a priorização.',
+      action:`openDashboardTasks('all')`
+    });
+  }
+
+  if(!insights.length){
+    insights.push({
+      icon:'★',
+      tone:'success',
+      title:'Rotina equilibrada',
+      text:'Não há alertas importantes neste recorte.',
+      action:`openDashboardTasks('all')`
+    });
+  }
+
+  dashboardInsights.innerHTML=insights.slice(0,4).map(item=>`
+    <button class="dashboard-insight ${item.tone}" type="button" onclick="${item.action}">
+      <span class="dashboard-insight-icon">${item.icon}</span>
+      <span><strong>${item.title}</strong><small>${item.text}</small></span>
+      <span class="dashboard-insight-arrow">›</span>
+    </button>
+  `).join('');
+
+  const recent=[...tasks]
+    .filter(t=>t.status==='Concluída' && t.completedAt)
+    .sort((a,b)=>(b.completedAt||'').localeCompare(a.completedAt||''))
+    .slice(0,5);
+
+  dashboardRecent.innerHTML=recent.length ? recent.map(t=>`
+    <button class="dashboard-recent-item" type="button" onclick="editTask('${t.id}')">
+      <span class="dashboard-recent-check">✓</span>
+      <span class="dashboard-recent-copy">
+        <strong>${esc(t.title)}</strong>
+        <small>${t.project ? esc(t.project)+' · ' : ''}${fmtDate(t.completedAt)}</small>
+      </span>
+      <span>›</span>
+    </button>
+  `).join('') : '<div class="dashboard-empty-state">Ainda não há tarefas concluídas com data registrada.</div>';
+
+  const projects={};
+  list.forEach(t=>{
+    const name=t.project||'Sem projeto';
+    if(!projects[name]) projects[name]={total:0,done:0,hours:0};
+    projects[name].total++;
+    if(t.status==='Concluída') projects[name].done++;
+    projects[name].hours+=Number(t.hours)||0;
+  });
+
+  const projectEntries=Object.entries(projects)
+    .sort((a,b)=>b[1].total-a[1].total)
+    .slice(0,6);
+
+  dashboardProjects.innerHTML=projectEntries.length ? projectEntries.map(([name,data])=>{
+    const pct=data.total?Math.round(data.done/data.total*100):0;
+    const filterName=name==='Sem projeto'?'':name;
+    return `
+      <button class="dashboard-project" type="button" onclick="openDashboardTasks('project','${esc(filterName).replaceAll("'","&#039;")}')">
+        <span class="dashboard-project-main">
+          <span class="dashboard-project-name">${esc(name)}</span>
+          <span class="dashboard-project-meta">${data.total} tarefa${data.total===1?'':'s'} · ${data.hours.toFixed(1)}h</span>
+        </span>
+        <span class="dashboard-project-progress">
+          <span><i style="width:${pct}%"></i></span>
+          <strong>${pct}%</strong>
+        </span>
+      </button>
+    `;
+  }).join('') : '<div class="dashboard-empty-state">Nenhum projeto encontrado neste período.</div>';
 }
 
-
-function changeCalendarMonth(delta){
+function changeCalendarMonthfunction changeCalendarMonth(delta){
   calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+delta,1);
   renderCalendar();
 }
@@ -5528,6 +6679,7 @@ document.querySelectorAll('.nav-btn').forEach(btn=>{
 });
 
 taskSort?.addEventListener('change',renderTaskTable);
+document.getElementById('dashboardPeriod')?.addEventListener('change',renderDashboard);
 
 fStatus.addEventListener('change',()=>{
   if(fStatus.value==='Concluída' && completedPeriod.value==='all') completedPeriod.value='month';
