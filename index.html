@@ -6,7 +6,7 @@
   <title>ULALÁ | Organização de Trabalho</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
@@ -1715,6 +1715,417 @@
       }
     }
 
+
+    /* =========================================================
+       IDENTIDADE VISUAL ULALÁ V2 — AZUL + ROSA, MAIOR LEGIBILIDADE
+       ========================================================= */
+    :root {
+      --bg:#f6f9ff;
+      --panel:#ffffff;
+      --panel-soft:#f8fbff;
+      --border:#dce6f4;
+      --text:#1f2a3d;
+      --muted:#6b7890;
+      --primary:#3b82f6;
+      --primary-soft:#eaf2ff;
+      --success:#2e9d72;
+      --warning:#d88b3f;
+      --danger:#df5d7d;
+      --purple:#7867d8;
+      --pink:#f472b6;
+      --pink-soft:#fff0f7;
+      --blue:#3b82f6;
+      --blue-dark:#2563eb;
+      --blue-soft:#eaf3ff;
+      --shadow:0 12px 30px rgba(53,91,145,.10);
+    }
+
+    html { background:#f6f9ff; }
+
+    body {
+      font-family:"Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 92% 4%, rgba(59,130,246,.07), transparent 24%),
+        linear-gradient(180deg,#f9fbff 0%,#f5f8fd 100%);
+    }
+
+    /* Logomarca ULALÁ mais moderna e reta */
+    .brand .brand-logo,
+    .app-logo,
+    .ulala-symbol {
+      font-family:"Sora", ui-sans-serif, system-ui, sans-serif;
+    }
+
+    .brand .brand-logo {
+      font-size:25px;
+      font-weight:800;
+      line-height:1;
+      letter-spacing:.08em;
+      color:#ffffff;
+      text-shadow:none;
+    }
+
+    .ulala-symbol {
+      transform:none;
+      border-radius:13px;
+      font-size:18px;
+      font-weight:800;
+      color:#2563eb;
+      background:#ffffff;
+      box-shadow:0 8px 20px rgba(18,64,130,.18);
+    }
+
+    .brand .ulala-brand-text > span {
+      color:rgba(255,255,255,.76);
+      font-size:9.5px;
+      letter-spacing:.01em;
+    }
+
+    .app-logo {
+      font-size:36px;
+      font-weight:800;
+      letter-spacing:.10em;
+      background:linear-gradient(90deg,#2563eb 0%,#4f7ff0 58%,#ed6aaa 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      -webkit-text-fill-color:transparent;
+      color:#2563eb;
+    }
+
+    /* Barra lateral com contraste alto */
+    .sidebar {
+      background:
+        radial-gradient(circle at 18% 4%, rgba(255,255,255,.08), transparent 25%),
+        linear-gradient(180deg,#173b77 0%,#214e91 55%,#2b63aa 100%);
+      box-shadow:8px 0 26px rgba(24,61,118,.13);
+    }
+
+    .brand {
+      border-bottom-color:rgba(255,255,255,.14);
+    }
+
+    .nav-group-title {
+      color:rgba(255,255,255,.57);
+    }
+
+    .nav button {
+      color:rgba(255,255,255,.86);
+      font-weight:600;
+    }
+
+    .nav button:hover {
+      background:rgba(255,255,255,.09);
+      border-color:rgba(255,255,255,.08);
+    }
+
+    .nav button.active {
+      background:#ffffff;
+      color:#244f8e;
+      border-color:#ffffff;
+      box-shadow:0 8px 20px rgba(9,39,85,.16);
+    }
+
+    .sidebar-footer {
+      border-top-color:rgba(255,255,255,.14);
+    }
+
+    .sidebar-tools {
+      background:rgba(7,35,78,.16);
+      border-color:rgba(255,255,255,.12);
+    }
+
+    .sidebar-tools summary,
+    .sidebar-logout {
+      color:rgba(255,255,255,.88) !important;
+    }
+
+    .sidebar-footer button,
+    .file-label {
+      background:rgba(255,255,255,.10);
+      border-color:rgba(255,255,255,.12);
+    }
+
+    .sidebar-footer button:hover,
+    .file-label:hover {
+      background:rgba(255,255,255,.17);
+    }
+
+    /* Topo e textos */
+    .topbar {
+      background:rgba(255,255,255,.94);
+      border-bottom-color:#dfe8f5;
+      box-shadow:0 5px 18px rgba(46,78,126,.04);
+    }
+
+    .topbar h1,
+    .section-head h2,
+    .section-head h3 {
+      color:#263652;
+    }
+
+    .topbar h1 {
+      font-weight:800;
+      letter-spacing:-.025em;
+    }
+
+    .topbar p,
+    .meta {
+      color:#738198;
+    }
+
+    /* Campos */
+    .search,
+    .field input,
+    .field select,
+    .field textarea,
+    .filters input,
+    .filters select,
+    .completed-filter-grid input,
+    .completed-filter-grid select {
+      border-color:#d8e3f1;
+      background:#ffffff;
+      color:#263652;
+    }
+
+    .search:focus,
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus,
+    .filters input:focus,
+    .filters select:focus,
+    .completed-filter-grid input:focus,
+    .completed-filter-grid select:focus {
+      border-color:#6aa0f7;
+      box-shadow:0 0 0 4px rgba(59,130,246,.11);
+      background:#fff;
+    }
+
+    .field label { color:#53627a; }
+
+    /* Botões */
+    .btn-primary {
+      background:linear-gradient(100deg,#2563eb 0%,#3b82f6 72%,#5a8ff3 100%);
+      color:#fff;
+      box-shadow:0 9px 20px rgba(37,99,235,.20);
+    }
+
+    .btn-primary:hover {
+      filter:brightness(1.03);
+      box-shadow:0 11px 24px rgba(37,99,235,.26);
+    }
+
+    .btn-soft {
+      background:#edf4ff;
+      color:#315a91;
+      border:1px solid #d8e6f8;
+    }
+
+    .btn-soft:hover {
+      background:#e4efff;
+    }
+
+    .btn-danger {
+      background:#fff0f4;
+      color:#b94b69;
+    }
+
+    .btn-success {
+      background:#eaf8f2;
+      color:#347b60;
+    }
+
+    /* Cards */
+    .card {
+      background:#ffffff;
+      border-color:#dfe7f2;
+      border-radius:17px;
+      box-shadow:var(--shadow);
+    }
+
+    .metric {
+      background:#ffffff;
+    }
+
+    .metric::after {
+      background:linear-gradient(145deg,rgba(59,130,246,.10),rgba(244,114,182,.08));
+    }
+
+    .metric span { color:#708098; }
+    .metric strong { color:#263652; }
+
+    .task-row {
+      background:#ffffff;
+      border-color:#dde6f1;
+      border-radius:13px;
+    }
+
+    .task-row:hover {
+      border-color:#abc7ef;
+      box-shadow:0 7px 18px rgba(59,98,151,.08);
+    }
+
+    .highlight {
+      border-left-color:#f472b6;
+    }
+
+    .empty {
+      background:#f9fbff;
+      border-color:#cfddec;
+    }
+
+    /* Meu Dia */
+    .today-hero {
+      background:
+        radial-gradient(circle at 92% 0%, rgba(255,255,255,.15), transparent 24%),
+        linear-gradient(125deg,#285fae 0%,#3b82f6 62%,#6d8fe8 100%);
+      box-shadow:0 16px 36px rgba(37,99,235,.20);
+      border-radius:20px;
+    }
+
+    .today-hero::after {
+      background:rgba(255,255,255,.10);
+    }
+
+    .progress-track {
+      background:rgba(255,255,255,.22);
+    }
+
+    .progress-fill {
+      background:#ffffff;
+      box-shadow:none;
+    }
+
+    .quick-action {
+      border-color:#dae5f2;
+      background:#ffffff;
+      color:#315578;
+      border-radius:13px;
+    }
+
+    .quick-action:hover {
+      border-color:#a9c8ef;
+      background:#f9fbff;
+      box-shadow:0 7px 17px rgba(56,94,147,.08);
+    }
+
+    /* Filtros e histórico de concluídas */
+    .completed-tools {
+      background:#f6f9ff;
+      border-color:#d8e4f2;
+    }
+
+    .completed-tools-head span {
+      color:#66768e;
+    }
+
+    /* Kanban */
+    .kanban-col {
+      background:#f4f7fb;
+      border-color:#dbe4ef;
+    }
+
+    .kanban-card {
+      border-color:#dce5f0;
+      background:#ffffff;
+      box-shadow:0 4px 14px rgba(50,80,126,.06);
+    }
+
+    /* Modal */
+    .modal {
+      border-color:#dce6f1;
+      border-radius:20px;
+      box-shadow:0 26px 62px rgba(41,67,106,.18);
+    }
+
+    .x {
+      background:#edf4ff;
+      color:#315a91;
+    }
+
+    .check-item {
+      background:#f9fbff;
+      border-color:#dce5f0;
+    }
+
+    /* Login */
+    .login-screen {
+      background:
+        radial-gradient(circle at 88% 12%, rgba(59,130,246,.18), transparent 31%),
+        radial-gradient(circle at 12% 87%, rgba(244,114,182,.12), transparent 29%),
+        linear-gradient(145deg,#eef5ff 0%,#f8fbff 50%,#fff4f8 100%);
+    }
+
+    .login-card {
+      background:rgba(255,255,255,.96);
+      border-color:rgba(255,255,255,.95);
+      box-shadow:0 26px 62px rgba(55,83,126,.16);
+    }
+
+    .login-logo {
+      transform:none;
+      color:#fff;
+      background:linear-gradient(145deg,#2563eb,#3b82f6);
+      box-shadow:0 10px 25px rgba(37,99,235,.24);
+      border-radius:17px;
+    }
+
+    .login-card > p {
+      color:#75829a;
+    }
+
+    .google-login-btn {
+      border-color:#d9e3ef;
+      color:#334763;
+      background:#ffffff;
+      box-shadow:0 5px 14px rgba(49,75,113,.06);
+    }
+
+    .google-login-btn:hover {
+      background:#f8fbff;
+      border-color:#b9cee8;
+    }
+
+    /* Navegação mobile */
+    .mobile-nav {
+      background:linear-gradient(105deg,rgba(27,66,124,.97),rgba(43,98,170,.97));
+      border-color:rgba(255,255,255,.13);
+      box-shadow:0 12px 30px rgba(21,57,108,.24);
+    }
+
+    .mobile-nav button {
+      color:rgba(255,255,255,.70);
+    }
+
+    .mobile-nav button.active {
+      color:#1e4e8c;
+      background:#ffffff;
+      box-shadow:none;
+    }
+
+    .mobile-fab {
+      background:linear-gradient(145deg,#2563eb,#3b82f6);
+      box-shadow:0 12px 26px rgba(37,99,235,.30);
+    }
+
+    @media (max-width:760px) {
+      body {
+        background:linear-gradient(180deg,#f9fbff 0%,#f5f8fd 100%);
+      }
+
+      .topbar {
+        background:rgba(255,255,255,.96);
+        border-bottom-color:#dfe7f1;
+      }
+
+      .login-screen {
+        background:
+          radial-gradient(circle at 88% 8%, rgba(59,130,246,.18), transparent 33%),
+          radial-gradient(circle at 10% 90%, rgba(244,114,182,.10), transparent 30%),
+          linear-gradient(155deg,#eef5ff,#f8fbff 58%,#fff4f8);
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2539,7 +2950,7 @@ function renderDashboard(){
     type:'doughnut',
     data:{labels:statusLabels,datasets:[{
       data:statusData,
-      backgroundColor:['#f3c5dc','#c7a1ef','#e3b4ec','#9fd9c2'],
+      backgroundColor:['#f7c2da','#91b8f8','#b4a8ef','#8fd1b5'],
       borderColor:'#ffffff',
       borderWidth:3,
       hoverOffset:5
@@ -2548,8 +2959,8 @@ function renderDashboard(){
       responsive:true,
       maintainAspectRatio:false,
       plugins:{
-        legend:{labels:{color:'#765f79',font:{family:'Outfit'}}},
-        title:{display:true,text:'Distribuição por status',color:'#5c4560',font:{family:'Outfit',size:14,weight:'700'}}
+        legend:{labels:{color:'#617089',font:{family:'Manrope'}}},
+        title:{display:true,text:'Distribuição por status',color:'#2f405d',font:{family:'Manrope',size:14,weight:'700'}}
       }
     }
   });
@@ -2562,8 +2973,8 @@ function renderDashboard(){
     data:{labels:Object.keys(areas),datasets:[{
       label:'Horas estimadas',
       data:Object.values(areas),
-      backgroundColor:'rgba(190,126,224,.58)',
-      borderColor:'#b875df',
+      backgroundColor:'rgba(59,130,246,.58)',
+      borderColor:'#3b82f6',
       borderWidth:1,
       borderRadius:8
     }]},
@@ -2571,12 +2982,12 @@ function renderDashboard(){
       responsive:true,
       maintainAspectRatio:false,
       scales:{
-        x:{ticks:{color:'#7d687f',font:{family:'Outfit'}},grid:{display:false}},
-        y:{ticks:{color:'#7d687f',font:{family:'Outfit'}},grid:{color:'rgba(226,203,222,.45)'}}
+        x:{ticks:{color:'#68778f',font:{family:'Manrope'}},grid:{display:false}},
+        y:{ticks:{color:'#68778f',font:{family:'Manrope'}},grid:{color:'rgba(208,220,235,.55)'}}
       },
       plugins:{
-        legend:{labels:{color:'#765f79',font:{family:'Outfit'}}},
-        title:{display:true,text:'Carga estimada por área',color:'#5c4560',font:{family:'Outfit',size:14,weight:'700'}}
+        legend:{labels:{color:'#617089',font:{family:'Manrope'}}},
+        title:{display:true,text:'Carga estimada por área',color:'#2f405d',font:{family:'Manrope',size:14,weight:'700'}}
       }
     }
   });
