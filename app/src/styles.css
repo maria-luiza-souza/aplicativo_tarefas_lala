@@ -707,3 +707,808 @@ h1,h2,h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
     transition: none !important;
   }
 }
+
+
+/* ===== UX NAVIGATION + THEME V10 ===== */
+.visually-hidden {
+  position: fixed !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.app-shell {
+  transition: grid-template-columns .24s cubic-bezier(.2,.8,.2,1);
+}
+
+.app-shell.sidebar-collapsed {
+  grid-template-columns: 76px minmax(0,1fr);
+}
+
+.sidebar {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.20) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255,255,255,.18);
+}
+
+.sidebar:hover::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.30);
+}
+
+/* Logo mais limpa e integrada */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 11px;
+  padding: 3px 5px 16px;
+}
+
+.brand-emblem,
+.login-brand-emblem {
+  position: relative;
+  flex: 0 0 auto;
+  overflow: hidden;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.96),rgba(245,238,234,.94));
+  border: 1px solid rgba(255,255,255,.52);
+  box-shadow:
+    0 11px 23px rgba(13,34,49,.18),
+    inset 0 0 0 1px rgba(41,67,89,.05);
+}
+
+.brand-emblem {
+  width: 55px;
+  height: 55px;
+  border-radius: 17px;
+}
+
+.brand-emblem img,
+.login-brand-emblem img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: 50% 22%;
+  transform: scale(1.55) translateY(-4%);
+  transform-origin: 50% 24%;
+}
+
+.brand-emblem::after,
+.login-brand-emblem::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(145deg,rgba(255,255,255,.20),transparent 42%);
+}
+
+.brand-emblem i,
+.login-brand-emblem i {
+  position: absolute;
+  z-index: 2;
+  right: 6px;
+  bottom: 6px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid rgba(255,255,255,.95);
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 3px 8px rgba(185,86,105,.28);
+}
+
+.brand-wordmark {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+}
+
+.brand-wordmark strong {
+  color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 23px;
+  line-height: .95;
+  font-weight: 800;
+  letter-spacing: -.075em;
+}
+
+.brand-wordmark span {
+  margin-top: 5px;
+  color: #efb1bc;
+  font-size: 6px;
+  font-weight: 800;
+  letter-spacing: .27em;
+  text-transform: uppercase;
+}
+
+.side-nav {
+  padding-top: 13px;
+}
+
+.side-nav-label {
+  display: block;
+  padding: 0 11px 7px;
+  color: rgba(255,255,255,.38);
+  font-size: 6.5px;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+
+.side-nav button b,
+.sidebar-footer button b {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.nav-icon {
+  width: 24px !important;
+  flex: 0 0 24px;
+}
+
+.workspace-tools {
+  margin-top: 4px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 12px;
+  background: rgba(8,28,43,.14);
+  overflow: hidden;
+}
+
+.workspace-tools summary {
+  min-height: 40px;
+  display: grid;
+  grid-template-columns: 22px minmax(0,1fr) auto;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  color: rgba(255,255,255,.72);
+  cursor: pointer;
+  list-style: none;
+  font-size: 9px;
+}
+
+.workspace-tools summary::-webkit-details-marker {
+  display: none;
+}
+
+.workspace-tools summary b {
+  font-weight: 700;
+}
+
+.workspace-tools summary i {
+  color: rgba(255,255,255,.40);
+  font-style: normal;
+  transition: transform .2s ease;
+}
+
+.workspace-tools[open] summary i {
+  transform: rotate(180deg);
+}
+
+.workspace-tools-list {
+  display: grid;
+  gap: 3px;
+  padding: 0 5px 6px;
+}
+
+.workspace-tools-list button,
+.mobile-tools-list button {
+  min-height: 35px;
+  display: grid;
+  grid-template-columns: 23px minmax(0,1fr);
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255,255,255,.72);
+  text-align: left;
+  font-size: 8px;
+}
+
+.workspace-tools-list button:hover {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+}
+
+.workspace-tools-list button b,
+.mobile-tools-list button b {
+  font-weight: 700;
+}
+
+.sidebar-footer {
+  gap: 6px;
+}
+
+.sidebar-footer > button {
+  display: grid;
+  grid-template-columns: 22px minmax(0,1fr);
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  text-align: left;
+}
+
+.sync-chip {
+  white-space: nowrap;
+}
+
+.sync-chip.sync-saving i,
+.sync-chip.sync-connecting i {
+  background: #d6a65e;
+}
+
+.sync-chip.sync-synced i {
+  background: #79c59e;
+}
+
+.app-shell.sidebar-collapsed .sidebar {
+  padding-left: 9px;
+  padding-right: 9px;
+}
+
+.app-shell.sidebar-collapsed .sidebar-brand {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.app-shell.sidebar-collapsed .brand-emblem {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+}
+
+.app-shell.sidebar-collapsed .brand-wordmark,
+.app-shell.sidebar-collapsed .side-nav-label,
+.app-shell.sidebar-collapsed .side-nav button b,
+.app-shell.sidebar-collapsed .workspace-tools,
+.app-shell.sidebar-collapsed .sidebar-footer button b,
+.app-shell.sidebar-collapsed .sync-chip span {
+  display: none;
+}
+
+.app-shell.sidebar-collapsed .side-nav button {
+  justify-content: center;
+  padding: 0;
+}
+
+.app-shell.sidebar-collapsed .nav-icon {
+  width: auto !important;
+  flex: 0 0 auto;
+  font-size: 17px;
+}
+
+.app-shell.sidebar-collapsed .sidebar-footer > button,
+.app-shell.sidebar-collapsed .sync-chip {
+  display: grid;
+  place-items: center;
+  grid-template-columns: 1fr;
+  padding: 0;
+}
+
+.app-shell.sidebar-collapsed .sync-chip {
+  min-height: 34px;
+}
+
+.topbar-left {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.sidebar-toggle,
+.theme-toggle,
+.login-theme-toggle {
+  display: grid;
+  place-items: center;
+  border: 1px solid #e1dedb;
+  background: #fff;
+  color: #506675;
+  box-shadow: 0 5px 14px rgba(47,57,66,.04);
+}
+
+.sidebar-toggle {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  gap: 3px;
+  border-radius: 11px;
+  padding: 10px 9px;
+}
+
+.sidebar-toggle span {
+  display: block;
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transition: transform .2s ease, width .2s ease;
+}
+
+.sidebar-toggle:hover span:nth-child(2) {
+  width: 11px;
+}
+
+.theme-toggle {
+  width: 39px;
+  height: 39px;
+  flex: 0 0 39px;
+  border-radius: 11px;
+  font-size: 15px;
+}
+
+.login-theme-toggle {
+  position: fixed;
+  z-index: 5;
+  top: 18px;
+  right: 18px;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  font-size: 16px;
+}
+
+/* Login brand — sem enfeites flutuantes */
+.login-brand {
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.login-brand-emblem {
+  width: 148px;
+  height: 148px;
+  margin: 0 auto;
+  border-radius: 36px;
+  border-color: #eaded9;
+  box-shadow:
+    0 20px 42px rgba(42,54,63,.14),
+    0 0 0 7px rgba(255,255,255,.72);
+}
+
+.login-brand-emblem img {
+  transform: scale(1.42) translateY(-3%);
+  transform-origin: 50% 22%;
+}
+
+.login-brand-copy {
+  gap: 0;
+}
+
+.login-brand-kicker {
+  margin-bottom: 7px;
+  color: #969093;
+  font-size: 6.5px;
+  letter-spacing: .16em;
+}
+
+.login-brand-copy h1 {
+  color: var(--navy);
+  font-size: 46px;
+  letter-spacing: -.08em;
+}
+
+.login-brand-copy h1::after {
+  width: 30px;
+  height: 3px;
+  margin-top: 9px;
+}
+
+.login-brand-copy small {
+  margin-top: 6px;
+  color: #7892a5;
+  letter-spacing: .28em;
+}
+
+/* Painel Mais do celular */
+.mobile-more-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(18,30,39,.42);
+  backdrop-filter: blur(4px);
+}
+
+.mobile-more-sheet {
+  width: 100%;
+  max-height: min(78vh, 650px);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding: 9px 14px 18px;
+  border-radius: 22px 22px 0 0;
+  background: #fff;
+  box-shadow: 0 -18px 45px rgba(25,38,48,.18);
+}
+
+.mobile-sheet-handle {
+  width: 40px;
+  height: 4px;
+  margin: 0 auto 12px;
+  border-radius: 999px;
+  background: #ddd8d5;
+}
+
+.mobile-more-sheet header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.mobile-more-sheet header span,
+.mobile-tools-title {
+  color: var(--coral-dark);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+
+.mobile-more-sheet header h3 {
+  margin: 2px 0 0;
+  color: #31404c;
+  font-size: 17px;
+}
+
+.mobile-more-sheet header button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  background: #eef2f4;
+  color: #516979;
+  font-size: 18px;
+}
+
+.mobile-more-navigation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.mobile-more-navigation button {
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: 32px minmax(0,1fr);
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #e6e1de;
+  border-radius: 13px;
+  background: #fbfaf8;
+  color: #3f505b;
+  text-align: left;
+}
+
+.mobile-more-navigation button span {
+  font-size: 18px;
+  text-align: center;
+}
+
+.mobile-more-navigation button b {
+  font-size: 10px;
+}
+
+.mobile-tools-title {
+  margin: 3px 2px 7px;
+}
+
+.mobile-tools-list {
+  display: grid;
+  gap: 6px;
+}
+
+.mobile-tools-list button {
+  min-height: 44px;
+  border: 1px solid #e6e1de;
+  border-radius: 11px;
+  background: #fff;
+  color: #4b5c67;
+  padding: 0 10px;
+  font-size: 9px;
+}
+
+.mobile-logout {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 12px;
+  border: 1px solid #efd9dd;
+  border-radius: 11px;
+  background: #fbecef;
+  color: #a94f61;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* ===== DARK MODE ===== */
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0f151b;
+  --panel: #182129;
+  --soft: #141c23;
+  --border: #2a3742;
+  --text: #edf2f5;
+  --muted: #99a5ae;
+  --navy: #b8d0e0;
+  --navy-2: #8eafc2;
+  --denim: #87a7bc;
+  --coral: #df788b;
+  --coral-dark: #ef91a1;
+  --green: #78b897;
+  --amber: #d2a061;
+  --purple: #aa92b8;
+  --shadow: 0 12px 30px rgba(0,0,0,.22);
+  background: #0f151b;
+}
+
+html[data-theme='dark'] body {
+  color: var(--text);
+  background:
+    radial-gradient(circle at 90% 3%, rgba(95,129,153,.10), transparent 27%),
+    linear-gradient(180deg,#10171d 0%,#0e1419 100%);
+}
+
+html[data-theme='dark'] .sidebar {
+  background:
+    radial-gradient(circle at 18% 2%, rgba(255,255,255,.05), transparent 25%),
+    linear-gradient(180deg,#152735 0%,#193142 58%,#1d3749 100%);
+  box-shadow: 8px 0 28px rgba(0,0,0,.22);
+}
+
+html[data-theme='dark'] .topbar {
+  background: rgba(20,28,35,.94);
+  border-bottom-color: #283640;
+  box-shadow: 0 5px 18px rgba(0,0,0,.10);
+}
+
+html[data-theme='dark'] .surface,
+html[data-theme='dark'] .task-toolbar,
+html[data-theme='dark'] .task-card,
+html[data-theme='dark'] .note-card,
+html[data-theme='dark'] .calendar-card,
+html[data-theme='dark'] .calendar-agenda,
+html[data-theme='dark'] .chart-card,
+html[data-theme='dark'] .recent-card,
+html[data-theme='dark'] .task-modal,
+html[data-theme='dark'] .note-modal,
+html[data-theme='dark'] .login-card,
+html[data-theme='dark'] .kanban-card,
+html[data-theme='dark'] .kpi-grid button,
+html[data-theme='dark'] .mobile-more-sheet {
+  background: #182129;
+  border-color: #2a3742;
+  color: #edf2f5;
+  box-shadow: 0 12px 28px rgba(0,0,0,.17);
+}
+
+html[data-theme='dark'] .kanban-column {
+  background: #121a21;
+  border-color: #26343e;
+}
+
+html[data-theme='dark'] .quick-filters button,
+html[data-theme='dark'] .task-controls select,
+html[data-theme='dark'] .field input,
+html[data-theme='dark'] .field select,
+html[data-theme='dark'] .field textarea,
+html[data-theme='dark'] .global-search,
+html[data-theme='dark'] .user-chip,
+html[data-theme='dark'] .sidebar-toggle,
+html[data-theme='dark'] .theme-toggle,
+html[data-theme='dark'] .login-theme-toggle,
+html[data-theme='dark'] .google-button,
+html[data-theme='dark'] .calendar-day,
+html[data-theme='dark'] .mobile-tools-list button {
+  background: #151e25;
+  border-color: #2d3b46;
+  color: #dce5ea;
+}
+
+html[data-theme='dark'] .quick-filters button.active {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: #fff;
+}
+
+html[data-theme='dark'] .calendar-day.outside,
+html[data-theme='dark'] .empty-state,
+html[data-theme='dark'] .date-chip,
+html[data-theme='dark'] .count-badge,
+html[data-theme='dark'] .task-check,
+html[data-theme='dark'] .icon-button,
+html[data-theme='dark'] .note-delete,
+html[data-theme='dark'] .kanban-card select,
+html[data-theme='dark'] .mobile-more-navigation button {
+  background: #121a21;
+  border-color: #293640;
+  color: #9fb0bb;
+}
+
+html[data-theme='dark'] .task-check.done {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+
+html[data-theme='dark'] .topbar-title h1,
+html[data-theme='dark'] .section-head h3,
+html[data-theme='dark'] .notes-toolbar h2,
+html[data-theme='dark'] .chart-card header h3,
+html[data-theme='dark'] .recent-card header h3,
+html[data-theme='dark'] .calendar-head h3,
+html[data-theme='dark'] .calendar-agenda h3,
+html[data-theme='dark'] .task-card-main > strong,
+html[data-theme='dark'] .note-card strong,
+html[data-theme='dark'] .upcoming-list strong,
+html[data-theme='dark'] .mobile-more-sheet header h3,
+html[data-theme='dark'] .modal-head h2,
+html[data-theme='dark'] .kpi-grid strong,
+html[data-theme='dark'] .empty-state strong {
+  color: #edf2f5;
+}
+
+html[data-theme='dark'] .topbar-title p,
+html[data-theme='dark'] .task-meta,
+html[data-theme='dark'] .note-card p,
+html[data-theme='dark'] .note-card small,
+html[data-theme='dark'] .upcoming-list small,
+html[data-theme='dark'] .empty-state span,
+html[data-theme='dark'] .kpi-grid small,
+html[data-theme='dark'] .kpi-grid span,
+html[data-theme='dark'] .recent-card article small,
+html[data-theme='dark'] .field > span {
+  color: #96a4ae;
+}
+
+html[data-theme='dark'] .calendar-day {
+  color: #cbd5db;
+}
+
+html[data-theme='dark'] .calendar-day:hover,
+html[data-theme='dark'] .task-card:hover,
+html[data-theme='dark'] .kanban-card:hover {
+  border-color: #456073;
+}
+
+html[data-theme='dark'] .login-screen {
+  background:
+    radial-gradient(circle at 88% 10%, rgba(95,129,153,.16), transparent 31%),
+    radial-gradient(circle at 11% 88%, rgba(216,107,125,.10), transparent 30%),
+    linear-gradient(145deg,#10171d 0%,#151e25 54%,#0f151b 100%);
+}
+
+html[data-theme='dark'] .login-card p,
+html[data-theme='dark'] .login-card em,
+html[data-theme='dark'] .login-brand-kicker {
+  color: #98a4ad;
+}
+
+html[data-theme='dark'] .login-brand-copy h1 {
+  color: #edf2f5;
+}
+
+html[data-theme='dark'] .login-brand-emblem {
+  border-color: #31414c;
+  box-shadow:
+    0 22px 48px rgba(0,0,0,.30),
+    0 0 0 7px rgba(27,38,47,.88);
+}
+
+html[data-theme='dark'] .mobile-sheet-handle {
+  background: #394751;
+}
+
+html[data-theme='dark'] .mobile-more-navigation button {
+  color: #d9e2e7;
+}
+
+html[data-theme='dark'] .mobile-logout {
+  background: #321f25;
+  border-color: #57313a;
+  color: #efa0af;
+}
+
+html[data-theme='dark'] .modal-actions {
+  border-top-color: #2a3742;
+}
+
+html[data-theme='dark'] .task-card,
+html[data-theme='dark'] .kanban-card,
+html[data-theme='dark'] .note-card {
+  box-shadow: 0 5px 16px rgba(0,0,0,.12);
+}
+
+@media (max-width: 1180px) and (min-width: 761px) {
+  .app-shell.sidebar-collapsed {
+    grid-template-columns: 72px minmax(0,1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell,
+  .app-shell.sidebar-collapsed {
+    display: block;
+  }
+
+  .sidebar-toggle {
+    display: none;
+  }
+
+  .mobile-brand-mark {
+    width: 38px;
+    height: 38px;
+    padding: 4px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #e4dfdc;
+    box-shadow: 0 6px 14px rgba(47,57,66,.05);
+  }
+
+  .mobile-brand-mark img {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    object-fit: cover;
+    object-position: 50% 22%;
+    transform: scale(1.42);
+    transform-origin: 50% 22%;
+  }
+
+  html[data-theme='dark'] .mobile-brand-mark {
+    background: #182129;
+    border-color: #2d3b46;
+  }
+
+  .topbar-left {
+    gap: 8px;
+  }
+
+  .theme-toggle {
+    width: 37px;
+    height: 37px;
+    flex-basis: 37px;
+  }
+
+  .login-theme-toggle {
+    top: 12px;
+    right: 12px;
+  }
+
+  .login-brand-emblem {
+    width: 132px;
+    height: 132px;
+    border-radius: 31px;
+  }
+
+  .login-brand-copy h1 {
+    font-size: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell,
+  .sidebar-toggle span {
+    transition: none !important;
+  }
+}
