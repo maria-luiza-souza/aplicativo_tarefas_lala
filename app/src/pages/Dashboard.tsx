@@ -30,9 +30,18 @@ ChartJS.register(
 
 type Period = 'all' | 'month' | '30days' | 'year';
 
-export function DashboardPage({ onOpenTasks }: { onOpenTasks: (filter: TaskFilter) => void }) {
+export function DashboardPage({
+  onOpenTasks,
+  theme
+}: {
+  onOpenTasks: (filter: TaskFilter) => void;
+  theme: 'light' | 'dark';
+}) {
   const { tasks } = useWorkspace();
   const [period, setPeriod] = useState<Period>('all');
+  const chartText = theme === 'dark' ? '#b7c2cb' : '#667078';
+  const chartGrid = theme === 'dark' ? 'rgba(145,160,171,.16)' : 'rgba(112,124,132,.12)';
+  const chartPanel = theme === 'dark' ? '#182129' : '#ffffff';
 
   const list = useMemo(() => {
     if (period === 'all') return tasks;
@@ -137,12 +146,21 @@ export function DashboardPage({ onOpenTasks }: { onOpenTasks: (filter: TaskFilte
                 datasets: [{
                   data: statusData,
                   backgroundColor: ['#e7c68d', '#7692aa', '#aa96b5', '#82b399'],
-                  borderColor: '#ffffff',
+                  borderColor: chartPanel,
                   borderWidth: 4,
                   hoverOffset: 10
                 }]
               }}
-              options={{ maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }}
+              options={{
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                  legend: {
+                    position: 'bottom',
+                    labels: { color: chartText, usePointStyle: true }
+                  }
+                }
+              }}
             />
           </div>
         </section>
@@ -165,7 +183,14 @@ export function DashboardPage({ onOpenTasks }: { onOpenTasks: (filter: TaskFilte
                   pointBorderWidth: 3
                 }]
               }}
-              options={{ maintainAspectRatio: false, plugins: { legend: { display: false } } }}
+              options={{
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                  x: { ticks: { color: chartText }, grid: { display: false } },
+                  y: { ticks: { color: chartText }, grid: { color: chartGrid } }
+                }
+              }}
             />
           </div>
         </section>
@@ -186,7 +211,10 @@ export function DashboardPage({ onOpenTasks }: { onOpenTasks: (filter: TaskFilte
                 indexAxis: 'y',
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
-                scales: { x: { beginAtZero: true } }
+                scales: {
+                  x: { beginAtZero: true, ticks: { color: chartText }, grid: { color: chartGrid } },
+                  y: { ticks: { color: chartText }, grid: { display: false } }
+                }
               }}
             />
           </div>
