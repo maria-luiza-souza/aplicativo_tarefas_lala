@@ -54,8 +54,21 @@ export function Layout({
     <div className="app-shell">
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <img src={logo} alt="ULALÁ" />
-          <span>Organização da rotina de trabalho</span>
+          <div className="brand-mark brand-mark-sidebar" aria-hidden="true">
+            <span className="brand-orbit orbit-one" />
+            <span className="brand-orbit orbit-two" />
+            <div className="brand-art">
+              <img src={logo} alt="" />
+            </div>
+            <span className="brand-music-note note-one">♪</span>
+            <span className="brand-music-note note-two">♫</span>
+          </div>
+
+          <div className="brand-lockup">
+            <strong>ULALÁ</strong>
+            <span>workspace</span>
+            <small>Organização da rotina de trabalho</small>
+          </div>
         </div>
 
         <nav className="side-nav" aria-label="Navegação principal">
@@ -78,9 +91,15 @@ export function Layout({
 
       <main className="main-shell">
         <header className="topbar">
-          <div className="topbar-title">
-            <h1>{meta.title}</h1>
-            <p>{meta.subtitle}</p>
+          <div className="topbar-title-wrap">
+            <div className="mobile-brand-mark" aria-hidden="true">
+              <img src={logo} alt="" />
+              <span>♪</span>
+            </div>
+            <div className="topbar-title">
+              <h1>{meta.title}</h1>
+              <p>{meta.subtitle}</p>
+            </div>
           </div>
 
           <div className="topbar-actions">
