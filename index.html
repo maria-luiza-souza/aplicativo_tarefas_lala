@@ -3073,6 +3073,22 @@
     }
   </style>
 
+
+  <style id="ulala-today-v4">
+    .today-metrics {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+    }
+    @media (max-width:760px) {
+      .today-metrics { grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
+      .today-metrics .metric { padding:11px 9px; }
+      .today-metrics .metric span { font-size:8px; }
+      .today-metrics .metric strong { font-size:23px; }
+      .today-metrics .metric small { font-size:8px; }
+    }
+  </style>
+
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
@@ -3176,11 +3192,10 @@
           <button class="quick-action" onclick="showCompletedHistory()">✓ Concluídas</button>
         </div>
 
-        <div class="grid-4" style="margin-top:14px">
-          <div class="card metric"><span>Para hoje</span><strong id="mToday">0</strong><small>Tarefas com vencimento hoje</small></div>
-          <div class="card metric"><span>Atrasadas</span><strong id="mOverdue">0</strong><small>Precisam de atenção</small></div>
-          <div class="card metric"><span>Urgentes</span><strong id="mUrgent">0</strong><small>Não concluídas</small></div>
-          <div class="card metric"><span>Aguardando</span><strong id="mWaiting">0</strong><small>Dependem de terceiros</small></div>
+        <div class="today-metrics" style="margin-top:14px">
+          <div class="card metric"><span>Para hoje</span><strong id="mToday">0</strong><small>Vencem hoje</small></div>
+          <div class="card metric"><span>Atrasadas</span><strong id="mOverdue">0</strong><small>Pedem atenção</small></div>
+          <div class="card metric"><span>Aguardando</span><strong id="mWaiting">0</strong><small>Dependem de retorno</small></div>
         </div>
 
         <div class="today-columns">
@@ -4044,7 +4059,6 @@ function renderToday(){
 
   mToday.textContent = today.length;
   mOverdue.textContent = overdue.length;
-  mUrgent.textContent = urgent.length;
   mWaiting.textContent = waiting.length;
 
   const focusMap = new Map();
