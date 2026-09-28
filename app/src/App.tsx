@@ -33,7 +33,24 @@ function LoginScreen() {
   return (
     <main className="login-screen">
       <section className="login-card">
-        <img src={logo} alt="ULALÁ" className="login-logo" />
+        <div className="login-brand">
+          <div className="brand-mark brand-mark-login" aria-hidden="true">
+            <span className="brand-orbit orbit-one" />
+            <span className="brand-orbit orbit-two" />
+            <div className="brand-art">
+              <img src={logo} alt="" />
+            </div>
+            <span className="brand-music-note note-one">♪</span>
+            <span className="brand-music-note note-two">♫</span>
+          </div>
+
+          <div className="login-brand-copy">
+            <span className="login-brand-kicker">SEU ESPAÇO DE ORGANIZAÇÃO</span>
+            <h1>ULALÁ</h1>
+            <small>workspace</small>
+          </div>
+        </div>
+
         <p>Organize tarefas, projetos, prazos e anotações em um espaço só seu.</p>
         <button type="button" className="google-button" onClick={() => void login()} disabled={loading}>
           <span>G</span>
