@@ -3061,6 +3061,18 @@
     }
   </style>
 
+
+  <style id="ulala-actions-v4">
+    .task-card-actions, .table-actions { display:flex; align-items:center; gap:6px; }
+    .task-done-btn { min-width:38px; padding-left:10px; padding-right:10px; }
+    @media (max-width:760px) {
+      .task-card-actions { width:100%; }
+      .task-card-actions .btn-soft { flex:1; }
+      .table-actions { width:100%; }
+      .table-actions .btn-soft { flex:1; }
+    }
+  </style>
+
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
@@ -3547,11 +3559,17 @@ const firebaseConfig = {
   appId: "1:584923643345:web:71cdfdc27147abc24df4f0"
 };
 
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 auth.useDeviceLanguage();
 
 let currentWorkspaceUser = null;
+let cloudDocRef = null;
+let cloudUnsubscribe = null;
+let cloudSyncReady = false;
+let cloudSaveTimer = null;
 
 function toWorkspaceUser(firebaseUser){
   if(!firebaseUser) return null;
@@ -3577,6 +3595,94 @@ function applyUserUI(user){
   }else{
     userAvatar.style.display = 'none';
   }
+}
+
+function setSyncStatus(type, text){
+  if(!window.syncBadge) return;
+  syncBadge.className = 'sync-badge ' + (type || 'local');
+  syncBadge.textContent = text || '☁️ Local';
+  syncBadge.title = text || 'Dados salvos neste navegador';
+}
+
+function applyRemoteWorkspace(data){
+  if(Array.isArray(data?.tasks)) tasks = data.tasks.map(normalizeTask);
+  if(Array.isArray(data?.notes)) notes = data.notes;
+  localStorage.setItem(STORAGE_TASKS, JSON.stringify(tasks));
+  localStorage.setItem(STORAGE_NOTES, JSON.stringify(notes));
+  renderAll();
+  checkTaskReminders();
+}
+
+function stopWorkspaceSync(){
+  if(cloudUnsubscribe){
+    cloudUnsubscribe();
+    cloudUnsubscribe = null;
+  }
+  cloudDocRef = null;
+  cloudSyncReady = false;
+  if(cloudSaveTimer) clearTimeout(cloudSaveTimer);
+  setSyncStatus('local','☁️ Local');
+}
+
+async function startWorkspaceSync(uid){
+  stopWorkspaceSync();
+  if(!uid) return;
+
+  cloudDocRef = db.collection('users').doc(uid).collection('workspace').doc('main');
+  setSyncStatus('syncing','☁️ Conectando');
+
+  try{
+    const first = await cloudDocRef.get();
+
+    if(first.exists){
+      applyRemoteWorkspace(first.data());
+    }else{
+      await cloudDocRef.set({
+        tasks,
+        notes,
+        version:3,
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    cloudSyncReady = true;
+    setSyncStatus('synced','☁️ Sincronizado');
+
+    cloudUnsubscribe = cloudDocRef.onSnapshot(snapshot=>{
+      if(!snapshot.exists) return;
+      applyRemoteWorkspace(snapshot.data());
+      setSyncStatus('synced','☁️ Sincronizado');
+    },error=>{
+      console.error('Sincronização Firestore:',error);
+      cloudSyncReady = false;
+      setSyncStatus('local','☁️ Local');
+    });
+  }catch(error){
+    console.error('Firestore indisponível:',error);
+    cloudSyncReady = false;
+    setSyncStatus('local','☁️ Local');
+  }
+}
+
+function saveWorkspaceToCloud(){
+  if(!cloudSyncReady || !cloudDocRef) return;
+  setSyncStatus('syncing','☁️ Salvando');
+
+  if(cloudSaveTimer) clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = setTimeout(async()=>{
+    try{
+      await cloudDocRef.set({
+        tasks,
+        notes,
+        version:3,
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      },{merge:true});
+      setSyncStatus('synced','☁️ Sincronizado');
+    }catch(error){
+      console.error('Erro ao salvar no Firestore:',error);
+      setSyncStatus('local','☁️ Local');
+    }
+  },350);
 }
 
 function showLoginError(message){
@@ -3634,8 +3740,11 @@ function initAuth(){
 
   auth.onAuthStateChanged(firebaseUser=>{
     if(firebaseUser){
-      enterWorkspace(toWorkspaceUser(firebaseUser));
+      const user=toWorkspaceUser(firebaseUser);
+      enterWorkspace(user);
+      startWorkspaceSync(firebaseUser.uid);
     }else{
+      stopWorkspaceSync();
       currentWorkspaceUser = null;
       appShell.style.display = 'none';
       loginScreen.style.display = 'flex';
@@ -3646,13 +3755,20 @@ function initAuth(){
 
 async function logoutGoogle(){
   try{
+    stopWorkspaceSync();
     await auth.signOut();
   }catch{
     showLoginError('Não foi possível sair da conta agora. Tente novamente.');
   }
 }
 
-const todayISO = () => new Date().toISOString().slice(0,10);
+const todayISOfunction toISODateLocal(date=new Date()){
+  const y=date.getFullYear();
+  const m=String(date.getMonth()+1).padStart(2,'0');
+  const d=String(date.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+d;
+}
+const todayISO = () => toISODateLocal(new Date());
 
 const seedTasks = [
   {
@@ -3689,17 +3805,36 @@ const seedNotes = [
   }
 ];
 
-let tasks = JSON.parse(localStorage.getItem(STORAGE_TASKS) || 'null') || seedTasks;
-tasks = tasks.map(t=>({...t, completedAt: t.completedAt || ''}));
+function normalizeTask(t){
+  return {
+    ...t,
+    id:t.id || crypto.randomUUID(),
+    completedAt:t.completedAt || '',
+    recurrence:t.recurrence || 'none',
+    reminder:t.reminder || 'none',
+    recurrenceGeneratedFor:t.recurrenceGeneratedFor || '',
+    createdAt:t.createdAt || new Date().toISOString(),
+    checklist:Array.isArray(t.checklist) ? t.checklist : [],
+    tags:Array.isArray(t.tags) ? t.tags : []
+  };
+}
+
+let tasks = (JSON.parse(localStorage.getItem(STORAGE_TASKS) || 'null') || seedTasks).map(normalizeTask);
 let notes = JSON.parse(localStorage.getItem(STORAGE_NOTES) || 'null') || seedNotes;
 let editingChecklist = [];
 let statusChart = null;
 let areaChart = null;
+let quickTaskFilter = 'all';
+let calendarCursor = new Date(new Date().getFullYear(),new Date().getMonth(),1);
+let calendarSelectedDate = todayISO();
 
 function persist(){
+  tasks = tasks.map(normalizeTask);
   localStorage.setItem(STORAGE_TASKS, JSON.stringify(tasks));
   localStorage.setItem(STORAGE_NOTES, JSON.stringify(notes));
   renderAll();
+  saveWorkspaceToCloud();
+  checkTaskReminders();
 }
 
 function esc(str=''){
@@ -3777,8 +3912,9 @@ function taskMatchesCompletedPeriod(t){
   return true;
 }
 
-function getFilteredTasks(){
-  const global = document.getElementById('globalSearch').value.trim().toLowerCase();
+
+function getFilteredTasks(includeQuick=false){
+  const global = document.getElementById('globalSearch')?.value.trim().toLowerCase() || '';
   const localText = document.getElementById('fText')?.value.trim().toLowerCase() || '';
   const status = document.getElementById('fStatus')?.value || '';
   const priority = document.getElementById('fPriority')?.value || '';
@@ -3787,20 +3923,76 @@ function getFilteredTasks(){
 
   return tasks.filter(t => {
     const blob = [t.title,t.area,t.project,t.related,t.nextAction,t.description,(t.tags||[]).join(' ')].join(' ').toLowerCase();
-    return (!global || blob.includes(global)) &&
-           (!localText || blob.includes(localText)) &&
-           (!status || t.status===status) &&
-           (!priority || t.priority===priority) &&
-           (!area || t.area===area) &&
-           (!project || t.project===project) &&
-           (status!=='Concluída' || taskMatchesCompletedPeriod(t));
+    const common =
+      (!global || blob.includes(global)) &&
+      (!localText || blob.includes(localText)) &&
+      (!status || t.status===status) &&
+      (!priority || t.priority===priority) &&
+      (!area || t.area===area) &&
+      (!project || t.project===project);
+
+    if(!common) return false;
+
+    const completedFiltering = status==='Concluída' || (includeQuick && quickTaskFilter==='completed');
+    if(completedFiltering && t.status==='Concluída' && !taskMatchesCompletedPeriod(t)) return false;
+
+    if(!includeQuick || quickTaskFilter==='all') return true;
+
+    const diff=daysDiff(t.due);
+    if(quickTaskFilter==='today') return t.status!=='Concluída' && diff===0;
+    if(quickTaskFilter==='overdue') return t.status!=='Concluída' && diff!==null && diff<0;
+    if(quickTaskFilter==='week'){
+      if(t.status==='Concluída' || !t.due) return false;
+      const d=parseDateLocal(t.due);
+      const start=startOfWeek(new Date());
+      const end=new Date(start); end.setDate(end.getDate()+6); end.setHours(23,59,59,999);
+      return d>=start && d<=end;
+    }
+    if(quickTaskFilter==='completed') return t.status==='Concluída';
+
+    return true;
   });
 }
+
+function sortTaskList(list){
+  const sort=document.getElementById('taskSort')?.value || 'due';
+  const priorityRank={Urgente:0,Alta:1,Média:2,Baixa:3};
+  const statusRank={'Em Andamento':0,'Pendente':1,'Aguardando':2,'Concluída':3};
+
+  return [...list].sort((a,b)=>{
+    if(quickTaskFilter==='completed'){
+      return (b.completedAt||'').localeCompare(a.completedAt||'') || a.title.localeCompare(b.title,'pt-BR');
+    }
+    if(sort==='priority') return (priorityRank[a.priority]??9)-(priorityRank[b.priority]??9) || (a.due||'9999').localeCompare(b.due||'9999');
+    if(sort==='title') return a.title.localeCompare(b.title,'pt-BR');
+    if(sort==='status') return (statusRank[a.status]??9)-(statusRank[b.status]??9) || (a.due||'9999').localeCompare(b.due||'9999');
+    return (a.due||'9999-99-99').localeCompare(b.due||'9999-99-99') || (priorityRank[a.priority]??9)-(priorityRank[b.priority]??9);
+  });
+}
+
+function setQuickTaskFilter(filter){
+  quickTaskFilter=filter;
+  document.querySelectorAll('.quick-filter').forEach(btn=>btn.classList.toggle('active',btn.dataset.quickFilter===filter));
+  if(window.fStatus) fStatus.value='';
+  if(filter==='completed'){
+    if(window.completedPeriod && completedPeriod.value==='all') completedPeriod.value='month';
+    advancedFilters?.classList.add('open');
+  }
+  toggleCompletedTools();
+  renderTaskTable();
+}
+
+function toggleAdvancedFilters(){
+  advancedFilters.classList.toggle('open');
+  advancedFiltersBtn.textContent = advancedFilters.classList.contains('open') ? '✕ Fechar filtros' : '⚙ Filtros';
+}
+
 
 function taskCardHTML(t, compact=false){
   const overdue = t.due && daysDiff(t.due) < 0 && t.status !== 'Concluída';
   const checklistDone = (t.checklist||[]).filter(i=>i.done).length;
   const checklistTotal = (t.checklist||[]).length;
+  const recurrenceLabel={daily:'Diária',weekly:'Semanal',monthly:'Mensal'}[t.recurrence];
 
   return `
     <div class="task-row ${compact ? 'compact':''} ${overdue ? 'highlight':''}">
@@ -3815,16 +4007,21 @@ function taskCardHTML(t, compact=false){
           <span>📅 ${fmtDate(t.due)}</span>
           ${t.status==='Concluída' && t.completedAt ? `<span>✅ ${fmtDate(t.completedAt)}</span>`:''}
           ${t.project ? `<span>📁 ${esc(t.project)}</span>`:''}
+          ${recurrenceLabel ? `<span>🔁 ${recurrenceLabel}</span>`:''}
+          ${t.reminder!=='none' ? '<span>🔔 Lembrete</span>':''}
           ${t.nextAction ? `<span>➡️ ${esc(t.nextAction)}</span>`:''}
           ${checklistTotal ? `<span>☑️ ${checklistDone}/${checklistTotal}</span>`:''}
         </div>
       </div>
-      <button class="btn btn-soft" onclick="editTask('${t.id}')">Abrir</button>
+      <div class="task-card-actions">
+        ${t.status!=='Concluída' ? `<button class="btn btn-success task-done-btn" onclick="quickCompleteTask('${t.id}')">✓</button>`:''}
+        <button class="btn btn-soft" onclick="editTask('${t.id}')">Abrir</button>
+      </div>
     </div>
   `;
 }
 
-function renderToday(){
+function renderTodayfunction renderToday(){
   const active = tasks.filter(t=>t.status!=='Concluída');
   const today = active.filter(t=>daysDiff(t.due)===0);
   const overdue = active.filter(t=>t.due && daysDiff(t.due)<0);
@@ -3886,8 +4083,9 @@ function fillFilterOptions(){
   if(projects.includes(values.project)) fProject.value=values.project;
 }
 
+
 function toggleCompletedTools(){
-  const active = fStatus.value==='Concluída';
+  const active = fStatus.value==='Concluída' || quickTaskFilter==='completed';
   completedTools.classList.toggle('active', active);
 
   const period=completedPeriod.value;
@@ -3897,16 +4095,15 @@ function toggleCompletedTools(){
 }
 
 function updateCompletedSummary(list){
-  if(fStatus.value!=='Concluída') return;
+  const active = fStatus.value==='Concluída' || quickTaskFilter==='completed';
+  if(!active) return;
   const withoutDate=list.filter(t=>!t.completedAt).length;
   completedFilterSummary.textContent = `${list.length} atividade${list.length===1?'':'s'}${withoutDate ? ` · ${withoutDate} sem data` : ''}`;
 }
 
+function renderTaskTable
 function renderTaskTable(){
-  let list = getFilteredTasks();
-  if(fStatus.value==='Concluída'){
-    list=[...list].sort((a,b)=>(b.completedAt||'').localeCompare(a.completedAt||''));
-  }
+  const list = sortTaskList(getFilteredTasks(true));
   updateCompletedSummary(list);
   taskTableBody.innerHTML = list.length ? list.map(t=>`
     <tr>
@@ -3918,12 +4115,17 @@ function renderTaskTable(){
       <td data-label="Vencimento">${fmtDate(t.due)}</td>
       <td data-label="Concluída em">${t.completedAt ? fmtDate(t.completedAt) : '<span style="color:#98a2b1">Sem data</span>'}</td>
       <td data-label="Próxima ação">${esc(t.nextAction||'-')}</td>
-      <td data-label="Ações"><button class="btn btn-soft" onclick="editTask('${t.id}')">Editar tarefa</button></td>
+      <td data-label="Ações">
+        <div class="table-actions">
+          ${t.status!=='Concluída' ? `<button class="btn btn-success" onclick="quickCompleteTask('${t.id}')">✓</button>`:''}
+          <button class="btn btn-soft" onclick="editTask('${t.id}')">Editar</button>
+        </div>
+      </td>
     </tr>
   `).join('') : '<tr><td colspan="9"><div class="empty">Nenhuma tarefa encontrada para este filtro.</div></td></tr>';
 }
 
-function renderKanban(){
+function renderKanbanfunction renderKanban(){
   const statuses=['Pendente','Em Andamento','Aguardando','Concluída'];
   const statusMeta={
     'Pendente':{icon:'○',label:'Pendente'},
@@ -3931,7 +4133,7 @@ function renderKanban(){
     'Aguardando':{icon:'◷',label:'Aguardando'},
     'Concluída':{icon:'✓',label:'Concluída'}
   };
-  const list=getFilteredTasks();
+  const list=getFilteredTasks(false);
 
   kanbanBoard.innerHTML = statuses.map(status=>{
     const items=list.filter(t=>t.status===status);
@@ -3995,12 +4197,91 @@ function renderKanban(){
       </button>
     </div>`;
   }).join('');
+  setupKanbanMobileTracker();
 }
 
 function openTaskForStatus(status){
   openTaskModal();
   taskStatus.value=status;
   updateCompletedField();
+}
+
+function addRecurrenceDate(iso,recurrence){
+  if(!iso) return '';
+  const d=parseDateLocal(iso);
+  if(recurrence==='daily') d.setDate(d.getDate()+1);
+  if(recurrence==='weekly') d.setDate(d.getDate()+7);
+  if(recurrence==='monthly'){
+    const originalDay=d.getDate();
+    d.setDate(1);
+    d.setMonth(d.getMonth()+1);
+    const lastDay=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+    d.setDate(Math.min(originalDay,lastDay));
+  }
+  return toISODateLocal(d);
+}
+
+function generateNextRecurringTask(source){
+  if(!source || source.recurrence==='none' || !source.due) return;
+  const completionKey=source.completedAt || todayISO();
+  if(source.recurrenceGeneratedFor===completionKey) return;
+
+  const nextDue=addRecurrenceDate(source.due,source.recurrence);
+  if(!nextDue) return;
+
+  const next=normalizeTask({
+    ...source,
+    id:crypto.randomUUID(),
+    status:'Pendente',
+    due:nextDue,
+    completedAt:'',
+    recurrenceGeneratedFor:'',
+    createdAt:new Date().toISOString(),
+    checklist:(source.checklist||[]).map(item=>({...item,id:crypto.randomUUID(),done:false}))
+  });
+
+  source.recurrenceGeneratedFor=completionKey;
+  tasks.push(next);
+}
+
+function applyTaskStatus(task,status){
+  if(!task) return;
+  const wasCompleted=task.status==='Concluída';
+  task.status=status;
+
+  if(status==='Concluída'){
+    if(!task.completedAt) task.completedAt=todayISO();
+    if(!wasCompleted) generateNextRecurringTask(task);
+  }else{
+    task.completedAt='';
+    task.recurrenceGeneratedFor='';
+  }
+}
+
+function quickCompleteTask(id){
+  const task=tasks.find(t=>t.id===id);
+  if(!task) return;
+  applyTaskStatus(task,'Concluída');
+  persist();
+}
+
+function setupKanbanMobileTracker(){
+  if(!window.kanbanBoard || !window.kanbanMobilePosition) return;
+  const update=()=>{
+    const col=kanbanBoard.querySelector('.kanban-col');
+    if(!col) return;
+    const gap=10;
+    const index=Math.max(0,Math.min(3,Math.round(kanbanBoard.scrollLeft/(col.getBoundingClientRect().width+gap))));
+    kanbanMobilePosition.textContent=(index+1)+'/4';
+  };
+  kanbanBoard.onscroll=update;
+  requestAnimationFrame(update);
+}
+
+function scrollKanban(direction){
+  const col=kanbanBoard.querySelector('.kanban-col');
+  if(!col) return;
+  kanbanBoard.scrollBy({left:direction*(col.getBoundingClientRect().width+10),behavior:'smooth'});
 }
 
 function dragTask(e,id){
@@ -4038,10 +4319,7 @@ function dropTask(e,status){
   const id=e.dataTransfer.getData('text/plain');
   const t=tasks.find(x=>x.id===id);
   if(t){
-    const wasCompleted=t.status==='Concluída';
-    t.status=status;
-    if(status==='Concluída' && !wasCompleted) t.completedAt=todayISO();
-    if(status!=='Concluída') t.completedAt='';
+    applyTaskStatus(t,status);
     persist();
   }
 }
@@ -4128,20 +4406,187 @@ function renderDashboard(){
   });
 }
 
+
+function changeCalendarMonth(delta){
+  calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+delta,1);
+  renderCalendar();
+}
+
+function goCalendarToday(){
+  const now=new Date();
+  calendarCursor=new Date(now.getFullYear(),now.getMonth(),1);
+  calendarSelectedDate=todayISO();
+  renderCalendar();
+}
+
+function selectCalendarDate(iso){
+  calendarSelectedDate=iso;
+  const d=parseDateLocal(iso);
+  if(d.getMonth()!==calendarCursor.getMonth() || d.getFullYear()!==calendarCursor.getFullYear()){
+    calendarCursor=new Date(d.getFullYear(),d.getMonth(),1);
+  }
+  renderCalendar();
+}
+
+function renderCalendar(){
+  if(!window.calendarGrid) return;
+
+  const year=calendarCursor.getFullYear();
+  const month=calendarCursor.getMonth();
+  calendarMonthLabel.textContent=calendarCursor.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+
+  const first=new Date(year,month,1);
+  const offset=(first.getDay()+6)%7;
+  const start=new Date(year,month,1-offset);
+  const cells=[];
+
+  for(let i=0;i<42;i++){
+    const date=new Date(start);
+    date.setDate(start.getDate()+i);
+    const iso=toISODateLocal(date);
+    const dayTasks=tasks.filter(t=>t.due===iso);
+    const isOutside=date.getMonth()!==month;
+    const classes=['calendar-day'];
+    if(isOutside) classes.push('outside');
+    if(iso===todayISO()) classes.push('today');
+    if(iso===calendarSelectedDate) classes.push('selected');
+
+    const previews=dayTasks.slice(0,2).map(t=>`<span class="calendar-task-dot" title="${esc(t.title)}">${esc(t.title)}</span>`).join('');
+    const more=dayTasks.length>2 ? `<span class="calendar-more">+${dayTasks.length-2}</span>` : '';
+
+    cells.push(`
+      <button type="button" class="${classes.join(' ')}" onclick="selectCalendarDate('${iso}')">
+        <span class="calendar-day-number">${date.getDate()}</span>
+        <span class="calendar-day-tasks">${previews}${more}</span>
+      </button>
+    `);
+  }
+
+  calendarGrid.innerHTML=cells.join('');
+
+  const selected=parseDateLocal(calendarSelectedDate);
+  calendarAgendaTitle.textContent=selected.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+  calendarAgendaSubtitle.textContent='Tarefas com vencimento nesta data';
+
+  const agenda=tasks
+    .filter(t=>t.due===calendarSelectedDate)
+    .sort((a,b)=>{
+      const rank={Urgente:0,Alta:1,Média:2,Baixa:3};
+      return (rank[a.priority]??9)-(rank[b.priority]??9);
+    });
+
+  calendarAgendaList.innerHTML=agenda.length
+    ? agenda.map(t=>taskCardHTML(t,true)).join('')
+    : '<div class="empty">Nenhuma tarefa para esta data.</div>';
+}
+
+async function enableNotifications(){
+  if(!('Notification' in window)){
+    alert('Este navegador não oferece notificações para páginas web.');
+    return;
+  }
+  const permission=await Notification.requestPermission();
+  updateNotificationButton();
+  if(permission==='granted'){
+    checkTaskReminders();
+    alert('Lembretes ativados. O ULALÁ poderá avisar sobre vencimentos enquanto estiver aberto.');
+  }
+}
+
+function updateNotificationButton(){
+  if(!window.notificationEnableBtn || !('Notification' in window)) return;
+  const strong=notificationEnableBtn.querySelector('strong');
+  const small=notificationEnableBtn.querySelector('small');
+  if(Notification.permission==='granted'){
+    strong.textContent='Lembretes ativados';
+    small.textContent='Avisos de vencimento estão permitidos';
+  }else if(Notification.permission==='denied'){
+    strong.textContent='Lembretes bloqueados';
+    small.textContent='Permita notificações nas configurações do navegador';
+  }
+}
+
+function checkTaskReminders(){
+  if(!('Notification' in window) || Notification.permission!=='granted') return;
+  const today=todayISO();
+  const storageKey='ulala_notification_log_v1';
+  let log={};
+  try{ log=JSON.parse(localStorage.getItem(storageKey)||'{}'); }catch{}
+
+  tasks.filter(t=>t.status!=='Concluída' && t.due && t.reminder && t.reminder!=='none').forEach(t=>{
+    const diff=daysDiff(t.due);
+    const shouldNotify=(t.reminder==='due' && diff===0) || (t.reminder==='day_before' && diff===1);
+    const key=(currentWorkspaceUser?.uid||'local')+':'+t.id+':'+today+':'+t.reminder;
+    if(!shouldNotify || log[key]) return;
+
+    const title=t.reminder==='day_before' ? 'ULALÁ · Vence amanhã' : 'ULALÁ · Tarefa para hoje';
+    new Notification(title,{body:t.title,tag:'ulala-'+t.id});
+    log[key]=Date.now();
+  });
+
+  localStorage.setItem(storageKey,JSON.stringify(log));
+}
+
+function toggleQuickCreate(){
+  mobileFabMenu.classList.toggle('open');
+  mobileFab.classList.toggle('open');
+}
+
+function closeQuickCreate(){
+  mobileFabMenu.classList.remove('open');
+  mobileFab.classList.remove('open');
+}
+
+function openTaskFromFab(){
+  closeQuickCreate();
+  openTaskModal();
+}
+
+function openNoteFromFab(){
+  closeQuickCreate();
+  openNoteModal();
+}
+
+function openMoreSheet(){
+  closeQuickCreate();
+  updateNotificationButton();
+  moreSheetBackdrop.classList.add('open');
+}
+
+function closeMoreSheet(){
+  moreSheetBackdrop.classList.remove('open');
+}
+
+function closeMoreBackdrop(event){
+  if(event.target===moreSheetBackdrop) closeMoreSheet();
+}
+
+function openMoreView(view){
+  closeMoreSheet();
+  activateView(view);
+}
+
 function renderAll(){
   fillFilterOptions();
   toggleCompletedTools();
   renderToday();
   renderTaskTable();
   renderKanban();
+  renderCalendar();
   renderNotes();
   renderDashboard();
 }
+
 
 function updateCompletedField(){
   const concluded = taskStatus.value==='Concluída';
   taskCompletedWrap.style.display = concluded ? 'block' : 'none';
   if(concluded && !taskCompletedAt.value) taskCompletedAt.value=todayISO();
+}
+
+function setTaskDetailsResponsive(){
+  if(!window.taskMoreDetails) return;
+  taskMoreDetails.open=window.innerWidth>760;
 }
 
 function openTaskModal(){
@@ -4151,9 +4596,13 @@ function openTaskModal(){
   deleteTaskBtn.style.display='none';
   editingChecklist=[];
   taskCompletedAt.value='';
+  taskRecurrence.value='none';
+  taskReminder.value='none';
   updateCompletedField();
+  setTaskDetailsResponsive();
   renderChecklistEditor();
   taskModalBackdrop.classList.add('open');
+  setTimeout(()=>taskTitle.focus(),80);
 }
 
 function closeTaskModal(){ taskModalBackdrop.classList.remove('open'); }
@@ -4172,17 +4621,20 @@ function editTask(id){
   taskCompletedAt.value=t.completedAt||'';
   taskHours.value=t.hours||0;
   taskTags.value=(t.tags||[]).join(', ');
+  taskRecurrence.value=t.recurrence||'none';
+  taskReminder.value=t.reminder||'none';
   taskNextAction.value=t.nextAction||'';
   taskDescription.value=t.description||'';
   editingChecklist=JSON.parse(JSON.stringify(t.checklist||[]));
   updateCompletedField();
+  setTaskDetailsResponsive();
   renderChecklistEditor();
   taskModalTitle.textContent='Editar tarefa';
   deleteTaskBtn.style.display='inline-block';
   taskModalBackdrop.classList.add('open');
 }
 
-function addChecklistItem(){
+function addChecklistItemfunction addChecklistItem(){
   const text=newCheckText.value.trim();
   if(!text) return;
   editingChecklist.push({id:crypto.randomUUID(),text,done:false});
@@ -4211,9 +4663,20 @@ function renderChecklistEditor(){
   `).join('');
 }
 
+
 taskForm.addEventListener('submit',e=>{
   e.preventDefault();
-  const payload={
+
+  if(taskRecurrence.value!=='none' && !taskDue.value){
+    alert('Para repetir uma tarefa, informe uma data de vencimento.');
+    taskMoreDetails.open=true;
+    return;
+  }
+
+  const existing=tasks.find(x=>x.id===taskId.value);
+  const wasCompleted=existing?.status==='Concluída';
+
+  const payload=normalizeTask({
     id:taskId.value||crypto.randomUUID(),
     title:taskTitle.value.trim(),
     status:taskStatus.value,
@@ -4225,18 +4688,27 @@ taskForm.addEventListener('submit',e=>{
     completedAt: taskStatus.value==='Concluída' ? (taskCompletedAt.value || todayISO()) : '',
     hours:Number(taskHours.value)||0,
     tags:taskTags.value.split(',').map(x=>x.trim()).filter(Boolean),
+    recurrence:taskRecurrence.value,
+    reminder:taskReminder.value,
     nextAction:taskNextAction.value.trim(),
     description:taskDescription.value.trim(),
-    checklist:editingChecklist
-  };
+    checklist:editingChecklist,
+    createdAt:existing?.createdAt || new Date().toISOString(),
+    recurrenceGeneratedFor:existing?.recurrenceGeneratedFor || ''
+  });
 
   const idx=tasks.findIndex(x=>x.id===payload.id);
   if(idx>=0) tasks[idx]=payload; else tasks.push(payload);
+
+  const saved=tasks.find(x=>x.id===payload.id);
+  if(saved.status==='Concluída' && !wasCompleted) generateNextRecurringTask(saved);
+  if(saved.status!=='Concluída') saved.recurrenceGeneratedFor='';
+
   closeTaskModal();
   persist();
 });
 
-function deleteTask(){
+function deleteTaskfunction deleteTask(){
   const id=taskId.value;
   if(!id || !confirm('Excluir esta tarefa?')) return;
   tasks=tasks.filter(x=>x.id!==id);
@@ -4299,10 +4771,12 @@ function closeBackdrop(e,id){
   }
 }
 
+
 const viewMeta={
   today:['Meu Dia','Veja o que precisa da sua atenção agora.'],
-  tasks:['Tarefas','Pesquise, filtre e acompanhe todas as demandas.'],
-  kanban:['Kanban','Mova tarefas entre os status conforme o trabalho avança.'],
+  tasks:['Tarefas','Encontre rapidamente o que precisa fazer.'],
+  kanban:['Kanban','Acompanhe o fluxo do trabalho por etapas.'],
+  calendar:['Calendário','Veja tarefas e vencimentos distribuídos no mês.'],
   notes:['Anotações','Guarde informações sem transformar tudo em tarefa.'],
   dashboard:['Dashboard','Acompanhe volume, status e carga de trabalho.']
 };
@@ -4312,7 +4786,9 @@ function activateView(view){
     x.classList.toggle('active', x.dataset.view===view);
   });
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
-  document.getElementById('view-'+view).classList.add('active');
+  const target=document.getElementById('view-'+view);
+  if(!target) return;
+  target.classList.add('active');
   pageTitle.textContent=viewMeta[view][0];
   pageSubtitle.textContent=viewMeta[view][1];
   window.scrollTo({top:0, behavior:'smooth'});
@@ -4321,10 +4797,11 @@ function activateView(view){
 
 function showCompletedHistory(){
   activateView('tasks');
-  fStatus.value='Concluída';
+  setQuickTaskFilter('completed');
   completedPeriod.value='month';
+  advancedFilters.classList.add('open');
   toggleCompletedTools();
-  renderAll();
+  renderTaskTable();
 }
 
 document.querySelectorAll('.nav-btn').forEach(btn=>{
@@ -4336,6 +4813,8 @@ document.querySelectorAll('.nav-btn').forEach(btn=>{
   document.getElementById(id)?.addEventListener('change',renderAll);
 });
 
+taskSort?.addEventListener('change',renderTaskTable);
+
 fStatus.addEventListener('change',()=>{
   if(fStatus.value==='Concluída' && completedPeriod.value==='all') completedPeriod.value='month';
   toggleCompletedTools();
@@ -4345,21 +4824,26 @@ fStatus.addEventListener('change',()=>{
 ['completedPeriod','completedMonth','completedFrom','completedTo'].forEach(id=>{
   document.getElementById(id)?.addEventListener('change',()=>{
     toggleCompletedTools();
-    renderAll();
+    renderTaskTable();
   });
 });
 
 taskStatus.addEventListener('change',updateCompletedField);
+window.addEventListener('resize',()=>{
+  if(!taskModalBackdrop.classList.contains('open')) return;
+  setTaskDetailsResponsive();
+});
+setInterval(checkTaskReminders,30*60*1000);
 
-function csvEscape(value){
+function csvEscapefunction csvEscape(value){
   const s=String(value??'').replaceAll('"','""');
   return `"${s}"`;
 }
 
 function exportCSV(){
-  const header=['ID','Título','Status','Prioridade','Área','Projeto','Relacionado a','Vencimento','Data da conclusão','Horas','Tags','Próxima ação','Descrição'];
+  const header=['ID','Título','Status','Prioridade','Área','Projeto','Relacionado a','Vencimento','Data da conclusão','Horas','Tags','Recorrência','Lembrete','Próxima ação','Descrição'];
   const rows=tasks.map(t=>[
-    t.id,t.title,t.status,t.priority,t.area,t.project,t.related,t.due,t.completedAt||'',t.hours,(t.tags||[]).join(','),t.nextAction,t.description
+    t.id,t.title,t.status,t.priority,t.area,t.project,t.related,t.due,t.completedAt||'',t.hours,(t.tags||[]).join(','),t.recurrence||'none',t.reminder||'none',t.nextAction,t.description
   ]);
   const csv=[header,...rows].map(r=>r.map(csvEscape).join(';')).join('\n');
   downloadFile('\uFEFF'+csv,'ulala_tarefas.csv','text/csv;charset=utf-8');
@@ -4401,13 +4885,15 @@ document.getElementById('importCSV').addEventListener('change',e=>{
         completedAt:c[idx('Data da conclusão')]||'',
         hours:Number(c[idx('Horas')])||0,
         tags:(c[idx('Tags')]||'').split(',').map(x=>x.trim()).filter(Boolean),
+        recurrence:c[idx('Recorrência')]||'none',
+        reminder:c[idx('Lembrete')]||'none',
         nextAction:c[idx('Próxima ação')]||'',
         description:c[idx('Descrição')]||'',
         checklist:[]
       };
     });
     if(imported.length){
-      tasks=imported;
+      tasks=imported.map(normalizeTask);
       persist();
       alert('CSV importado com sucesso.');
     }
@@ -4417,7 +4903,7 @@ document.getElementById('importCSV').addEventListener('change',e=>{
 });
 
 function exportJSON(){
-  const data={version:2,exportedAt:new Date().toISOString(),tasks,notes};
+  const data={version:3,exportedAt:new Date().toISOString(),tasks,notes};
   downloadFile(JSON.stringify(data,null,2),'backup_workspace.json','application/json');
 }
 
@@ -4428,7 +4914,7 @@ document.getElementById('importJSON').addEventListener('change',e=>{
     try{
       const data=JSON.parse(reader.result);
       if(!Array.isArray(data.tasks) || !Array.isArray(data.notes)) throw new Error();
-      tasks=data.tasks; notes=data.notes; persist();
+      tasks=data.tasks.map(normalizeTask); notes=data.notes; persist();
       alert('Backup restaurado com sucesso.');
     }catch{
       alert('Arquivo JSON inválido.');
@@ -4447,7 +4933,9 @@ function downloadFile(content,name,type){
 }
 
 renderAll();
+updateNotificationButton();
 initAuth();
+setTimeout(checkTaskReminders,1500);
 </script>
 </body>
 </html>
