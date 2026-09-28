@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Workspace Pessoal | Organização de Trabalho</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <style>
     :root {
       --bg: #f6f8fb;
@@ -891,6 +892,36 @@
     .login-card h1 { margin:0; font-size:25px; }
     .login-card > p { color:var(--muted); line-height:1.55; font-size:13px; margin:9px 0 20px; }
     .google-button-wrap { min-height:44px; display:flex; justify-content:center; }
+    .google-login-btn {
+      width:100%;
+      min-height:48px;
+      border:1px solid #d9dee7;
+      background:#fff;
+      color:#263244;
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:10px 14px;
+      font-weight:800;
+      transition:.15s ease;
+      box-shadow:0 1px 2px rgba(0,0,0,.03);
+    }
+    .google-login-btn:hover { background:#f8fafc; border-color:#c6ced9; }
+    .google-login-btn:disabled { opacity:.65; cursor:wait; }
+    .google-g {
+      width:20px;
+      height:20px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:#fff;
+      font-size:17px;
+      font-weight:900;
+      color:#4285f4;
+    }
+    .login-hint.error { background:#fff1f2; border-color:#fecdd3; color:#9f2330; }
     .login-hint {
       background:#f6f8fc;
       border:1px solid var(--border);
@@ -901,7 +932,6 @@
       line-height:1.45;
       margin-top:14px;
     }
-    .demo-access { width:100%; margin-top:10px; }
     .login-security { margin-top:16px; color:#8a95a4; font-size:10px; text-align:center; }
 
     .topbar-title-row {
@@ -1120,12 +1150,14 @@
     <div class="login-logo">💼</div>
     <h1>Workspace da Lala</h1>
     <p>Entre com sua conta Google para acessar tarefas, anotações e o painel de trabalho.</p>
-    <div id="googleButton" class="google-button-wrap"></div>
-    <div id="googleSetupHint" class="login-hint">
-      O login Google está preparado, mas ainda precisa do Client ID do Google para ser ativado.
+    <div class="google-button-wrap">
+      <button id="googleLoginBtn" class="google-login-btn" type="button" onclick="signInWithGoogle()">
+        <span class="google-g">G</span>
+        <span>Continuar com Google</span>
+      </button>
     </div>
-    <button id="demoAccessBtn" class="btn btn-soft demo-access" type="button" onclick="enterDemoMode()">Continuar em modo de teste</button>
-    <div class="login-security">O aplicativo não lê seus e-mails. O Google é usado apenas para identificar a conta.</div>
+    <div id="googleSetupHint" class="login-hint" style="display:none"></div>
+    <div class="login-security">O aplicativo não lê seus e-mails. O Google é usado apenas para autenticação.</div>
   </div>
 </div>
 
@@ -1459,48 +1491,40 @@
 <script>
 const STORAGE_TASKS = 'workspace_tasks_v2';
 const STORAGE_NOTES = 'workspace_notes_v2';
-const STORAGE_USER = 'workspace_google_user';
 
-/*
-  Para ativar o login real:
-  1) Crie um OAuth Client ID do tipo Web no Google Cloud.
-  2) Adicione a origem do GitHub Pages nas "Authorized JavaScript origins".
-  3) Cole o Client ID abaixo.
-*/
-const GOOGLE_CLIENT_ID = 'COLE_SEU_CLIENT_ID_AQUI.apps.googleusercontent.com';
-const ALLOWED_EMAILS = []; // Opcional: ex. ['email@gmail.com'] para restringir a conta.
+const firebaseConfig = {
+  apiKey: "AIzaSyAIvmTZLHVThtANwCSCJ7FrvTcaAMB1fGI",
+  authDomain: "aplicativo-tarefas-lala.firebaseapp.com",
+  projectId: "aplicativo-tarefas-lala",
+  storageBucket: "aplicativo-tarefas-lala.firebasestorage.app",
+  messagingSenderId: "584923643345",
+  appId: "1:584923643345:web:71cdfdc27147abc24df4f0"
+};
 
-function googleConfigured(){
-  return GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith('COLE_SEU_CLIENT_ID');
-}
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+auth.useDeviceLanguage();
 
-function decodeGoogleCredential(token){
-  try{
-    const payload = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
-    const json = decodeURIComponent(atob(payload).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-    return JSON.parse(json);
-  }catch{
-    return null;
-  }
+let currentWorkspaceUser = null;
+
+function toWorkspaceUser(firebaseUser){
+  if(!firebaseUser) return null;
+  return {
+    uid: firebaseUser.uid,
+    name: firebaseUser.displayName || firebaseUser.email || 'Lala',
+    given_name: (firebaseUser.displayName || '').split(' ')[0],
+    email: firebaseUser.email || '',
+    picture: firebaseUser.photoURL || ''
+  };
 }
 
 function getStoredUser(){
-  try{
-    const user = JSON.parse(localStorage.getItem(STORAGE_USER) || 'null');
-    if(!user) return null;
-    if(user.exp && Date.now()/1000 > user.exp){
-      localStorage.removeItem(STORAGE_USER);
-      return null;
-    }
-    return user;
-  }catch{
-    return null;
-  }
+  return currentWorkspaceUser;
 }
 
 function applyUserUI(user){
   const firstName = (user?.name || user?.given_name || 'Lala').split(' ')[0];
-  userName.textContent = user?.demo ? 'Modo teste' : firstName;
+  userName.textContent = firstName;
   if(user?.picture){
     userAvatar.src = user.picture;
     userAvatar.style.display = 'block';
@@ -1509,93 +1533,77 @@ function applyUserUI(user){
   }
 }
 
+function showLoginError(message){
+  googleSetupHint.textContent = message;
+  googleSetupHint.classList.add('error');
+  googleSetupHint.style.display = 'block';
+}
+
+function clearLoginError(){
+  googleSetupHint.textContent = '';
+  googleSetupHint.classList.remove('error');
+  googleSetupHint.style.display = 'none';
+}
+
 function enterWorkspace(user){
-  if(user) localStorage.setItem(STORAGE_USER, JSON.stringify(user));
+  currentWorkspaceUser = user;
   loginScreen.style.display = 'none';
   appShell.style.display = '';
-  applyUserUI(user || getStoredUser());
+  applyUserUI(user);
   renderAll();
 }
 
-function enterDemoMode(){
-  enterWorkspace({name:'Lala', demo:true});
-}
+async function signInWithGoogle(){
+  clearLoginError();
+  googleLoginBtn.disabled = true;
 
-function handleGoogleCredential(response){
-  const payload = decodeGoogleCredential(response.credential);
-  if(!payload?.email){
-    alert('Não foi possível identificar a conta Google.');
-    return;
-  }
-  if(ALLOWED_EMAILS.length && !ALLOWED_EMAILS.map(x=>x.toLowerCase()).includes(payload.email.toLowerCase())){
-    alert('Esta conta Google não está autorizada a acessar o aplicativo.');
-    return;
-  }
-  enterWorkspace({
-    name: payload.name,
-    given_name: payload.given_name,
-    email: payload.email,
-    picture: payload.picture,
-    exp: payload.exp
-  });
-}
+  try{
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    await auth.signInWithPopup(provider);
+  }catch(error){
+    console.error(error);
+    let message = 'Não foi possível entrar com o Google. Tente novamente.';
 
-function renderGoogleLogin(){
-  if(!googleConfigured()){
-    googleSetupHint.style.display = 'block';
-    demoAccessBtn.style.display = 'block';
-    return;
-  }
-  googleSetupHint.style.display = 'none';
-  demoAccessBtn.style.display = 'none';
-
-  let attempts = 0;
-  const timer = setInterval(()=>{
-    attempts++;
-    if(window.google?.accounts?.id){
-      clearInterval(timer);
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleCredential,
-        auto_select: false,
-        cancel_on_tap_outside: true
-      });
-      googleButton.innerHTML = '';
-      google.accounts.id.renderButton(googleButton,{
-        theme:'outline',
-        size:'large',
-        type:'standard',
-        shape:'rectangular',
-        text:'signin_with',
-        width:340,
-        locale:'pt-BR'
-      });
-    }else if(attempts > 25){
-      clearInterval(timer);
-      googleSetupHint.textContent = 'Não foi possível carregar o botão do Google. Verifique a conexão e recarregue a página.';
-      googleSetupHint.style.display = 'block';
+    if(error.code === 'auth/unauthorized-domain'){
+      message = 'Este endereço ainda não está autorizado no Firebase. Adicione maria-luiza-souza.github.io em Authentication → Settings → Authorized domains.';
+    }else if(error.code === 'auth/popup-blocked'){
+      message = 'O navegador bloqueou a janela do Google. Permita pop-ups para este site e tente novamente.';
+    }else if(error.code === 'auth/popup-closed-by-user'){
+      message = 'A janela de login foi fechada antes de concluir.';
+    }else if(error.code === 'auth/operation-not-allowed'){
+      message = 'O login com Google ainda não está ativado no Firebase Authentication.';
+    }else if(error.code === 'auth/network-request-failed'){
+      message = 'Falha de conexão. Verifique a internet e tente novamente.';
     }
-  },200);
+
+    showLoginError(message);
+  }finally{
+    googleLoginBtn.disabled = false;
+  }
 }
 
 function initAuth(){
-  const user = getStoredUser();
-  if(user){
-    enterWorkspace(user);
-  }else{
-    loginScreen.style.display = 'flex';
-    appShell.style.display = 'none';
-    renderGoogleLogin();
-  }
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
+
+  auth.onAuthStateChanged(firebaseUser=>{
+    if(firebaseUser){
+      enterWorkspace(toWorkspaceUser(firebaseUser));
+    }else{
+      currentWorkspaceUser = null;
+      appShell.style.display = 'none';
+      loginScreen.style.display = 'flex';
+      clearLoginError();
+    }
+  });
 }
 
-function logoutGoogle(){
-  localStorage.removeItem(STORAGE_USER);
-  if(window.google?.accounts?.id) google.accounts.id.disableAutoSelect();
-  appShell.style.display = 'none';
-  loginScreen.style.display = 'flex';
-  googleButton.innerHTML = '';
-  renderGoogleLogin();
+async function logoutGoogle(){
+  try{
+    await auth.signOut();
+  }catch{
+    showLoginError('Não foi possível sair da conta agora. Tente novamente.');
+  }
 }
 
 const todayISO = () => new Date().toISOString().slice(0,10);
