@@ -10,6 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <style>
     :root {
       --bg: #f6f8fb;
@@ -2719,6 +2720,347 @@
     }
   </style>
 
+
+  <style id="ulala-productivity-v4">
+    .sync-badge {
+      display:inline-flex;
+      align-items:center;
+      min-height:32px;
+      padding:5px 9px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background:#fff;
+      color:var(--muted);
+      font-size:10px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .sync-badge.synced { background:#eef8f3; color:#3b7f63; border-color:#d4eadf; }
+    .sync-badge.syncing { background:#fff8e9; color:#8b6b2f; border-color:#f0e1bd; }
+    .sync-badge.local { background:#faf5f7; color:#7c6871; }
+
+    .task-toolbar {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .quick-filter-scroll {
+      display:flex;
+      align-items:center;
+      gap:7px;
+      overflow-x:auto;
+      scrollbar-width:none;
+      padding:1px;
+    }
+    .quick-filter-scroll::-webkit-scrollbar { display:none; }
+    .quick-filter {
+      flex:0 0 auto;
+      border:1px solid var(--border);
+      background:#fff;
+      color:var(--muted);
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:11px;
+      font-weight:800;
+    }
+    .quick-filter.active {
+      color:#fff;
+      background:var(--primary);
+      border-color:var(--primary);
+    }
+    .task-toolbar-actions { display:flex; gap:8px; align-items:center; }
+    .task-sort {
+      min-height:38px;
+      border:1px solid var(--border);
+      border-radius:10px;
+      background:#fff;
+      color:var(--text);
+      padding:8px 10px;
+      font-size:11px;
+      font-weight:700;
+    }
+    .filters-panel {
+      display:none;
+      padding:12px;
+      margin-bottom:14px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:var(--panel-soft);
+    }
+    .filters-panel.open { display:block; }
+    .filters-panel .filters { margin-bottom:0; }
+    .filters-panel .completed-tools { margin:12px 0 0; }
+
+    .calendar-shell { display:grid; gap:14px; }
+    .calendar-header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+    .calendar-header h2 { margin:0; font-size:20px; }
+    .calendar-header p { margin:4px 0 0; color:var(--muted); font-size:12px; }
+    .calendar-nav { display:flex; gap:7px; align-items:center; }
+    .calendar-layout { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(300px,.8fr); gap:14px; }
+    .calendar-card, .calendar-agenda { padding:16px; }
+    .calendar-month-label {
+      font-family:"Plus Jakarta Sans",sans-serif;
+      font-size:17px;
+      font-weight:800;
+      color:var(--text);
+      text-transform:capitalize;
+      margin-bottom:14px;
+    }
+    .calendar-weekdays, .calendar-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); }
+    .calendar-weekdays span {
+      padding:8px 4px;
+      text-align:center;
+      color:var(--muted);
+      font-size:10px;
+      font-weight:800;
+      text-transform:uppercase;
+    }
+    .calendar-grid { border-top:1px solid var(--border); border-left:1px solid var(--border); }
+    .calendar-day {
+      position:relative;
+      min-height:92px;
+      border:none;
+      border-right:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+      background:#fff;
+      color:var(--text);
+      text-align:left;
+      padding:8px;
+      cursor:pointer;
+    }
+    .calendar-day:hover { background:var(--panel-soft); }
+    .calendar-day.outside { color:#b8adb3; background:#fdfbfc; }
+    .calendar-day.today .calendar-day-number {
+      background:var(--primary);
+      color:#fff;
+    }
+    .calendar-day.selected { box-shadow:inset 0 0 0 2px rgba(201,120,152,.52); z-index:1; }
+    .calendar-day-number {
+      display:inline-grid;
+      place-items:center;
+      width:26px;
+      height:26px;
+      border-radius:50%;
+      font-size:11px;
+      font-weight:800;
+    }
+    .calendar-day-tasks { display:grid; gap:3px; margin-top:5px; }
+    .calendar-task-dot {
+      display:block;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      padding:3px 5px;
+      border-radius:5px;
+      background:var(--primary-soft);
+      color:#82526a;
+      font-size:9px;
+      font-weight:700;
+    }
+    .calendar-more { color:var(--muted); font-size:9px; padding-left:3px; }
+    .calendar-agenda { min-height:380px; }
+
+    .kanban-mobile-guide { display:none; }
+
+    .task-more-details {
+      border:1px solid var(--border);
+      border-radius:12px;
+      margin:4px 0 14px;
+      background:var(--panel-soft);
+      overflow:hidden;
+    }
+    .task-more-details summary {
+      cursor:pointer;
+      list-style:none;
+      padding:11px 12px;
+      color:#69565f;
+      font-size:12px;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .task-more-details summary::-webkit-details-marker { display:none; }
+    .task-more-details summary::after { content:"⌄"; font-size:14px; transition:transform .15s ease; }
+    .task-more-details[open] summary::after { transform:rotate(180deg); }
+    .task-details-content { padding:0 12px 4px; border-top:1px solid var(--border); padding-top:12px; }
+
+    .mobile-fab-menu {
+      display:none;
+      position:fixed;
+      right:18px;
+      bottom:calc(148px + env(safe-area-inset-bottom));
+      z-index:91;
+      width:178px;
+      padding:7px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:#fff;
+      box-shadow:0 16px 34px rgba(71,46,57,.17);
+    }
+    .mobile-fab-menu.open { display:grid; gap:5px; }
+    .mobile-fab-menu button {
+      border:none;
+      background:transparent;
+      text-align:left;
+      padding:10px;
+      border-radius:9px;
+      color:var(--text);
+      font-size:12px;
+      font-weight:800;
+    }
+    .mobile-fab-menu button:hover { background:var(--panel-soft); }
+    .mobile-fab.open { transform:rotate(45deg); }
+
+    .more-sheet-backdrop {
+      display:none;
+      position:fixed;
+      inset:0;
+      z-index:120;
+      background:rgba(31,24,28,.35);
+      align-items:flex-end;
+      justify-content:center;
+      padding:0;
+    }
+    .more-sheet-backdrop.open { display:flex; }
+    .more-sheet {
+      width:min(560px,100%);
+      max-height:88dvh;
+      overflow:auto;
+      background:#fff;
+      border-radius:22px 22px 0 0;
+      padding:10px 14px calc(18px + env(safe-area-inset-bottom));
+      box-shadow:0 -20px 50px rgba(45,31,37,.18);
+    }
+    .more-sheet-handle {
+      width:42px; height:4px; border-radius:999px; background:#d9cfd4; margin:0 auto 13px;
+    }
+    .more-sheet-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+    .more-sheet-head strong { display:block; font-size:16px; }
+    .more-sheet-head span { display:block; color:var(--muted); font-size:10px; margin-top:2px; }
+    .more-menu { display:grid; gap:7px; }
+    .more-menu > button {
+      display:grid;
+      grid-template-columns:34px 1fr;
+      gap:9px;
+      align-items:center;
+      border:1px solid var(--border);
+      background:#fff;
+      color:var(--text);
+      border-radius:12px;
+      padding:11px;
+      text-align:left;
+    }
+    .more-menu > button > span { font-size:20px; }
+    .more-menu strong { display:block; font-size:12px; }
+    .more-menu small { display:block; color:var(--muted); font-size:10px; margin-top:2px; }
+    .more-tools { margin-top:15px; padding-top:13px; border-top:1px solid var(--border); }
+    .more-tools > strong { display:block; margin-bottom:8px; font-size:11px; color:var(--muted); text-transform:uppercase; }
+    .more-tools-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+    .more-tools-grid button {
+      border:1px solid var(--border);
+      background:var(--panel-soft);
+      color:var(--text);
+      border-radius:10px;
+      padding:10px;
+      font-size:10px;
+      font-weight:800;
+    }
+    .more-logout {
+      width:100%;
+      margin-top:12px;
+      border:none;
+      background:#fff4f6;
+      color:#a5526c;
+      border-radius:10px;
+      padding:11px;
+      font-size:11px;
+      font-weight:800;
+    }
+    .mobile-more-btn {
+      border:none;
+      background:transparent;
+      color:rgba(255,255,255,.70);
+      border-radius:12px;
+      min-width:0;
+      min-height:52px;
+      padding:5px 2px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:3px;
+      font-size:9px;
+      font-weight:700;
+    }
+    .mobile-more-btn .ico { font-size:18px; line-height:1; }
+
+    @media (max-width:1000px) {
+      .calendar-layout { grid-template-columns:1fr; }
+    }
+
+    @media (max-width:760px) {
+      .topbar .actions .btn { display:none; }
+      .quick-actions { display:none; }
+      .sync-badge { font-size:0; padding:5px 7px; min-width:30px; }
+      .sync-badge::first-letter { font-size:12px; }
+
+      .task-toolbar { display:grid; gap:9px; }
+      .quick-filter-scroll { margin-right:-12px; padding-right:12px; }
+      .task-toolbar-actions { display:grid; grid-template-columns:1fr auto; }
+      .task-sort { width:100%; min-height:42px; }
+      .filters-panel { padding:10px; }
+      .filters { grid-template-columns:1fr 1fr !important; }
+      #fText { grid-column:1 / -1; }
+
+      .calendar-header { align-items:flex-start; }
+      .calendar-header p { display:none; }
+      .calendar-nav .calendar-today-btn { display:none; }
+      .calendar-card { padding:10px; overflow:hidden; }
+      .calendar-weekdays span { font-size:8px; padding:6px 1px; }
+      .calendar-day { min-height:58px; padding:4px; }
+      .calendar-day-number { width:22px; height:22px; font-size:10px; }
+      .calendar-task-dot { width:6px; height:6px; padding:0; border-radius:50%; font-size:0; display:inline-block; margin-right:2px; background:var(--primary); }
+      .calendar-day-tasks { display:block; white-space:nowrap; margin-top:3px; }
+      .calendar-more { display:none; }
+      .calendar-agenda { min-height:auto; padding:13px; }
+
+      .task-more-details { background:#fff; }
+      .task-details-content { padding:11px 0 0; border-top:1px solid var(--border); margin:0 11px; }
+      .task-more-details summary { min-height:44px; }
+
+      .kanban-mobile-guide {
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:9px;
+        margin:0 0 8px;
+        color:var(--muted);
+        font-size:10px;
+        font-weight:700;
+      }
+      .kanban-mobile-guide button {
+        width:30px; height:30px; border:1px solid var(--border); border-radius:9px; background:#fff; color:var(--text);
+      }
+
+      .mobile-fab { display:grid; transition:transform .15s ease; }
+      .mobile-fab-menu { display:none; }
+      .mobile-fab-menu.open { display:grid; }
+
+      .mobile-nav { grid-template-columns:repeat(5,1fr); }
+      .mobile-more-btn { color:rgba(255,255,255,.72); }
+
+      .more-sheet-backdrop { padding:0; }
+    }
+  </style>
+
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
@@ -2753,9 +3095,10 @@
       <div class="nav-group-title">Dia a dia</div>
       <button class="nav-btn active" data-view="today">🏠 Meu Dia</button>
       <button class="nav-btn" data-view="tasks">✅ Tarefas</button>
-      <button class="nav-btn" data-view="kanban">📋 Kanban</button>
 
       <div class="nav-group-title">Organização</div>
+      <button class="nav-btn" data-view="kanban">📋 Kanban</button>
+      <button class="nav-btn" data-view="calendar">📅 Calendário</button>
       <button class="nav-btn" data-view="notes">📝 Anotações</button>
 
       <div class="nav-group-title">Análise</div>
@@ -2787,6 +3130,7 @@
           <h1 id="pageTitle">Meu Dia</h1>
           <p id="pageSubtitle">Veja o que precisa da sua atenção agora.</p>
         </div>
+        <span id="syncBadge" class="sync-badge" title="Status da sincronização">☁️ Local</span>
         <button id="userChip" class="user-chip" type="button" onclick="logoutGoogle()" title="Sair da conta">
           <img id="userAvatar" alt="" style="display:none">
           <span id="userName">Conta</span>
@@ -2846,13 +3190,33 @@
 
       <section id="view-tasks" class="view">
         <div class="card section">
-          <div class="filters">
-            <select id="fStatus"><option value="">Todos os status</option></select>
-            <select id="fPriority"><option value="">Todas as prioridades</option></select>
-            <select id="fArea"><option value="">Todas as áreas</option></select>
-            <select id="fProject"><option value="">Todos os projetos</option></select>
-            <input id="fText" placeholder="Filtrar por texto..." />
+          <div class="task-toolbar">
+            <div class="quick-filter-scroll" aria-label="Filtros rápidos">
+              <button class="quick-filter active" data-quick-filter="all" onclick="setQuickTaskFilter('all')">Todas</button>
+              <button class="quick-filter" data-quick-filter="today" onclick="setQuickTaskFilter('today')">Hoje</button>
+              <button class="quick-filter" data-quick-filter="overdue" onclick="setQuickTaskFilter('overdue')">Atrasadas</button>
+              <button class="quick-filter" data-quick-filter="week" onclick="setQuickTaskFilter('week')">Esta semana</button>
+              <button class="quick-filter" data-quick-filter="completed" onclick="setQuickTaskFilter('completed')">Concluídas</button>
+            </div>
+            <div class="task-toolbar-actions">
+              <select id="taskSort" class="task-sort" aria-label="Ordenar tarefas">
+                <option value="due">Ordenar: vencimento</option>
+                <option value="priority">Ordenar: prioridade</option>
+                <option value="title">Ordenar: título</option>
+                <option value="status">Ordenar: status</option>
+              </select>
+              <button id="advancedFiltersBtn" class="btn btn-soft" type="button" onclick="toggleAdvancedFilters()">⚙ Filtros</button>
+            </div>
           </div>
+
+          <div id="advancedFilters" class="filters-panel">
+            <div class="filters">
+              <select id="fStatus"><option value="">Todos os status</option></select>
+              <select id="fPriority"><option value="">Todas as prioridades</option></select>
+              <select id="fArea"><option value="">Todas as áreas</option></select>
+              <select id="fProject"><option value="">Todos os projetos</option></select>
+              <input id="fText" placeholder="Filtrar por texto..." />
+            </div>
 
           <div id="completedTools" class="completed-tools">
             <div class="completed-tools-head">
@@ -2884,6 +3248,7 @@
               </div>
             </div>
           </div>
+          </div>
           <div class="table-wrap">
             <table>
               <thead>
@@ -2899,7 +3264,46 @@
       </section>
 
       <section id="view-kanban" class="view">
+        <div class="kanban-mobile-guide">
+          <button type="button" onclick="scrollKanban(-1)" aria-label="Coluna anterior">‹</button>
+          <span>Deslize entre as colunas · <strong id="kanbanMobilePosition">1/4</strong></span>
+          <button type="button" onclick="scrollKanban(1)" aria-label="Próxima coluna">›</button>
+        </div>
         <div class="kanban" id="kanbanBoard"></div>
+      </section>
+
+      <section id="view-calendar" class="view">
+        <div class="calendar-shell">
+          <div class="calendar-header">
+            <div>
+              <h2>Calendário</h2>
+              <p>Veja as tarefas organizadas pelas datas de vencimento.</p>
+            </div>
+            <div class="calendar-nav">
+              <button class="btn btn-soft" type="button" onclick="changeCalendarMonth(-1)">‹</button>
+              <button class="btn btn-soft calendar-today-btn" type="button" onclick="goCalendarToday()">Hoje</button>
+              <button class="btn btn-soft" type="button" onclick="changeCalendarMonth(1)">›</button>
+            </div>
+          </div>
+          <div class="calendar-layout">
+            <div class="card calendar-card">
+              <div id="calendarMonthLabel" class="calendar-month-label"></div>
+              <div class="calendar-weekdays">
+                <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span>
+              </div>
+              <div id="calendarGrid" class="calendar-grid"></div>
+            </div>
+            <div class="card calendar-agenda">
+              <div class="section-head">
+                <div>
+                  <h3 id="calendarAgendaTitle">Tarefas do dia</h3>
+                  <p id="calendarAgendaSubtitle"></p>
+                </div>
+              </div>
+              <div id="calendarAgendaList" class="task-list"></div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section id="view-notes" class="view">
@@ -2930,12 +3334,44 @@
 <nav class="mobile-nav" aria-label="Navegação principal">
   <button class="nav-btn active" data-view="today"><span class="ico">🏠</span><span>Meu Dia</span></button>
   <button class="nav-btn" data-view="tasks"><span class="ico">✅</span><span>Tarefas</span></button>
-  <button class="nav-btn" data-view="kanban"><span class="ico">📋</span><span>Kanban</span></button>
-  <button class="nav-btn" data-view="notes"><span class="ico">📝</span><span>Notas</span></button>
-  <button class="nav-btn" data-view="dashboard"><span class="ico">📊</span><span>Painel</span></button>
+  <button class="nav-btn" data-view="kanban"><span class="ico">▦</span><span>Kanban</span></button>
+  <button class="nav-btn" data-view="calendar"><span class="ico">📅</span><span>Calendário</span></button>
+  <button type="button" class="mobile-more-btn" onclick="openMoreSheet()"><span class="ico">•••</span><span>Mais</span></button>
 </nav>
 
-<button class="mobile-fab" type="button" onclick="openTaskModal()" aria-label="Nova tarefa">＋</button>
+<div id="mobileFabMenu" class="mobile-fab-menu">
+  <button type="button" onclick="openTaskFromFab()">✅ Nova tarefa</button>
+  <button type="button" onclick="openNoteFromFab()">📝 Nova anotação</button>
+</div>
+<button id="mobileFab" class="mobile-fab" type="button" onclick="toggleQuickCreate()" aria-label="Criar">＋</button>
+
+<div id="moreSheetBackdrop" class="more-sheet-backdrop" onclick="closeMoreBackdrop(event)">
+  <div class="more-sheet">
+    <div class="more-sheet-handle"></div>
+    <div class="more-sheet-head">
+      <div>
+        <strong>Mais opções</strong>
+        <span>Recursos e configurações do ULALÁ</span>
+      </div>
+      <button class="x" type="button" onclick="closeMoreSheet()">✕</button>
+    </div>
+    <div class="more-menu">
+      <button type="button" onclick="openMoreView('notes')"><span>📝</span><div><strong>Anotações</strong><small>Informações e lembretes rápidos</small></div></button>
+      <button type="button" onclick="openMoreView('dashboard')"><span>📊</span><div><strong>Dashboard</strong><small>Resumo e indicadores</small></div></button>
+      <button id="notificationEnableBtn" type="button" onclick="enableNotifications()"><span>🔔</span><div><strong>Ativar lembretes</strong><small>Receber avisos enquanto o app estiver aberto</small></div></button>
+    </div>
+    <div class="more-tools">
+      <strong>Ferramentas</strong>
+      <div class="more-tools-grid">
+        <button type="button" onclick="exportCSV()">📤 Exportar CSV</button>
+        <button type="button" onclick="document.getElementById('importCSV').click()">📥 Importar CSV</button>
+        <button type="button" onclick="exportJSON()">💾 Fazer backup</button>
+        <button type="button" onclick="document.getElementById('importJSON').click()">♻️ Restaurar backup</button>
+      </div>
+    </div>
+    <button class="more-logout" type="button" onclick="logoutGoogle()">🚪 Sair da conta</button>
+  </div>
+</div>
 
 <div id="taskModalBackdrop" class="modal-backdrop" onclick="closeBackdrop(event,'taskModalBackdrop')">
   <div class="modal">
@@ -2952,7 +3388,7 @@
         <input id="taskTitle" required placeholder="Ex: Conferir contratos pendentes" />
       </div>
 
-      <div class="form-grid-2">
+      <div class="form-grid-2 task-core-grid">
         <div class="field">
           <label>Status</label>
           <select id="taskStatus">
@@ -2973,26 +3409,9 @@
         </div>
       </div>
 
-      <div class="form-grid-2">
-        <div class="field">
-          <label>Área / setor</label>
-          <input id="taskArea" placeholder="Ex: Financeiro" />
-        </div>
-        <div class="field">
-          <label>Projeto</label>
-          <input id="taskProject" placeholder="Ex: Fechamento Setembro" />
-        </div>
-      </div>
-
-      <div class="form-grid-2">
-        <div class="field">
-          <label>Relacionado a</label>
-          <input id="taskRelated" placeholder="Cliente, gestor, fornecedor..." />
-        </div>
-        <div class="field">
-          <label>Data de vencimento</label>
-          <input id="taskDue" type="date" />
-        </div>
+      <div class="field">
+        <label>Data de vencimento</label>
+        <input id="taskDue" type="date" />
       </div>
 
       <div id="taskCompletedWrap" class="field" style="display:none">
@@ -3000,35 +3419,76 @@
         <input id="taskCompletedAt" type="date" />
       </div>
 
-      <div class="form-grid-2">
-        <div class="field">
-          <label>Tempo estimado (h)</label>
-          <input id="taskHours" type="number" min="0" step="0.5" value="1" />
-        </div>
-        <div class="field">
-          <label>Tags</label>
-          <input id="taskTags" placeholder="Ex: cliente, mensal, documento" />
-        </div>
-      </div>
+      <details id="taskMoreDetails" class="task-more-details" open>
+        <summary>Mais detalhes</summary>
+        <div class="task-details-content">
+          <div class="form-grid-2">
+            <div class="field">
+              <label>Área / setor</label>
+              <input id="taskArea" placeholder="Ex: Financeiro" />
+            </div>
+            <div class="field">
+              <label>Projeto</label>
+              <input id="taskProject" placeholder="Ex: Fechamento Setembro" />
+            </div>
+          </div>
 
-      <div class="field">
-        <label>Próxima ação</label>
-        <input id="taskNextAction" placeholder="Ex: Aguardar retorno do setor financeiro" />
-      </div>
+          <div class="field">
+            <label>Relacionado a</label>
+            <input id="taskRelated" placeholder="Cliente, gestor, fornecedor..." />
+          </div>
 
-      <div class="field">
-        <label>Descrição</label>
-        <textarea id="taskDescription" placeholder="Detalhes importantes da tarefa..."></textarea>
-      </div>
+          <div class="form-grid-2">
+            <div class="field">
+              <label>Tempo estimado (h)</label>
+              <input id="taskHours" type="number" min="0" step="0.5" value="1" />
+            </div>
+            <div class="field">
+              <label>Tags</label>
+              <input id="taskTags" placeholder="Ex: cliente, mensal, documento" />
+            </div>
+          </div>
 
-      <div class="field">
-        <label>Checklist</label>
-        <div class="checklist-editor">
-          <input id="newCheckText" placeholder="Adicionar uma etapa..." />
-          <button type="button" class="btn btn-soft" onclick="addChecklistItem()">Adicionar</button>
+          <div class="form-grid-2">
+            <div class="field">
+              <label>Recorrência</label>
+              <select id="taskRecurrence">
+                <option value="none">Não repetir</option>
+                <option value="daily">Todos os dias</option>
+                <option value="weekly">Toda semana</option>
+                <option value="monthly">Todo mês</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Lembrete</label>
+              <select id="taskReminder">
+                <option value="none">Sem lembrete</option>
+                <option value="due">No dia do vencimento</option>
+                <option value="day_before">1 dia antes</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Próxima ação</label>
+            <input id="taskNextAction" placeholder="Ex: Aguardar retorno do setor financeiro" />
+          </div>
+
+          <div class="field">
+            <label>Descrição</label>
+            <textarea id="taskDescription" placeholder="Detalhes importantes da tarefa..."></textarea>
+          </div>
+
+          <div class="field">
+            <label>Checklist</label>
+            <div class="checklist-editor">
+              <input id="newCheckText" placeholder="Adicionar uma etapa..." />
+              <button type="button" class="btn btn-soft" onclick="addChecklistItem()">Adicionar</button>
+            </div>
+            <div id="checklistItems" class="checklist-items"></div>
+          </div>
         </div>
-        <div id="checklistItems" class="checklist-items"></div>
-      </div>
+      </details>
 
       <div class="modal-actions">
         <button id="deleteTaskBtn" type="button" class="btn btn-danger" onclick="deleteTask()" style="margin-right:auto;display:none">Excluir</button>
