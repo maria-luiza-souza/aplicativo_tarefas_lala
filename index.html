@@ -6272,7 +6272,7 @@ function renderDashboard(){
   }).join('') : '<div class="dashboard-empty-state">Nenhum projeto encontrado neste período.</div>';
 }
 
-function changeCalendarMonthfunction changeCalendarMonth(delta){
+function changeCalendarMonth(delta){
   calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+delta,1);
   renderCalendar();
 }
