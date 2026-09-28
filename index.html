@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ULALÁ | Organização de Trabalho</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
@@ -1211,13 +1214,514 @@
       .completed-filter-grid { grid-template-columns:1fr; }
       .completed-filter-grid > :first-child { grid-column:auto; }
     }
+
+    /* =========================================================
+       IDENTIDADE VISUAL ULALÁ — ROSA + LILÁS
+       ========================================================= */
+    :root {
+      --bg:#fff8fc;
+      --panel:#ffffff;
+      --panel-soft:#fff5fb;
+      --border:#f0dbea;
+      --text:#49394f;
+      --muted:#8d7a91;
+      --primary:#b875ea;
+      --primary-soft:#f4e8ff;
+      --success:#44ad82;
+      --warning:#e7a05c;
+      --danger:#e96898;
+      --purple:#a966dc;
+      --pink:#f39ac5;
+      --pink-soft:#fff0f7;
+      --lilac:#b982ef;
+      --lilac-soft:#f5edff;
+      --shadow:0 14px 34px rgba(181,117,203,.12);
+    }
+
+    html { background:#fff8fc; }
+
+    body {
+      font-family:"Outfit", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 86% 8%, rgba(224,183,255,.16), transparent 26%),
+        radial-gradient(circle at 20% 95%, rgba(255,190,220,.15), transparent 28%),
+        linear-gradient(180deg,#fffafd 0%,#fff7fb 100%);
+      color:var(--text);
+    }
+
+    /* Logomarca */
+    .brand {
+      padding:7px 8px 18px;
+      border-bottom:1px solid rgba(255,255,255,.24);
+    }
+
+    .ulala-brand-wrap {
+      display:flex;
+      align-items:center;
+      gap:11px;
+    }
+
+    .ulala-symbol {
+      flex:0 0 42px;
+      width:42px;
+      height:42px;
+      display:grid;
+      place-items:center;
+      border-radius:14px;
+      font-family:"Pacifico", cursive;
+      font-size:23px;
+      line-height:1;
+      color:#a35bd8;
+      background:linear-gradient(145deg,#ffffff 0%,#ffe6f3 50%,#f0ddff 100%);
+      box-shadow:0 9px 24px rgba(99,43,133,.18), inset 0 1px 0 rgba(255,255,255,.8);
+      transform:rotate(-3deg);
+    }
+
+    .ulala-brand-text {
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .brand .brand-logo {
+      display:inline-block;
+      width:max-content;
+      font-family:"Pacifico", cursive;
+      font-size:27px;
+      font-weight:400;
+      line-height:1.12;
+      letter-spacing:.01em;
+      color:#fff;
+      text-shadow:0 5px 18px rgba(86,36,112,.16);
+    }
+
+    .brand .ulala-brand-text > span {
+      display:block;
+      color:rgba(255,255,255,.85);
+      font-size:10px;
+      font-weight:500;
+      margin-top:3px;
+      white-space:nowrap;
+    }
+
+    /* Barra lateral */
+    .sidebar {
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,.18), transparent 22%),
+        linear-gradient(180deg,#ad73df 0%,#be82e6 43%,#e894bf 100%);
+      box-shadow:9px 0 35px rgba(182,119,205,.16);
+    }
+
+    .nav-group-title {
+      color:rgba(255,255,255,.66);
+      font-weight:800;
+    }
+
+    .nav button {
+      color:rgba(255,255,255,.91);
+      font-weight:600;
+      border:1px solid transparent;
+    }
+
+    .nav button:hover {
+      background:rgba(255,255,255,.13);
+      border-color:rgba(255,255,255,.08);
+      color:#fff;
+    }
+
+    .nav button.active {
+      background:rgba(255,255,255,.23);
+      border-color:rgba(255,255,255,.18);
+      color:#fff;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 8px 18px rgba(103,50,128,.11);
+    }
+
+    .sidebar-footer {
+      border-top-color:rgba(255,255,255,.20);
+    }
+
+    .sidebar-tools {
+      background:rgba(93,48,113,.12);
+      border-color:rgba(255,255,255,.19);
+    }
+
+    .sidebar-tools summary {
+      color:rgba(255,255,255,.93);
+    }
+
+    .sidebar-tools summary::after {
+      color:rgba(255,255,255,.70);
+    }
+
+    .sidebar-footer button,
+    .file-label {
+      background:rgba(255,255,255,.14);
+      border-color:rgba(255,255,255,.18);
+      color:#fff;
+    }
+
+    .sidebar-footer button:hover,
+    .file-label:hover {
+      background:rgba(255,255,255,.23);
+      border-color:rgba(255,255,255,.27);
+    }
+
+    .sidebar-logout {
+      color:rgba(255,255,255,.82) !important;
+    }
+
+    /* Topo */
+    .topbar {
+      background:rgba(255,251,253,.90);
+      border-bottom:1px solid rgba(232,205,225,.85);
+      box-shadow:0 5px 22px rgba(188,119,194,.05);
+    }
+
+    .topbar h1 {
+      color:#5a405e;
+      letter-spacing:-.02em;
+      font-weight:800;
+    }
+
+    .search {
+      border-color:#ecd7e7;
+      background:#fffafd;
+      color:var(--text);
+      transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+
+    .search:focus,
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus,
+    .filters input:focus,
+    .filters select:focus,
+    .completed-filter-grid input:focus,
+    .completed-filter-grid select:focus {
+      border-color:#c98ee9;
+      box-shadow:0 0 0 4px rgba(198,132,230,.12);
+      background:#fff;
+    }
+
+    .user-chip {
+      border-color:#ead6e6;
+      background:#fff9fc;
+      color:#765679;
+    }
+
+    /* Botões */
+    .btn {
+      transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+    }
+
+    .btn:hover { transform:translateY(-1px); }
+
+    .btn-primary {
+      background:linear-gradient(100deg,#d680d8 0%,#b979ed 52%,#ee91bd 100%);
+      color:#fff;
+      box-shadow:0 9px 22px rgba(197,115,210,.22);
+    }
+
+    .btn-primary:hover {
+      filter:saturate(1.07) brightness(1.02);
+      box-shadow:0 12px 26px rgba(197,115,210,.29);
+    }
+
+    .btn-soft {
+      background:linear-gradient(135deg,#fff2f8,#f7efff);
+      color:#78567e;
+      border:1px solid #efd9e9;
+    }
+
+    .btn-soft:hover { background:#fff; }
+
+    .btn-danger {
+      background:#fff0f5;
+      color:#b64972;
+    }
+
+    .btn-success {
+      background:#eefaf5;
+      color:#397e63;
+    }
+
+    /* Cards e listas */
+    .card {
+      background:rgba(255,255,255,.96);
+      border-color:var(--border);
+      border-radius:19px;
+      box-shadow:var(--shadow);
+    }
+
+    .metric {
+      position:relative;
+      overflow:hidden;
+      background:linear-gradient(145deg,#fff 0%,#fff9fc 100%);
+    }
+
+    .metric::after {
+      content:"";
+      position:absolute;
+      width:62px;
+      height:62px;
+      right:-24px;
+      top:-24px;
+      border-radius:50%;
+      background:linear-gradient(145deg,rgba(244,166,207,.13),rgba(185,130,239,.13));
+    }
+
+    .metric span { color:#a37ba0; }
+    .metric strong { color:#684a6e; }
+
+    .section-head h2,
+    .section-head h3 {
+      color:#5b4160;
+      letter-spacing:-.01em;
+    }
+
+    .task-row {
+      border-color:#efdce9;
+      background:linear-gradient(145deg,#fff 0%,#fffafd 100%);
+      border-radius:14px;
+      transition:transform .14s ease, border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .task-row:hover {
+      border-color:#dcb4d6;
+      box-shadow:0 8px 20px rgba(191,128,192,.09);
+      transform:translateY(-1px);
+    }
+
+    .empty {
+      border-color:#e9cfe2;
+      background:#fff9fc;
+    }
+
+    .highlight {
+      border-left-color:#ed83ac;
+    }
+
+    /* Meu Dia */
+    .today-hero {
+      background:
+        radial-gradient(circle at 92% 4%, rgba(255,255,255,.20), transparent 24%),
+        radial-gradient(circle at 15% 110%, rgba(255,255,255,.12), transparent 32%),
+        linear-gradient(125deg,#d980ce 0%,#b77be8 52%,#ee93bd 100%);
+      box-shadow:0 18px 42px rgba(191,120,208,.24);
+      border-radius:22px;
+    }
+
+    .today-hero::after {
+      background:rgba(255,255,255,.12);
+    }
+
+    .progress-track { background:rgba(255,255,255,.24); }
+    .progress-fill {
+      background:linear-gradient(90deg,#fff,#ffe8f4);
+      box-shadow:0 0 12px rgba(255,255,255,.28);
+    }
+
+    .quick-action {
+      border-color:#ecd6e7;
+      background:linear-gradient(145deg,#fff 0%,#fff7fb 100%);
+      color:#76537c;
+      border-radius:14px;
+      transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .quick-action:hover {
+      border-color:#d6add3;
+      background:#fff;
+      transform:translateY(-1px);
+      box-shadow:0 8px 18px rgba(190,129,193,.10);
+    }
+
+    /* Tabelas, filtros e Kanban */
+    .filters input,
+    .filters select {
+      border-color:#ead6e6;
+      background:#fffafd;
+    }
+
+    table { background:transparent; }
+
+    tbody tr {
+      border-color:#efdeea;
+    }
+
+    .kanban-col {
+      background:linear-gradient(180deg,#fff7fb 0%,#faf3ff 100%);
+      border-color:#ead8e7;
+    }
+
+    .kanban-card {
+      border-color:#ead9e6;
+      border-radius:14px;
+      box-shadow:0 5px 16px rgba(181,120,189,.07);
+    }
+
+    .completed-tools {
+      background:linear-gradient(135deg,#fff8fc,#f7efff);
+      border-color:#ead3e5;
+    }
+
+    .completed-tools-head span { color:#876a89; }
+
+    .completed-filter-grid input,
+    .completed-filter-grid select {
+      border-color:#e4cce0;
+    }
+
+    /* Modal */
+    .modal {
+      border:1px solid #eedbe9;
+      border-radius:22px;
+      box-shadow:0 28px 70px rgba(118,70,126,.20);
+    }
+
+    .field label { color:#765b79; }
+
+    .field input,
+    .field select,
+    .field textarea {
+      border-color:#ead6e5;
+      background:#fffafd;
+    }
+
+    .x {
+      background:#fff0f7;
+      color:#895c83;
+    }
+
+    .check-item {
+      border-color:#ead8e6;
+      background:#fff9fc;
+    }
+
+    /* Login */
+    .login-screen {
+      background:
+        radial-gradient(circle at 14% 12%, rgba(255,255,255,.72), transparent 20%),
+        radial-gradient(circle at 88% 18%, rgba(224,185,255,.55), transparent 31%),
+        radial-gradient(circle at 17% 88%, rgba(255,184,219,.50), transparent 30%),
+        linear-gradient(145deg,#fff5fb 0%,#f4e9ff 47%,#ffe9f4 100%);
+    }
+
+    .login-card {
+      background:rgba(255,255,255,.89);
+      border:1px solid rgba(255,255,255,.92);
+      box-shadow:0 28px 75px rgba(155,99,170,.20);
+      backdrop-filter:blur(18px);
+    }
+
+    .login-logo {
+      width:60px;
+      height:60px;
+      margin:0 auto 13px;
+      border-radius:19px;
+      font-family:"Pacifico", cursive;
+      font-size:29px;
+      color:#fff;
+      background:linear-gradient(145deg,#d980d5,#ad72e1 58%,#ef92bf);
+      box-shadow:0 13px 28px rgba(187,109,203,.28), inset 0 1px 0 rgba(255,255,255,.28);
+      transform:rotate(-3deg);
+    }
+
+    .app-logo {
+      margin:0;
+      font-family:"Pacifico", cursive;
+      font-size:42px;
+      line-height:1.15;
+      font-weight:400;
+      text-align:center;
+      background:linear-gradient(95deg,#db78c4 0%,#a96edf 52%,#ef8db8 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      -webkit-text-fill-color:transparent;
+      color:transparent;
+      letter-spacing:.01em;
+    }
+
+    .login-card > p {
+      text-align:center;
+      color:#88758d;
+      margin:8px 0 22px;
+    }
+
+    .google-login-btn {
+      border-color:#ead7e5;
+      color:#684f6c;
+      border-radius:14px;
+      background:#fffafd;
+      box-shadow:0 6px 16px rgba(169,107,176,.08);
+    }
+
+    .google-login-btn:hover {
+      background:#fff;
+      border-color:#d6b5d2;
+      box-shadow:0 9px 20px rgba(169,107,176,.12);
+    }
+
+    .login-security { color:#a08fa3; }
+
+    /* Navegação mobile */
+    .mobile-nav {
+      background:linear-gradient(105deg,rgba(126,75,151,.96),rgba(177,102,190,.96),rgba(214,116,164,.96));
+      border-color:rgba(255,255,255,.22);
+      box-shadow:0 14px 34px rgba(123,70,139,.27);
+    }
+
+    .mobile-nav button { color:rgba(255,255,255,.72); }
+
+    .mobile-nav button.active {
+      color:#fff;
+      background:rgba(255,255,255,.20);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+    }
+
+    .mobile-fab {
+      background:linear-gradient(145deg,#b875e8,#e886c0);
+      box-shadow:0 13px 30px rgba(191,106,199,.34);
+    }
+
+    @media (max-width:760px) {
+      body {
+        background:
+          radial-gradient(circle at 88% 4%, rgba(229,194,255,.16), transparent 26%),
+          linear-gradient(180deg,#fffafd 0%,#fff6fb 100%);
+      }
+
+      .topbar {
+        background:rgba(255,251,253,.94);
+        border-bottom-color:#efdbe9;
+      }
+
+      .today-hero { border-radius:19px; }
+
+      tbody tr {
+        border-color:#efdeea;
+        box-shadow:0 6px 16px rgba(180,119,183,.06);
+      }
+
+      .modal {
+        border-radius:24px 24px 0 0;
+      }
+
+      .login-screen {
+        background:
+          radial-gradient(circle at 86% 10%, rgba(220,181,255,.56), transparent 33%),
+          radial-gradient(circle at 14% 83%, rgba(255,181,217,.48), transparent 31%),
+          linear-gradient(155deg,#fff5fb,#f6ecff 55%,#ffeef7);
+      }
+    }
+
   </style>
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
   <div class="login-card">
-    <div class="login-logo">💼</div>
-    <h1>ULALÁ</h1>
+    <div class="login-logo">U</div>
+    <h1 class="app-logo">ULALÁ</h1>
     <p>Entre com sua conta Google para acessar tarefas, anotações e o painel de trabalho.</p>
     <div class="google-button-wrap">
       <button id="googleLoginBtn" class="google-login-btn" type="button" onclick="signInWithGoogle()">
@@ -1233,8 +1737,13 @@
 <div class="app" id="appShell" style="display:none">
   <aside class="sidebar">
     <div class="brand">
-      <strong>✨ ULALÁ</strong>
-      <span>Organização da rotina de trabalho</span>
+      <div class="ulala-brand-wrap">
+        <div class="ulala-symbol">U</div>
+        <div class="ulala-brand-text">
+          <strong class="brand-logo">ULALÁ</strong>
+          <span>Organização da rotina de trabalho</span>
+        </div>
+      </div>
     </div>
 
     <div class="nav">
@@ -2028,8 +2537,21 @@ function renderDashboard(){
   if(statusChart) statusChart.destroy();
   statusChart=new Chart(document.getElementById('statusChart'),{
     type:'doughnut',
-    data:{labels:statusLabels,datasets:[{data:statusData}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{title:{display:true,text:'Distribuição por status'}}}
+    data:{labels:statusLabels,datasets:[{
+      data:statusData,
+      backgroundColor:['#f3c5dc','#c7a1ef','#e3b4ec','#9fd9c2'],
+      borderColor:'#ffffff',
+      borderWidth:3,
+      hoverOffset:5
+    }]},
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{labels:{color:'#765f79',font:{family:'Outfit'}}},
+        title:{display:true,text:'Distribuição por status',color:'#5c4560',font:{family:'Outfit',size:14,weight:'700'}}
+      }
+    }
   });
 
   const areas={};
@@ -2037,8 +2559,26 @@ function renderDashboard(){
   if(areaChart) areaChart.destroy();
   areaChart=new Chart(document.getElementById('areaChart'),{
     type:'bar',
-    data:{labels:Object.keys(areas),datasets:[{label:'Horas estimadas',data:Object.values(areas)}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{title:{display:true,text:'Carga estimada por área'}}}
+    data:{labels:Object.keys(areas),datasets:[{
+      label:'Horas estimadas',
+      data:Object.values(areas),
+      backgroundColor:'rgba(190,126,224,.58)',
+      borderColor:'#b875df',
+      borderWidth:1,
+      borderRadius:8
+    }]},
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      scales:{
+        x:{ticks:{color:'#7d687f',font:{family:'Outfit'}},grid:{display:false}},
+        y:{ticks:{color:'#7d687f',font:{family:'Outfit'}},grid:{color:'rgba(226,203,222,.45)'}}
+      },
+      plugins:{
+        legend:{labels:{color:'#765f79',font:{family:'Outfit'}}},
+        title:{display:true,text:'Carga estimada por área',color:'#5c4560',font:{family:'Outfit',size:14,weight:'700'}}
+      }
+    }
   });
 }
 
