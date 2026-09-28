@@ -322,3 +322,388 @@ h1,h2,h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+
+
+/* ===== ULALÁ BRAND SYSTEM ===== */
+.brand-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  isolation: isolate;
+}
+
+.brand-art {
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+  border-radius: 38% 62% 56% 44% / 46% 42% 58% 54%;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.95), rgba(247,239,235,.92));
+  border: 1px solid rgba(255,255,255,.72);
+  box-shadow:
+    0 16px 34px rgba(15,36,51,.24),
+    inset 0 0 0 1px rgba(41,67,89,.05);
+  transform: rotate(-2deg);
+  transition:
+    transform .36s cubic-bezier(.2,.8,.2,1),
+    box-shadow .36s ease,
+    border-radius .36s ease;
+}
+
+.brand-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(140deg, rgba(255,255,255,.28), transparent 38%),
+    linear-gradient(0deg, rgba(41,67,89,.08), transparent 42%);
+  mix-blend-mode: soft-light;
+}
+
+.brand-art img,
+.sidebar-brand .brand-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: center;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  transform: scale(1.045);
+  transition: transform .4s cubic-bezier(.2,.8,.2,1), filter .4s ease;
+}
+
+.brand-mark:hover .brand-art {
+  transform: rotate(0deg) translateY(-2px);
+  border-radius: 48% 52% 45% 55% / 55% 46% 54% 45%;
+  box-shadow:
+    0 20px 42px rgba(15,36,51,.28),
+    0 0 0 5px rgba(216,107,125,.06);
+}
+
+.brand-mark:hover .brand-art img {
+  transform: scale(1.085);
+  filter: saturate(1.04) contrast(1.02);
+}
+
+.brand-orbit,
+.sidebar-brand .brand-orbit {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.17);
+  pointer-events: none;
+}
+
+.brand-orbit::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #f1a4b1;
+  box-shadow: 0 0 12px rgba(241,164,177,.65);
+}
+
+.orbit-one {
+  inset: -9px;
+  transform: rotate(22deg);
+  animation: brandOrbit 16s linear infinite;
+}
+
+.orbit-one::after {
+  top: 8%;
+  left: 23%;
+}
+
+.orbit-two {
+  inset: -18px;
+  border-color: rgba(255,255,255,.09);
+  transform: rotate(-18deg);
+  animation: brandOrbitReverse 23s linear infinite;
+}
+
+.orbit-two::after {
+  right: 7%;
+  bottom: 20%;
+  width: 4px;
+  height: 4px;
+  background: #b7ccdc;
+  box-shadow: 0 0 10px rgba(183,204,220,.5);
+}
+
+.brand-music-note,
+.sidebar-brand .brand-music-note {
+  position: absolute;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(255,255,255,.32);
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(216,107,125,.94), rgba(185,86,105,.98));
+  color: white;
+  box-shadow: 0 7px 16px rgba(24,44,59,.24);
+  font-size: 11px;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.brand-music-note.note-one {
+  right: -7px;
+  top: 8%;
+  animation: noteFloatOne 3.8s ease-in-out infinite;
+}
+
+.brand-music-note.note-two {
+  left: -7px;
+  bottom: 8%;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(145deg,#7692aa,#58788f);
+  font-size: 9px;
+  animation: noteFloatTwo 4.6s ease-in-out infinite;
+}
+
+.brand-lockup {
+  display: grid;
+  justify-items: center;
+  line-height: 1;
+}
+
+.sidebar-brand .brand-lockup strong {
+  color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.07em;
+  text-shadow: 0 6px 18px rgba(15,35,49,.18);
+}
+
+.sidebar-brand .brand-lockup > span {
+  display: block;
+  margin-top: 2px;
+  color: #f0a6b3;
+  font-size: 6px;
+  font-weight: 800;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+}
+
+.sidebar-brand .brand-lockup small {
+  max-width: 170px;
+  margin-top: 7px;
+  color: rgba(255,255,255,.57);
+  font-size: 7.5px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.brand-mark-sidebar {
+  width: 104px;
+  height: 104px;
+  margin: 8px 0 13px;
+}
+
+.brand-mark-sidebar .brand-art {
+  width: 88px;
+  height: 88px;
+}
+
+.sidebar-brand {
+  gap: 0;
+  padding-top: 2px;
+}
+
+.login-brand {
+  display: grid;
+  justify-items: center;
+  gap: 21px;
+  margin-bottom: 17px;
+}
+
+.brand-mark-login {
+  width: 194px;
+  height: 194px;
+}
+
+.brand-mark-login .brand-art {
+  width: 162px;
+  height: 162px;
+  border-color: rgba(255,255,255,.95);
+  box-shadow:
+    0 24px 54px rgba(38,57,70,.18),
+    0 0 0 8px rgba(255,255,255,.72),
+    0 0 0 9px rgba(216,107,125,.10);
+}
+
+.brand-mark-login .brand-orbit {
+  border-color: rgba(53,91,115,.13);
+}
+
+.brand-mark-login .orbit-two {
+  border-color: rgba(216,107,125,.11);
+}
+
+.login-brand-copy {
+  position: relative;
+  display: grid;
+  justify-items: center;
+}
+
+.login-brand-kicker {
+  margin-bottom: 8px;
+  color: #8a8790;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .18em;
+}
+
+.login-brand-copy h1 {
+  margin: 0;
+  color: var(--navy);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 43px;
+  font-weight: 800;
+  line-height: .9;
+  letter-spacing: -.075em;
+}
+
+.login-brand-copy h1::after {
+  content: "";
+  display: block;
+  width: 38%;
+  height: 4px;
+  margin: 10px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg,var(--coral),#e59aaa);
+}
+
+.login-brand-copy small {
+  margin-top: 7px;
+  color: var(--denim);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+}
+
+.login-card {
+  overflow: visible;
+}
+
+.login-card > p {
+  margin-top: 12px;
+}
+
+.topbar-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.mobile-brand-mark {
+  display: none;
+}
+
+@keyframes brandOrbit {
+  to { transform: rotate(382deg); }
+}
+
+@keyframes brandOrbitReverse {
+  to { transform: rotate(-378deg); }
+}
+
+@keyframes noteFloatOne {
+  0%,100% { transform: translate3d(0,0,0) rotate(3deg); }
+  50% { transform: translate3d(2px,-5px,0) rotate(-4deg); }
+}
+
+@keyframes noteFloatTwo {
+  0%,100% { transform: translate3d(0,0,0) rotate(-4deg); }
+  50% { transform: translate3d(-2px,4px,0) rotate(4deg); }
+}
+
+@media (max-width: 760px) {
+  .topbar-title-wrap {
+    gap: 9px;
+  }
+
+  .mobile-brand-mark {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 39px;
+    height: 39px;
+    flex: 0 0 39px;
+    padding: 3px;
+    border-radius: 13px;
+    background:
+      linear-gradient(145deg,rgba(216,107,125,.17),rgba(118,146,170,.14)),
+      white;
+    border: 1px solid rgba(118,146,170,.18);
+    box-shadow: 0 6px 15px rgba(48,65,77,.08);
+  }
+
+  .mobile-brand-mark img {
+    width: 31px;
+    height: 31px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .mobile-brand-mark span {
+    position: absolute;
+    right: -4px;
+    top: -4px;
+    width: 15px;
+    height: 15px;
+    display: grid;
+    place-items: center;
+    border: 2px solid white;
+    border-radius: 50%;
+    background: var(--coral);
+    color: white;
+    font-size: 6px;
+    font-weight: 900;
+    box-shadow: 0 4px 8px rgba(185,86,105,.18);
+  }
+
+  .topbar-title h1 {
+    font-size: 17px;
+  }
+
+  .brand-mark-login {
+    width: 165px;
+    height: 165px;
+  }
+
+  .brand-mark-login .brand-art {
+    width: 138px;
+    height: 138px;
+  }
+
+  .login-brand-copy h1 {
+    font-size: 38px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-orbit,
+  .brand-music-note {
+    animation: none !important;
+  }
+
+  .brand-art,
+  .brand-art img {
+    transition: none !important;
+  }
+}
