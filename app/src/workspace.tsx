@@ -77,7 +77,7 @@ export function WorkspaceProvider({ user, children }: PropsWithChildren<{ user: 
   useEffect(() => {
     const workspaceRef = doc(db, 'users', user.uid, 'workspace', 'main');
     let cancelled = false;
-    let unsubscribe = () => undefined;
+    let unsubscribe: () => void = () => {};
 
     async function start() {
       setSyncState('connecting');
