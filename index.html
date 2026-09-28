@@ -3096,6 +3096,79 @@
     }
   </style>
 
+
+  <style id="ulala-mobile-sync-status">
+    @media (max-width:760px) {
+      .topbar-title-row {
+        display:grid !important;
+        grid-template-columns:minmax(0,1fr) auto;
+        grid-template-rows:auto auto;
+        column-gap:10px;
+        row-gap:2px;
+        align-items:center;
+        justify-content:stretch !important;
+      }
+
+      .topbar-title-row > div:first-child {
+        grid-column:1;
+        grid-row:1;
+        min-width:0;
+      }
+
+      .topbar-title-row .user-chip {
+        grid-column:2;
+        grid-row:1 / span 2;
+        justify-self:end;
+        align-self:center;
+      }
+
+      .topbar-title-row .sync-badge {
+        grid-column:1;
+        grid-row:2;
+        justify-self:start;
+        min-width:0;
+        min-height:0;
+        padding:0;
+        border:0;
+        border-radius:0;
+        background:transparent !important;
+        box-shadow:none;
+        font-size:9px !important;
+        line-height:1.25;
+        font-weight:700;
+      }
+
+      .topbar-title-row .sync-badge.synced {
+        color:#4f846d;
+      }
+
+      .topbar-title-row .sync-badge.syncing {
+        color:#9a7442;
+      }
+
+      .topbar-title-row .sync-badge.local {
+        color:#8c7b83;
+      }
+
+      .topbar-title-row .sync-badge::first-letter {
+        font-size:inherit !important;
+      }
+
+      .user-chip {
+        padding:4px !important;
+        min-height:36px;
+        width:36px;
+        height:36px;
+        border-radius:50%;
+      }
+
+      .user-chip img {
+        width:26px;
+        height:26px;
+      }
+    }
+  </style>
+
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
@@ -3165,7 +3238,7 @@
           <h1 id="pageTitle">Meu Dia</h1>
           <p id="pageSubtitle">Veja o que precisa da sua atenção agora.</p>
         </div>
-        <span id="syncBadge" class="sync-badge" title="Status da sincronização">☁️ Local</span>
+        <span id="syncBadge" class="sync-badge local" title="Status da sincronização">Somente neste aparelho</span>
         <button id="userChip" class="user-chip" type="button" onclick="logoutGoogle()" title="Sair da conta">
           <img id="userAvatar" alt="" style="display:none">
           <span id="userName">Conta</span>
@@ -3622,7 +3695,7 @@ function applyUserUI(user){
 function setSyncStatus(type, text){
   if(!window.syncBadge) return;
   syncBadge.className = 'sync-badge ' + (type || 'local');
-  syncBadge.textContent = text || '☁️ Local';
+  syncBadge.textContent = text || 'Somente neste aparelho';
   syncBadge.title = text || 'Dados salvos neste navegador';
 }
 
@@ -3643,7 +3716,7 @@ function stopWorkspaceSync(){
   cloudDocRef = null;
   cloudSyncReady = false;
   if(cloudSaveTimer) clearTimeout(cloudSaveTimer);
-  setSyncStatus('local','☁️ Local');
+  setSyncStatus('local','Somente neste aparelho');
 }
 
 async function startWorkspaceSync(uid){
@@ -3651,7 +3724,7 @@ async function startWorkspaceSync(uid){
   if(!uid) return;
 
   cloudDocRef = db.collection('users').doc(uid).collection('workspace').doc('main');
-  setSyncStatus('syncing','☁️ Conectando');
+  setSyncStatus('syncing','Conectando...');
 
   try{
     const first = await cloudDocRef.get();
@@ -3668,27 +3741,27 @@ async function startWorkspaceSync(uid){
     }
 
     cloudSyncReady = true;
-    setSyncStatus('synced','☁️ Sincronizado');
+    setSyncStatus('synced','Sincronizado');
 
     cloudUnsubscribe = cloudDocRef.onSnapshot(snapshot=>{
       if(!snapshot.exists) return;
       applyRemoteWorkspace(snapshot.data());
-      setSyncStatus('synced','☁️ Sincronizado');
+      setSyncStatus('synced','Sincronizado');
     },error=>{
       console.error('Sincronização Firestore:',error);
       cloudSyncReady = false;
-      setSyncStatus('local','☁️ Local');
+      setSyncStatus('local','Somente neste aparelho');
     });
   }catch(error){
     console.error('Firestore indisponível:',error);
     cloudSyncReady = false;
-    setSyncStatus('local','☁️ Local');
+    setSyncStatus('local','Somente neste aparelho');
   }
 }
 
 function saveWorkspaceToCloud(){
   if(!cloudSyncReady || !cloudDocRef) return;
-  setSyncStatus('syncing','☁️ Salvando');
+  setSyncStatus('syncing','Salvando...');
 
   if(cloudSaveTimer) clearTimeout(cloudSaveTimer);
   cloudSaveTimer = setTimeout(async()=>{
@@ -3699,10 +3772,10 @@ function saveWorkspaceToCloud(){
         version:3,
         updatedAt:firebase.firestore.FieldValue.serverTimestamp()
       },{merge:true});
-      setSyncStatus('synced','☁️ Sincronizado');
+      setSyncStatus('synced','Sincronizado');
     }catch(error){
       console.error('Erro ao salvar no Firestore:',error);
-      setSyncStatus('local','☁️ Local');
+      setSyncStatus('local','Somente neste aparelho');
     }
   },350);
 }
