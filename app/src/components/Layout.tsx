@@ -69,7 +69,7 @@ export function Layout({
   children: ReactNode;
 }) {
   const meta = viewMeta[activeView];
-  const logo = import.meta.env.BASE_URL + 'logo-ulala.webp';
+  const logoIcon = import.meta.env.BASE_URL + 'brand/ulala-icon.webp';
   const { tasks, notes, replaceWorkspace } = useWorkspace();
   const restoreInputRef = useRef<HTMLInputElement>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
@@ -189,14 +189,15 @@ export function Layout({
 
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <div className="brand-emblem" aria-hidden="true">
-            <img src={logo} alt="" />
-            <i />
-          </div>
+          <img
+            src={logoIcon}
+            alt="ULALÁ"
+            className="sidebar-brand-icon"
+          />
 
           <div className="brand-wordmark">
             <strong>ulalá</strong>
-            <span>workspace</span>
+            <span>minhas tarefas</span>
           </div>
         </div>
 
@@ -253,7 +254,7 @@ export function Layout({
             </button>
 
             <div className="mobile-brand-mark" aria-hidden="true">
-              <img src={logo} alt="" />
+              <img src={logoIcon} alt="" />
             </div>
 
             <div className="topbar-title">
