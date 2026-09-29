@@ -24,7 +24,7 @@ function LoginScreen({
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const logo = import.meta.env.BASE_URL + 'logo-ulala.webp';
+  const logoFull = import.meta.env.BASE_URL + 'brand/ulala-logo-full.webp';
 
   async function login() {
     setLoading(true);
@@ -50,17 +50,13 @@ function LoginScreen({
       </button>
 
       <section className="login-card">
-        <div className="login-brand">
-          <div className="login-brand-emblem" aria-hidden="true">
-            <img src={logo} alt="" />
-            <i />
-          </div>
-
-          <div className="login-brand-copy">
-            <span className="login-brand-kicker">ORGANIZE · PRIORIZE · AVANCE</span>
-            <h1>ulalá</h1>
-            <small>workspace</small>
-          </div>
+        <div className="login-brand-showcase">
+          <img
+            src={logoFull}
+            alt="ULALÁ — Minhas tarefas"
+            className="login-main-brand"
+          />
+          <span className="login-brand-status">ORGANIZE · PRIORIZE · AVANCE</span>
         </div>
 
         <p>Organize tarefas, projetos, prazos e anotações em um espaço só seu.</p>
