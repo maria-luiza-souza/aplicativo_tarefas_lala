@@ -5,6 +5,7 @@ import { auth, googleProvider } from './firebase';
 import type { Task, TaskFilter, ViewKey } from './types';
 import { WorkspaceProvider, useWorkspace } from './workspace';
 import { Layout } from './components/Layout';
+import { Brand } from './components/Brand';
 import { TaskModal } from './components/TaskModal';
 import { TodayPage } from './pages/Today';
 import { TasksPage } from './pages/Tasks';
@@ -24,7 +25,6 @@ function LoginScreen({
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const logoFull = import.meta.env.BASE_URL + 'brand/ulala-logo-full.webp';
 
   async function login() {
     setLoading(true);
@@ -39,35 +39,50 @@ function LoginScreen({
   }
 
   return (
-    <main className="login-screen">
+    <main className="relative grid min-h-screen place-items-center bg-slate-50 px-4 py-10 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
       <button
         type="button"
-        className="login-theme-toggle"
+        className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-950 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
         onClick={onToggleTheme}
         title={theme === 'dark' ? 'Usar modo claro' : 'Usar modo escuro'}
+        aria-label={theme === 'dark' ? 'Usar modo claro' : 'Usar modo escuro'}
       >
         {theme === 'dark' ? '☀' : '☾'}
       </button>
 
-      <section className="login-card">
-        <div className="login-brand-showcase">
-          <img
-            src={logoFull}
-            alt="ULALÁ — Minhas tarefas"
-            className="login-main-brand"
-          />
-          <span className="login-brand-status">ORGANIZE · PRIORIZE · AVANCE</span>
+      <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white px-7 py-9 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:px-9 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
+        <div className="mb-8">
+          <Brand centered size="hero" subtitle="Productivity workspace" />
         </div>
 
-        <p>Organize tarefas, projetos, prazos e anotações em um espaço só seu.</p>
+        <div className="mx-auto mb-8 max-w-sm text-center">
+          <h1 className="text-xl font-semibold tracking-[-0.02em] text-slate-950 dark:text-white">
+            Organize o trabalho com clareza
+          </h1>
+          <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
+            Tarefas, projetos, prazos e anotações em um único espaço.
+          </p>
+        </div>
 
-        <button type="button" className="google-button" onClick={() => void login()} disabled={loading}>
-          <span>G</span>
+        <button
+          type="button"
+          className="flex min-h-11 w-full items-center justify-center gap-3 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/15 disabled:cursor-default disabled:opacity-60 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800"
+          onClick={() => void login()}
+          disabled={loading}
+        >
+          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-slate-100 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">G</span>
           {loading ? 'Entrando...' : 'Continuar com Google'}
         </button>
 
-        {error && <small className="login-error">{error}</small>}
-        <em>O Google é usado apenas para autenticação.</em>
+        {error && (
+          <small className="mt-3 block text-center text-xs font-medium text-red-600 dark:text-red-400">
+            {error}
+          </small>
+        )}
+
+        <p className="mt-5 text-center text-xs text-slate-400 dark:text-slate-500">
+          O Google é usado apenas para autenticação.
+        </p>
       </section>
     </main>
   );
