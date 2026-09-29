@@ -4,14 +4,15 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import type { Note, SyncState, Task, ViewKey } from '../types';
 import { useWorkspace } from '../workspace';
+import { Brand } from './Brand';
 
-const nav: Array<{ key: ViewKey; icon: string; label: string }> = [
-  { key: 'today', icon: '⌂', label: 'Meu Dia' },
-  { key: 'tasks', icon: '✓', label: 'Tarefas' },
-  { key: 'kanban', icon: '▦', label: 'Kanban' },
-  { key: 'calendar', icon: '□', label: 'Calendário' },
-  { key: 'notes', icon: '✎', label: 'Anotações' },
-  { key: 'dashboard', icon: '◫', label: 'Dashboard' }
+const nav: Array<{ key: ViewKey; label: string }> = [
+  { key: 'today', label: 'Meu Dia' },
+  { key: 'tasks', label: 'Tarefas' },
+  { key: 'kanban', label: 'Kanban' },
+  { key: 'calendar', label: 'Calendário' },
+  { key: 'notes', label: 'Anotações' },
+  { key: 'dashboard', label: 'Dashboard' }
 ];
 
 const viewMeta: Record<ViewKey, { title: string; subtitle: string }> = {
@@ -23,11 +24,81 @@ const viewMeta: Record<ViewKey, { title: string; subtitle: string }> = {
   dashboard: { title: 'Dashboard', subtitle: 'Indicadores de produtividade e andamento.' }
 };
 
+function NavIcon({ view }: { view: ViewKey }) {
+  const common = 'h-[18px] w-[18px] shrink-0';
+
+  if (view === 'today') {
+    return (
+      <svg className={common} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="m3 10.5 9-7 9 7M5.5 9.5V20h13V9.5M9 20v-6h6v6" />
+      </svg>
+    );
+  }
+
+  if (view === 'tasks') {
+    return (
+      <svg className={common} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+        <rect x="4" y="4" width="16" height="16" rx="3" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="m8 12 2.5 2.5L16 9" />
+      </svg>
+    );
+  }
+
+  if (view === 'kanban') {
+    return (
+      <svg className={common} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+        <rect x="3.5" y="4" width="5" height="16" rx="2" />
+        <rect x="9.5" y="4" width="5" height="10" rx="2" />
+        <rect x="15.5" y="4" width="5" height="13" rx="2" />
+      </svg>
+    );
+  }
+
+  if (view === 'calendar') {
+    return (
+      <svg className={common} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+        <rect x="3.5" y="5.5" width="17" height="15" rx="3" />
+        <path strokeLinecap="round" d="M7.5 3.5v4M16.5 3.5v4M3.5 9.5h17" />
+      </svg>
+    );
+  }
+
+  if (view === 'notes') {
+    return (
+      <svg className={common} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 4.5h12a2 2 0 0 1 2 2v9L15.5 20H6a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2Z" />
+        <path strokeLinecap="round" d="M8 9h8M8 13h6" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg className={common} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 20V10h4v10H4Zm6 0V4h4v16h-4Zm6 0v-7h4v7h-4Z" />
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <circle cx="11" cy="11" r="6.5" />
+      <path strokeLinecap="round" d="m16 16 4 4" />
+    </svg>
+  );
+}
+
 function syncLabel(state: SyncState): string {
   if (state === 'connecting') return 'Conectando';
   if (state === 'saving') return 'Salvando';
   if (state === 'synced') return 'Sincronizado';
   return 'Somente local';
+}
+
+function syncDotClass(state: SyncState): string {
+  if (state === 'synced') return 'bg-emerald-500';
+  if (state === 'saving' || state === 'connecting') return 'bg-amber-500 animate-pulse';
+  return 'bg-slate-400';
 }
 
 function csvEscape(value: string | number): string {
@@ -69,7 +140,6 @@ export function Layout({
   children: ReactNode;
 }) {
   const meta = viewMeta[activeView];
-  const logoIcon = import.meta.env.BASE_URL + 'brand/ulala-icon.webp';
   const { tasks, notes, replaceWorkspace } = useWorkspace();
   const restoreInputRef = useRef<HTMLInputElement>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
@@ -165,113 +235,151 @@ export function Layout({
     }
   }
 
+  const toolButtonClass =
+    'flex min-h-10 w-full items-center gap-3 rounded-lg px-3 text-left text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white';
+
   const tools = (
     <>
-      <button type="button" onClick={exportCsv}><span>⇩</span><b>Exportar tarefas CSV</b></button>
-      <button type="button" onClick={exportJson}><span>⤓</span><b>Backup completo JSON</b></button>
-      <button type="button" onClick={() => restoreInputRef.current?.click()}><span>⤒</span><b>Restaurar backup</b></button>
-      <button type="button" onClick={onToggleTheme}>
-        <span>{theme === 'dark' ? '☀' : '☾'}</span>
-        <b>{theme === 'dark' ? 'Usar modo claro' : 'Usar modo escuro'}</b>
+      <button type="button" className={toolButtonClass} onClick={exportCsv}><span aria-hidden="true">↓</span><b className="font-medium">Exportar tarefas CSV</b></button>
+      <button type="button" className={toolButtonClass} onClick={exportJson}><span aria-hidden="true">⇩</span><b className="font-medium">Backup completo JSON</b></button>
+      <button type="button" className={toolButtonClass} onClick={() => restoreInputRef.current?.click()}><span aria-hidden="true">↑</span><b className="font-medium">Restaurar backup</b></button>
+      <button type="button" className={toolButtonClass} onClick={onToggleTheme}>
+        <span aria-hidden="true">{theme === 'dark' ? '☀' : '☾'}</span>
+        <b className="font-medium">{theme === 'dark' ? 'Usar modo claro' : 'Usar modo escuro'}</b>
       </button>
     </>
   );
 
   return (
-    <div className={'app-shell ' + (sidebarCollapsed ? 'sidebar-collapsed' : '')}>
+    <div
+      className={
+        sidebarCollapsed
+          ? 'min-h-screen bg-app-bg text-app-text md:grid md:grid-cols-[72px_minmax(0,1fr)] dark:bg-slate-950 dark:text-slate-100'
+          : 'min-h-screen bg-app-bg text-app-text md:grid md:grid-cols-[248px_minmax(0,1fr)] dark:bg-slate-950 dark:text-slate-100'
+      }
+    >
       <input
         ref={restoreInputRef}
-        className="visually-hidden"
+        className="fixed h-px w-px opacity-0 pointer-events-none"
         type="file"
         accept=".json,application/json"
         onChange={restoreBackup}
       />
 
-      <aside className="sidebar">
-        <div className="sidebar-brand">
-          <img
-            src={logoIcon}
-            alt="ULALÁ"
-            className="sidebar-brand-icon"
-          />
-
-          <div className="brand-wordmark">
-            <strong>ulalá</strong>
-            <span>minhas tarefas</span>
-          </div>
+      <aside className="sticky top-0 hidden h-screen min-h-0 flex-col border-r border-slate-200 bg-white px-3 py-4 md:flex dark:border-slate-800 dark:bg-slate-950">
+        <div className={sidebarCollapsed ? 'flex h-14 items-center justify-center' : 'flex h-14 items-center px-2'}>
+          <Brand compact={sidebarCollapsed} subtitle="Productivity" />
         </div>
 
-        <nav className="side-nav" aria-label="Navegação principal">
-          <span className="side-nav-label">ORGANIZAÇÃO</span>
-          {nav.map(item => (
-            <button
-              key={item.key}
-              type="button"
-              title={sidebarCollapsed ? item.label : undefined}
-              className={activeView === item.key ? 'active' : ''}
-              onClick={() => navigate(item.key)}
-            >
-              <span className="nav-icon">{item.icon}</span>
-              <b>{item.label}</b>
-            </button>
-          ))}
+        <nav className="mt-5 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain" aria-label="Navegação principal">
+          {!sidebarCollapsed && (
+            <span className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+              Organização
+            </span>
+          )}
+
+          {nav.map(item => {
+            const active = activeView === item.key;
+            return (
+              <button
+                key={item.key}
+                type="button"
+                title={sidebarCollapsed ? item.label : undefined}
+                aria-current={active ? 'page' : undefined}
+                className={[
+                  'group flex min-h-11 items-center rounded-lg transition-colors',
+                  sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3',
+                  active
+                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-100'
+                ].join(' ')}
+                onClick={() => navigate(item.key)}
+              >
+                <NavIcon view={item.key} />
+                {!sidebarCollapsed && <span className="text-sm font-medium">{item.label}</span>}
+              </button>
+            );
+          })}
+
+          {!sidebarCollapsed && (
+            <details className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-800">
+              <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between rounded-lg px-3 text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-white">
+                <span>Ferramentas</span>
+                <span aria-hidden="true">⌄</span>
+              </summary>
+              <div className="mt-1 grid gap-1">{tools}</div>
+            </details>
+          )}
         </nav>
 
-        <details className="workspace-tools">
-          <summary>
-            <span>⌘</span>
-            <b>Ferramentas</b>
-            <i>⌄</i>
-          </summary>
-          <div className="workspace-tools-list">{tools}</div>
-        </details>
-
-        <div className="sidebar-footer">
-          <div className={'sync-chip sync-' + syncState} title={syncLabel(syncState)}>
-            <i />
-            <span>{syncLabel(syncState)}</span>
+        <div className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-800">
+          <div
+            className={sidebarCollapsed
+              ? 'flex min-h-9 items-center justify-center'
+              : 'flex min-h-9 items-center gap-2 px-3 text-xs text-slate-500 dark:text-slate-400'}
+            title={syncLabel(syncState)}
+          >
+            <span className={'h-2 w-2 shrink-0 rounded-full ' + syncDotClass(syncState)} />
+            {!sidebarCollapsed && <span>{syncLabel(syncState)}</span>}
           </div>
-          <button type="button" onClick={() => void signOut(auth)}>
-            <span>↪</span>
-            <b>Sair da conta</b>
+
+          <button
+            type="button"
+            onClick={() => void signOut(auth)}
+            className={
+              sidebarCollapsed
+                ? 'mt-1 flex min-h-10 w-full items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-white'
+                : 'mt-1 flex min-h-10 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-white'
+            }
+            title="Sair da conta"
+          >
+            <span aria-hidden="true">↪</span>
+            {!sidebarCollapsed && <span>Sair da conta</span>}
           </button>
         </div>
       </aside>
 
-      <main className="main-shell">
-        <header className="topbar">
-          <div className="topbar-left">
+      <main className="min-w-0 bg-app-bg dark:bg-slate-950">
+        <header className="sticky top-0 z-30 flex min-h-[72px] items-center justify-between gap-4 border-b border-slate-200 bg-white/95 px-4 backdrop-blur md:px-7 dark:border-slate-800 dark:bg-slate-950/95">
+          <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
-              className="sidebar-toggle"
+              className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-950 md:flex dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
               onClick={() => setSidebarCollapsed(current => !current)}
               title={sidebarCollapsed ? 'Expandir menu' : 'Recolher menu'}
               aria-label={sidebarCollapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'}
             >
-              <span />
-              <span />
-              <span />
+              <span className="grid gap-1">
+                <span className="block h-[2px] w-4 rounded-full bg-current" />
+                <span className="block h-[2px] w-4 rounded-full bg-current" />
+                <span className="block h-[2px] w-4 rounded-full bg-current" />
+              </span>
             </button>
 
-            <div className="mobile-brand-mark" aria-hidden="true">
-              <img src={logoIcon} alt="" />
+            <div className="md:hidden">
+              <Brand compact />
             </div>
 
-            <div className="topbar-title">
-              <h1>{meta.title}</h1>
-              <p>{meta.subtitle}</p>
+            <div className="min-w-0">
+              <h1 className="truncate text-xl font-semibold tracking-[-0.025em] text-slate-950 md:text-2xl dark:text-white">{meta.title}</h1>
+              <p className="mt-0.5 hidden truncate text-sm text-slate-500 sm:block dark:text-slate-400">{meta.subtitle}</p>
             </div>
           </div>
 
-          <div className="topbar-actions">
-            <label className="global-search">
-              <span>⌕</span>
-              <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Buscar tarefa, projeto, área..." />
+          <div className="flex shrink-0 items-center gap-2">
+            <label className="hidden h-10 w-[min(320px,28vw)] items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-slate-400 transition focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 lg:flex dark:border-slate-700 dark:bg-slate-900 dark:text-slate-500">
+              <SearchIcon />
+              <input
+                value={search}
+                onChange={event => setSearch(event.target.value)}
+                placeholder="Buscar tarefa, projeto, área..."
+                className="min-w-0 flex-1 border-0 bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
+              />
             </label>
 
             <button
               type="button"
-              className="theme-toggle"
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-950 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
               onClick={onToggleTheme}
               title={theme === 'dark' ? 'Usar modo claro' : 'Usar modo escuro'}
               aria-label={theme === 'dark' ? 'Usar modo claro' : 'Usar modo escuro'}
@@ -279,60 +387,113 @@ export function Layout({
               {theme === 'dark' ? '☀' : '☾'}
             </button>
 
-            <button type="button" className="button primary desktop-create" onClick={onCreateTask}>+ Nova tarefa</button>
+            <button
+              type="button"
+              className="hidden h-10 items-center justify-center rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 sm:inline-flex"
+              onClick={onCreateTask}
+            >
+              + Nova tarefa
+            </button>
 
-            <button type="button" className="user-chip" onClick={() => void signOut(auth)} title="Sair da conta">
-              {user.photoURL ? <img src={user.photoURL} alt="" /> : <span>{(user.displayName || 'U').charAt(0)}</span>}
-              <strong>{user.displayName?.split(' ')[0] || 'Conta'}</strong>
+            <button
+              type="button"
+              className="flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white p-1 pr-2 text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+              onClick={() => void signOut(auth)}
+              title="Sair da conta"
+            >
+              {user.photoURL ? (
+                <img src={user.photoURL} alt="" className="h-8 w-8 rounded-md object-cover" />
+              ) : (
+                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-sm font-semibold dark:bg-slate-800">
+                  {(user.displayName || 'U').charAt(0)}
+                </span>
+              )}
+              <strong className="hidden max-w-24 truncate text-sm font-medium md:block">{user.displayName?.split(' ')[0] || 'Conta'}</strong>
             </button>
           </div>
         </header>
 
-        <div className="page-content">{children}</div>
+        <div className="mx-auto w-full max-w-[1440px] px-3 pb-24 pt-5 sm:px-5 md:px-7 md:pt-7">
+          {children}
+        </div>
       </main>
 
-      <nav className="mobile-nav" aria-label="Navegação mobile">
-        {nav.slice(0, 4).map(item => (
-          <button
-            key={item.key}
-            type="button"
-            className={activeView === item.key ? 'active' : ''}
-            onClick={() => navigate(item.key)}
-          >
-            <span>{item.icon}</span>
-            <small>{item.label}</small>
-          </button>
-        ))}
+      <nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-slate-200 bg-white/95 px-1 pb-[max(6px,env(safe-area-inset-bottom))] pt-1 backdrop-blur md:hidden dark:border-slate-800 dark:bg-slate-950/95" aria-label="Navegação mobile">
+        {nav.slice(0, 4).map(item => {
+          const active = activeView === item.key;
+          return (
+            <button
+              key={item.key}
+              type="button"
+              className={active
+                ? 'flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg text-indigo-600 dark:text-indigo-400'
+                : 'flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg text-slate-500 dark:text-slate-400'}
+              onClick={() => navigate(item.key)}
+            >
+              <NavIcon view={item.key} />
+              <small className="text-[11px] font-medium">{item.label}</small>
+            </button>
+          );
+        })}
+
         <button
           type="button"
-          className={mobileMoreOpen || activeView === 'notes' || activeView === 'dashboard' ? 'active' : ''}
+          className={mobileMoreOpen || activeView === 'notes' || activeView === 'dashboard'
+            ? 'flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg text-indigo-600 dark:text-indigo-400'
+            : 'flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg text-slate-500 dark:text-slate-400'}
           onClick={() => setMobileMoreOpen(true)}
         >
-          <span>•••</span>
-          <small>Mais</small>
+          <span className="text-lg leading-none" aria-hidden="true">•••</span>
+          <small className="text-[11px] font-medium">Mais</small>
         </button>
       </nav>
 
-      <button className="mobile-fab" type="button" onClick={onCreateTask} aria-label="Nova tarefa">+</button>
+      <button
+        type="button"
+        className="fixed bottom-20 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 text-2xl font-light text-white shadow-lg shadow-indigo-600/20 sm:hidden"
+        onClick={onCreateTask}
+        aria-label="Nova tarefa"
+      >
+        +
+      </button>
 
       {mobileMoreOpen && (
-        <div className="mobile-more-backdrop" onMouseDown={event => event.target === event.currentTarget && setMobileMoreOpen(false)}>
-          <section className="mobile-more-sheet">
-            <div className="mobile-sheet-handle" />
-            <header>
-              <div><span>ULALÁ</span><h3>Mais opções</h3></div>
-              <button type="button" onClick={() => setMobileMoreOpen(false)}>×</button>
+        <div
+          className="fixed inset-0 z-[70] flex items-end bg-slate-950/35 backdrop-blur-sm md:hidden"
+          onMouseDown={event => event.target === event.currentTarget && setMobileMoreOpen(false)}
+        >
+          <section className="max-h-[80vh] w-full overflow-y-auto rounded-t-2xl border-t border-slate-200 bg-white p-4 shadow-2xl dark:border-slate-800 dark:bg-slate-950">
+            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-200 dark:bg-slate-700" />
+
+            <header className="mb-4 flex items-center justify-between gap-3">
+              <Brand subtitle="Mais opções" />
+              <button
+                type="button"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-lg text-slate-500 dark:bg-slate-900 dark:text-slate-400"
+                onClick={() => setMobileMoreOpen(false)}
+                aria-label="Fechar"
+              >
+                ×
+              </button>
             </header>
 
-            <div className="mobile-more-navigation">
-              <button type="button" onClick={() => navigate('notes')}><span>✎</span><b>Anotações</b></button>
-              <button type="button" onClick={() => navigate('dashboard')}><span>◫</span><b>Dashboard</b></button>
+            <div className="grid grid-cols-2 gap-2">
+              <button type="button" className="flex min-h-14 items-center gap-3 rounded-xl border border-slate-200 px-4 text-left text-sm font-medium text-slate-700 dark:border-slate-800 dark:text-slate-200" onClick={() => navigate('notes')}>
+                <NavIcon view="notes" /> Anotações
+              </button>
+              <button type="button" className="flex min-h-14 items-center gap-3 rounded-xl border border-slate-200 px-4 text-left text-sm font-medium text-slate-700 dark:border-slate-800 dark:text-slate-200" onClick={() => navigate('dashboard')}>
+                <NavIcon view="dashboard" /> Dashboard
+              </button>
             </div>
 
-            <div className="mobile-tools-title">FERRAMENTAS</div>
-            <div className="mobile-tools-list">{tools}</div>
+            <div className="my-4 border-t border-slate-200 dark:border-slate-800" />
+            <div className="grid gap-1">{tools}</div>
 
-            <button type="button" className="mobile-logout" onClick={() => void signOut(auth)}>
+            <button
+              type="button"
+              className="mt-4 min-h-11 w-full rounded-lg border border-red-200 bg-red-50 px-4 text-sm font-semibold text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-300"
+              onClick={() => void signOut(auth)}
+            >
               Sair da conta
             </button>
           </section>
