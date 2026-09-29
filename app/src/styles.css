@@ -1,30 +1,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
 @import "tailwindcss";
+@import "./variables.css";
 @import "./theme.css";
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 :root {
-  font-family: 'Manrope', system-ui, sans-serif;
-  color: #2d333a;
-  background: #f8f6f3;
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background: var(--color-bg-page);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --bg: #f8f6f3;
-  --panel: #ffffff;
-  --soft: #faf8f6;
-  --border: #e7e0dc;
-  --text: #2d333a;
-  --muted: #777477;
-  --navy: #294359;
-  --navy-2: #355b73;
-  --denim: #7692aa;
-  --coral: #d86b7d;
-  --coral-dark: #b95669;
-  --green: #5d9879;
-  --amber: #c78c50;
-  --purple: #8e789f;
-  --shadow: 0 12px 30px rgba(47, 57, 66, .07);
+
+  /* Aliases temporários para o CSS legado durante a migração */
+  --bg: var(--color-bg-page);
+  --panel: var(--color-surface);
+  --soft: var(--color-bg-subtle);
+  --border: var(--color-border);
+  --text: var(--color-text-primary);
+  --muted: var(--color-text-secondary);
+  --navy: var(--color-sidebar-bg);
+  --navy-2: var(--color-sidebar-hover);
+  --denim: var(--color-primary);
+  --coral: var(--color-primary);
+  --coral-dark: var(--color-primary-hover);
+  --green: var(--color-success);
+  --amber: var(--color-warning);
+  --purple: var(--color-primary);
+  --shadow: var(--shadow-sm);
 }
 
 * { box-sizing: border-box; }
@@ -1773,5 +1777,366 @@ html[data-theme='light'] .login-main-brand {
   .login-brand-showcase::before,
   .sidebar-brand-icon {
     transition: none !important;
+  }
+}
+
+
+/* ===== DESIGN SYSTEM FOUNDATION V12 ===== */
+html {
+  background: var(--color-bg-page);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--color-text-primary);
+  font-family: var(--font-family-sans);
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.02em;
+}
+
+.main-shell {
+  background: var(--color-bg-page);
+}
+
+.page-content {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 32px 32px 96px;
+}
+
+/* Superfícies SaaS: discretas, sem sombras pesadas */
+.surface,
+.task-card,
+.note-card,
+.kanban-card,
+.task-modal,
+.note-modal {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+}
+
+.surface:hover,
+.task-card:hover,
+.note-card:hover,
+.kanban-card:hover {
+  border-color: var(--color-border-strong);
+}
+
+/* Topbar */
+.topbar {
+  min-height: var(--header-height);
+  padding: 14px 28px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.topbar-title h1 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.topbar-title p {
+  margin: 4px 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+.global-search {
+  min-height: 42px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  box-shadow: none;
+}
+
+.global-search:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.global-search input {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.global-search input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.user-chip,
+.sidebar-toggle,
+.theme-toggle {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  box-shadow: none;
+}
+
+.user-chip strong {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Sidebar sólida e menos pesada */
+.sidebar {
+  background: var(--color-sidebar-bg);
+  color: var(--color-sidebar-text);
+  border-right: 1px solid var(--color-sidebar-border);
+  box-shadow: none;
+}
+
+.side-nav-label {
+  color: var(--color-sidebar-text-muted);
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.08em;
+}
+
+.side-nav button {
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  color: var(--color-sidebar-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.side-nav button:hover {
+  background: var(--color-sidebar-hover);
+  color: var(--color-sidebar-text);
+}
+
+.side-nav button.active {
+  background: var(--color-sidebar-hover);
+  color: var(--color-sidebar-text);
+  box-shadow: inset 3px 0 0 var(--color-primary-400);
+}
+
+.workspace-tools {
+  border-color: var(--color-sidebar-border);
+  background: transparent;
+}
+
+.workspace-tools summary,
+.workspace-tools-list button,
+.sidebar-footer > button,
+.sync-chip {
+  color: var(--color-sidebar-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.workspace-tools-list button:hover,
+.sidebar-footer > button:hover {
+  background: var(--color-sidebar-hover);
+  color: var(--color-sidebar-text);
+}
+
+/* Botões */
+.button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  box-shadow: none;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.button.primary {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  box-shadow: var(--shadow-xs);
+}
+
+.button.primary:hover {
+  border-color: var(--color-primary-hover);
+  background: var(--color-primary-hover);
+}
+
+.button.primary:active {
+  border-color: var(--color-primary-active);
+  background: var(--color-primary-active);
+}
+
+.button.primary:focus-visible,
+.button.ghost:focus-visible,
+.button.danger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.button.ghost {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+.button.ghost:hover {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+}
+
+.button.danger {
+  border-color: transparent;
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+/* Escala de leitura: elimina textos excessivamente pequenos */
+.eyebrow {
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.08em;
+}
+
+.section-head h3,
+.chart-card header h3,
+.recent-card header h3 {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.task-card-main > strong,
+.kanban-card-main strong,
+.note-card strong,
+.upcoming-list strong {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.task-meta,
+.kanban-card-main small,
+.note-card p,
+.note-card small,
+.upcoming-list small,
+.list-summary {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.priority,
+.status {
+  min-height: 22px;
+  padding: 0 8px;
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+}
+
+.count-badge,
+.date-chip {
+  font-size: var(--font-size-xs);
+}
+
+/* Campos */
+.field > span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.02em;
+}
+
+.field input,
+.field select,
+.field textarea,
+.task-controls select,
+.kanban-card select {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus,
+.task-controls select:focus,
+.kanban-card select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+/* Light/Dark seguem os mesmos tokens sem duplicar paleta */
+html[data-theme='dark'] body,
+html[data-theme='dark'] .main-shell {
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+}
+
+html[data-theme='dark'] .topbar,
+html[data-theme='dark'] .surface,
+html[data-theme='dark'] .task-card,
+html[data-theme='dark'] .note-card,
+html[data-theme='dark'] .kanban-card,
+html[data-theme='dark'] .task-modal,
+html[data-theme='dark'] .note-modal,
+html[data-theme='dark'] .global-search,
+html[data-theme='dark'] .user-chip,
+html[data-theme='dark'] .sidebar-toggle,
+html[data-theme='dark'] .theme-toggle {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+html[data-theme='dark'] .sidebar {
+  background: var(--color-sidebar-bg);
+}
+
+@media (max-width: 760px) {
+  .page-content {
+    padding: 16px 12px 92px;
+  }
+
+  .topbar {
+    min-height: 64px;
+    padding: 10px 12px;
+  }
+
+  .topbar-title h1 {
+    font-size: var(--font-size-xl);
   }
 }
