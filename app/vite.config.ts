@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['logo-ulala.webp'],
+      includeAssets: ['brand/ulala-icon.webp', 'brand/ulala-logo-full.webp'],
       manifest: {
         name: 'ULALÁ',
         short_name: 'ULALÁ',
@@ -19,8 +19,8 @@ export default defineConfig({
         start_url: '/aplicativo_tarefas_lala/',
         icons: [
           {
-            src: 'logo-ulala.webp',
-            sizes: '1254x1254',
+            src: 'brand/ulala-icon.webp',
+            sizes: '180x180',
             type: 'image/webp',
             purpose: 'any maskable'
           }
