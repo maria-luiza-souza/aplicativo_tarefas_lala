@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['brand/ulala-mark.svg'],
+      includeAssets: ['brand/ulala-icon.webp', 'brand/ulala-logo-full.webp'],
       manifest: {
         name: 'ULALÁ',
         short_name: 'ULALÁ',
@@ -21,9 +21,9 @@ export default defineConfig({
         start_url: '/aplicativo_tarefas_lala/',
         icons: [
           {
-            src: 'brand/ulala-mark.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
+            src: 'brand/ulala-icon.webp',
+            sizes: '240x240',
+            type: 'image/webp',
             purpose: 'any maskable'
           }
         ]
