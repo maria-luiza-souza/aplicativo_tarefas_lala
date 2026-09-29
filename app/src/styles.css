@@ -1512,3 +1512,262 @@ html[data-theme='dark'] .note-card {
     transition: none !important;
   }
 }
+
+
+/* ===== BRAND SYSTEM V11 — NOVA ARTE ULALÁ ===== */
+.login-card {
+  width: min(470px, 100%);
+  padding: 26px 30px 30px;
+}
+
+.login-brand-showcase {
+  position: relative;
+  width: min(330px, 78vw);
+  margin: 0 auto 18px;
+  padding: 7px;
+  border: 1px solid rgba(216,107,125,.13);
+  border-radius: 31px;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.92),rgba(248,244,242,.80));
+  box-shadow:
+    0 22px 48px rgba(35,46,55,.13),
+    0 0 0 1px rgba(255,255,255,.58) inset;
+  isolation: isolate;
+  transition:
+    transform .28s cubic-bezier(.2,.8,.2,1),
+    box-shadow .28s ease,
+    border-color .28s ease;
+}
+
+.login-brand-showcase::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 12% 9% -7%;
+  border-radius: 34px;
+  background: rgba(216,107,125,.14);
+  filter: blur(24px);
+  opacity: .55;
+  transition: opacity .28s ease, transform .28s ease;
+}
+
+.login-brand-showcase:hover {
+  transform: translateY(-3px);
+  border-color: rgba(216,107,125,.28);
+  box-shadow:
+    0 28px 58px rgba(35,46,55,.17),
+    0 0 0 1px rgba(255,255,255,.68) inset;
+}
+
+.login-brand-showcase:hover::before {
+  opacity: .78;
+  transform: scale(1.02);
+}
+
+.login-main-brand {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 25px;
+  background: #111315;
+  box-shadow: 0 8px 20px rgba(0,0,0,.14);
+}
+
+.login-brand-status {
+  position: absolute;
+  left: 50%;
+  bottom: -13px;
+  transform: translateX(-50%);
+  min-width: max-content;
+  padding: 6px 11px;
+  border: 1px solid #eee5e2;
+  border-radius: 999px;
+  background: rgba(255,255,255,.96);
+  color: #7e7378;
+  box-shadow: 0 7px 18px rgba(40,47,52,.08);
+  font-size: 6.5px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+
+.login-card > p {
+  margin-top: 25px;
+}
+
+/* Sidebar: ícone real da nova marca, sem efeitos artificiais */
+.sidebar-brand {
+  gap: 11px;
+  min-height: 72px;
+  padding: 4px 5px 15px;
+}
+
+.sidebar-brand-icon {
+  width: 55px;
+  height: 55px;
+  flex: 0 0 55px;
+  display: block;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 17px;
+  background: #111315;
+  box-shadow:
+    0 10px 22px rgba(8,25,38,.22),
+    0 0 0 1px rgba(255,255,255,.04) inset;
+  transition:
+    transform .22s ease,
+    box-shadow .22s ease,
+    border-color .22s ease;
+}
+
+.sidebar-brand:hover .sidebar-brand-icon {
+  transform: translateY(-1px) scale(1.025);
+  border-color: rgba(241,77,143,.40);
+  box-shadow:
+    0 13px 26px rgba(8,25,38,.26),
+    0 0 0 3px rgba(241,77,143,.07);
+}
+
+.brand-wordmark strong {
+  color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 23px;
+  font-weight: 800;
+  line-height: .95;
+  letter-spacing: -.07em;
+}
+
+.brand-wordmark span {
+  margin-top: 6px;
+  color: #f3a6c3;
+  font-size: 6.5px;
+  font-weight: 800;
+  letter-spacing: .20em;
+  text-transform: uppercase;
+}
+
+/* Retira qualquer resíduo visual da identidade anterior */
+.brand-emblem,
+.login-brand-emblem,
+.brand-mark,
+.brand-orbit,
+.brand-music-note,
+.login-brand-copy {
+  display: none !important;
+}
+
+.app-shell.sidebar-collapsed .sidebar-brand-icon {
+  width: 46px;
+  height: 46px;
+  flex-basis: 46px;
+  border-radius: 14px;
+}
+
+.app-shell.sidebar-collapsed .sidebar-brand {
+  min-height: 62px;
+}
+
+/* Mini marca do topo mobile */
+.mobile-brand-mark {
+  overflow: hidden;
+  padding: 3px;
+  border-radius: 12px;
+  background: #111315;
+  border: 1px solid rgba(216,107,125,.18);
+}
+
+.mobile-brand-mark img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 9px;
+  transform: none;
+}
+
+/* Integração com modo escuro */
+html[data-theme='dark'] .login-brand-showcase {
+  border-color: rgba(241,77,143,.20);
+  background:
+    linear-gradient(145deg,rgba(28,38,47,.94),rgba(19,27,34,.90));
+  box-shadow:
+    0 26px 58px rgba(0,0,0,.30),
+    0 0 0 1px rgba(255,255,255,.035) inset;
+}
+
+html[data-theme='dark'] .login-brand-showcase::before {
+  background: rgba(241,77,143,.16);
+}
+
+html[data-theme='dark'] .login-brand-status {
+  border-color: #35414a;
+  background: rgba(24,33,41,.96);
+  color: #b8c2c9;
+  box-shadow: 0 7px 18px rgba(0,0,0,.18);
+}
+
+html[data-theme='dark'] .sidebar-brand-icon {
+  border-color: rgba(255,255,255,.13);
+}
+
+html[data-theme='dark'] .mobile-brand-mark {
+  background: #101417;
+  border-color: rgba(241,77,143,.24);
+}
+
+/* A arte já contém fundo escuro e deve continuar intacta nos dois temas */
+html[data-theme='dark'] .login-main-brand,
+html[data-theme='light'] .login-main-brand {
+  filter: none;
+}
+
+@media (max-width: 760px) {
+  .login-card {
+    padding: 22px 18px 25px;
+  }
+
+  .login-brand-showcase {
+    width: min(300px, 78vw);
+    border-radius: 27px;
+  }
+
+  .login-main-brand {
+    border-radius: 22px;
+  }
+
+  .login-brand-status {
+    font-size: 6px;
+    letter-spacing: .10em;
+  }
+
+  .mobile-brand-mark {
+    width: 38px;
+    height: 38px;
+    padding: 3px;
+  }
+
+  .mobile-brand-mark img {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+@media (max-height: 720px) and (max-width: 760px) {
+  .login-brand-showcase {
+    width: min(235px, 62vw);
+  }
+
+  .login-card > p {
+    margin-top: 20px;
+    margin-bottom: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-brand-showcase,
+  .login-brand-showcase::before,
+  .sidebar-brand-icon {
+    transition: none !important;
+  }
+}
