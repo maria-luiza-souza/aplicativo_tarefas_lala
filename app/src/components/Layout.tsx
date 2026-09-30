@@ -5,6 +5,7 @@ import { auth } from '../firebase';
 import type { Note, SyncState, Task, ViewKey } from '../types';
 import { useWorkspace } from '../workspace';
 import { Brand } from './Brand';
+import { Sidebar } from './Sidebar';
 
 const nav: Array<{ key: ViewKey; label: string }> = [
   { key: 'today', label: 'Meu Dia' },
@@ -86,19 +87,6 @@ function SearchIcon() {
       <path strokeLinecap="round" d="m16 16 4 4" />
     </svg>
   );
-}
-
-function syncLabel(state: SyncState): string {
-  if (state === 'connecting') return 'Conectando';
-  if (state === 'saving') return 'Salvando';
-  if (state === 'synced') return 'Sincronizado';
-  return 'Somente local';
-}
-
-function syncDotClass(state: SyncState): string {
-  if (state === 'synced') return 'bg-emerald-500';
-  if (state === 'saving' || state === 'connecting') return 'bg-amber-500 animate-pulse';
-  return 'bg-slate-400';
 }
 
 function csvEscape(value: string | number): string {
@@ -266,78 +254,14 @@ export function Layout({
         onChange={restoreBackup}
       />
 
-      <aside className="sticky top-0 hidden h-screen min-h-0 flex-col border-r border-slate-200 bg-white px-3 py-4 md:flex dark:border-slate-800 dark:bg-slate-950">
-        <div className={sidebarCollapsed ? 'flex h-14 items-center justify-center' : 'flex h-14 items-center px-2'}>
-          <Brand compact={sidebarCollapsed} subtitle="Productivity" />
-        </div>
-
-        <nav className="mt-5 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain" aria-label="Navegação principal">
-          {!sidebarCollapsed && (
-            <span className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-              Organização
-            </span>
-          )}
-
-          {nav.map(item => {
-            const active = activeView === item.key;
-            return (
-              <button
-                key={item.key}
-                type="button"
-                title={sidebarCollapsed ? item.label : undefined}
-                aria-current={active ? 'page' : undefined}
-                className={[
-                  'group flex min-h-11 items-center rounded-lg transition-colors',
-                  sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-3',
-                  active
-                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-100'
-                ].join(' ')}
-                onClick={() => navigate(item.key)}
-              >
-                <NavIcon view={item.key} />
-                {!sidebarCollapsed && <span className="text-sm font-medium">{item.label}</span>}
-              </button>
-            );
-          })}
-
-          {!sidebarCollapsed && (
-            <details className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-800">
-              <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between rounded-lg px-3 text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-white">
-                <span>Ferramentas</span>
-                <span aria-hidden="true">⌄</span>
-              </summary>
-              <div className="mt-1 grid gap-1">{tools}</div>
-            </details>
-          )}
-        </nav>
-
-        <div className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-800">
-          <div
-            className={sidebarCollapsed
-              ? 'flex min-h-9 items-center justify-center'
-              : 'flex min-h-9 items-center gap-2 px-3 text-xs text-slate-500 dark:text-slate-400'}
-            title={syncLabel(syncState)}
-          >
-            <span className={'h-2 w-2 shrink-0 rounded-full ' + syncDotClass(syncState)} />
-            {!sidebarCollapsed && <span>{syncLabel(syncState)}</span>}
-          </div>
-
-          <button
-            type="button"
-            onClick={() => void signOut(auth)}
-            className={
-              sidebarCollapsed
-                ? 'mt-1 flex min-h-10 w-full items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-white'
-                : 'mt-1 flex min-h-10 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-white'
-            }
-            title="Sair da conta"
-          >
-            <span aria-hidden="true">↪</span>
-            {!sidebarCollapsed && <span>Sair da conta</span>}
-          </button>
-        </div>
-      </aside>
+      <Sidebar
+        activeView={activeView}
+        onNavigate={navigate}
+        collapsed={sidebarCollapsed}
+        syncState={syncState}
+        tools={tools}
+        onLogout={() => void signOut(auth)}
+      />
 
       <main className="min-w-0 bg-app-bg dark:bg-slate-950">
         <header className="sticky top-0 z-30 flex min-h-[72px] items-center justify-between gap-4 border-b border-slate-200 bg-white/95 px-4 backdrop-blur md:px-7 dark:border-slate-800 dark:bg-slate-950/95">
